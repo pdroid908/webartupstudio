@@ -167,7 +167,7 @@ export default function Home() {
             </p>
             
             <a href={currentItem.link} target="_blank" className="w-full md:w-max bg-blue-600 hover:bg-blue-500 text-center text-white px-10 py-4 rounded-2xl font-black text-xs md:text-sm active:scale-95 transition-all shadow-lg uppercase tracking-widest">
-              📥 Download {activeTab === 'games' ? 'Game' : 'Bot'}
+              📥 Download 
             </a>
 
             {/* Gallery (Hanya muncul jika ada screenshots) */}
