@@ -100,7 +100,7 @@ export default function Home() {
         </div>
 
         {/* BAWAH: DONASI & INFO (Hanya muncul di Sidebar Laptop) */}
-        <div className="hidden md:flex flex-col gap-4 mt-auto bg-slate-900">
+        <div className="hidden md:flex flex-col gap-4 mt-auto ">
             <div className="space-y-2 bg-slate-900/50 p-3 rounded-2xl border border-slate-800">
               <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-1">Support Me</p>
               <a href="https://paypal.me/put98" target="_blank" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -185,7 +185,7 @@ export default function Home() {
         </div>
 
         {/* --- FOOTER MOBILE (Donasi muncul di sini saat di HP) --- */}
-        <div className="md:hidden mt-10 pt-8 border-t border-slate-900 flex flex-col items-center gap-6 pb-20">
+        <div className="md:hidden mt-10 p-6 bg-slate-900/90 backdrop-blur-md rounded-[2.5rem] border border-slate-800 shadow-2xl">
           <div className="flex flex-col items-center gap-2">
              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Support My Work</p>
              <div className="flex gap-4">
