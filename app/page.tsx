@@ -185,22 +185,26 @@ export default function Home() {
         </div>
 
         {/* --- FOOTER MOBILE (Donasi muncul di sini saat di HP) --- */}
-        <div className="md:hidden mt-10 p-6 bg-slate-900/90 backdrop-blur-md rounded-[2.5rem] border border-slate-800 shadow-2xl">
-          <div className="flex flex-col items-center gap-2">
-             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Support My Work</p>
-             <div className="flex gap-4">
-                <a href="https://paypal.me/put98" className="text-xs font-bold text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg border border-blue-500/20">PayPal</a>
-                <div className="text-xs font-bold text-purple-400 bg-purple-500/10 px-4 py-2 rounded-lg border border-purple-500/20">OVO: 081328343908</div>
-             </div>
-          </div>
-          <div className="flex gap-8">
-            <a href="/privacy" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Privacy</a>
-            <a href="mailto:p1998nr@gmail.com" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Contact</a>
-          </div>
-          <p className="text-[9px] text-slate-700 font-mono text-center tracking-widest uppercase">
-            Artup Studio &copy; 2026<br/>Honest and pure heart
-          </p>
-        </div>
+        <div className="w-full flex flex-row justify-center items-center gap-8 mt-6">
+  
+  <a href="/privacy" className="text-[10px] font-bold text-slate-500 hover:text-blue-400 uppercase tracking-[0.15em] transition-colors">
+    Privacy Policy
+  </a>
+
+  {/* Garis Pembatas Kecil (Opsional agar lebih manis) */}
+  <div className="h-3 w-[1px] bg-slate-800"></div>
+
+  <a href="mailto:p1998nr@gmail.com" className="text-[10px] font-bold text-slate-500 hover:text-blue-400 uppercase tracking-[0.15em] transition-colors">
+    Contact Support
+  </a>
+  
+</div>
+
+{/* COPYRIGHT DI BAWAHNYA */}
+<p className="text-[8px] text-slate-700 font-mono text-center tracking-[0.2em] uppercase mt-4 leading-relaxed">
+  Artup Studio &copy; 2026<br/>
+  Honest and pure heart
+</p>
 
       </section>
     </main>
