@@ -64,7 +64,7 @@ export default function Home() {
           muted={isMuted} 
           loop 
           playsInline 
-          className="w-full h-full object-cover opacity-30"
+          className="w-full h-full object-cover opacity-100"
         >
           <source src="videomiku.mp4" type="video/mp4" />
         </video>
