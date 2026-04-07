@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 // --- DATA GAMES (DOWNLOADABLE) ---
 const MY_GAMES = [
@@ -24,7 +24,7 @@ const MY_GAMES = [
   }
 ];
 
-// --- DATA WEB GAMES (PLAYABLE IN BROWSER) ---
+// --- DATA WEB GAMES ---
 const WEB_GAMES = [
   {
     id: "block-fight-web",
@@ -51,14 +51,12 @@ const MY_BOTS = [
 ];
 
 export default function Home() {
-  const [inputText, setInputText] = useState("");
   const [activeTab, setActiveTab] = useState('games');
   const [activeGameId, setActiveGameId] = useState(MY_GAMES[0].id);
   const [activeWebId, setActiveWebId] = useState(WEB_GAMES[0].id);
   const [activeBotId, setActiveBotId] = useState(MY_BOTS[0].id);
   const [isMuted, setIsMuted] = useState(true);
   const [showIframe, setShowIframe] = useState(false);
-  const [copyStatus, setCopyStatus] = useState(false);
 
   // Logika Data Dinamis
   const currentItems = 
@@ -72,21 +70,6 @@ export default function Home() {
     activeBotId;
 
   const currentItem = currentItems.find(item => item.id === currentActiveId) || currentItems[0];
-
-  // PERBAIKAN: Fungsi Input yang lebih stabil untuk HP
-  const handleMobileInput = (text: string) => {
-    setInputText(text);
-    
-    // Auto-Copy ke Clipboard (Solusi Utama HP)
-    if (text.length > 0 && navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(() => {
-        setCopyStatus(true);
-        setTimeout(() => setCopyStatus(false), 2000);
-      }).catch(() => {
-        // Fallback jika browser memblokir auto-copy
-      });
-    }
-  };
 
   const handleItemClick = (id: string) => {
     if (activeTab === 'games') setActiveGameId(id);
@@ -159,10 +142,7 @@ export default function Home() {
             target="_blank"
             className="w-full px-4 py-2.5 rounded-xl font-bold text-[10px] md:text-xs transition-all bg-green-600/10 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white flex items-center justify-center gap-2"
           >
-            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
-            <span>Hire Me</span>
+            Hire Me
           </a>
         </div>
 
@@ -247,45 +227,10 @@ export default function Home() {
               )}
             </div>
 
-            {/* PERBAIKAN: Area Iframe dengan Keyboard Bridge yang lebih kuat */}
+            {/* AREA IFRAME (Full Screen Game Focus) */}
             {showIframe && activeTab === 'web' && (
               <div className="mt-6 flex flex-col items-center w-full relative animate-in fade-in zoom-in duration-300">
-                
-                {/* --- MOBILE KEYBOARD HELPER --- */}
-                <div className="w-full max-w-[450px] mb-6 p-4 bg-purple-900/10 border border-purple-500/30 rounded-2xl shadow-xl">
-                  <div className="flex justify-between items-center mb-2 px-1">
-                    <label className="text-[10px] font-bold text-purple-400 uppercase tracking-widest italic">
-                      Mobile Input Bridge
-                    </label>
-                    {copyStatus && (
-                      <span className="text-[9px] font-bold text-green-400 animate-pulse">READY TO PASTE!</span>
-                    )}
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <input 
-                      type="text"
-                      inputMode="text" // Memastikan keyboard teks muncul di HP
-                      placeholder="Type text here..."
-                      className="flex-1 bg-slate-900 border-2 border-slate-800 focus:border-purple-500 p-4 rounded-xl text-white outline-none transition-all placeholder:text-slate-600 text-sm"
-                      value={inputText}
-                      onChange={(e) => handleMobileInput(e.target.value)}
-                    />
-                    
-                    <button 
-                      onClick={() => handleMobileInput(inputText)}
-                      className="bg-purple-600 hover:bg-purple-500 px-4 rounded-xl font-bold text-[10px] transition-transform active:scale-90 flex items-center justify-center min-w-[60px]"
-                    >
-                      {copyStatus ? "✔️" : "COPY"}
-                    </button>
-                  </div>
-                  
-                  <p className="text-[9px] text-slate-500 mt-3 italic text-center leading-tight">
-                    Ketik di atas, lalu klik <span className="text-purple-400 font-bold">COPY</span> dan <span className="text-purple-400 font-bold underline">Paste</span> di kolom game.
-                  </p>
-                </div>
-
-                <div className="w-full max-w-[450px] aspect-[720/1100] relative rounded-3xl overflow-hidden border-4 border-slate-900 shadow-2xl bg-black">
+                <div className="w-full max-w-[800px] aspect-video relative rounded-3xl overflow-hidden border-4 border-slate-900 shadow-2xl bg-black">
                   <iframe 
                     src={(currentItem as any).embedUrl} 
                     allowFullScreen
@@ -295,10 +240,7 @@ export default function Home() {
                 </div>
                 
                 <button 
-                  onClick={() => {
-                    setShowIframe(false);
-                    setInputText("");
-                  }}
+                  onClick={() => setShowIframe(false)}
                   className="mt-6 px-10 py-3 bg-red-500/10 border border-red-500/20 rounded-full text-[10px] text-red-400 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest transition-all"
                 >
                   × Close Session
@@ -306,7 +248,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Gallery */}
+            {/* Gallery Section */}
             {currentItem.screenshots && currentItem.screenshots.length > 0 && (
               <div className="mt-6">
                 <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mb-4">Gallery Preview</p>
