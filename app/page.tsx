@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // --- DATA GAMES (DOWNLOADABLE) ---
 const MY_GAMES = [
@@ -51,12 +51,14 @@ const MY_BOTS = [
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('games'); // 'games', 'web', atau 'bots'
+  const [inputText, setInputText] = useState("");
+  const [activeTab, setActiveTab] = useState('games');
   const [activeGameId, setActiveGameId] = useState(MY_GAMES[0].id);
   const [activeWebId, setActiveWebId] = useState(WEB_GAMES[0].id);
   const [activeBotId, setActiveBotId] = useState(MY_BOTS[0].id);
   const [isMuted, setIsMuted] = useState(true);
   const [showIframe, setShowIframe] = useState(false);
+  const [copyStatus, setCopyStatus] = useState(false);
 
   // Logika Data Dinamis
   const currentItems = 
@@ -71,18 +73,37 @@ export default function Home() {
 
   const currentItem = currentItems.find(item => item.id === currentActiveId) || currentItems[0];
 
+  // FUNGSI KRITIKAL: Kirim ke Godot + Auto Copy untuk HP
+  const handleMobileInput = (text: string) => {
+    setInputText(text);
+    
+    // 1. Kirim via postMessage (Jika suatu saat kamu tambah listener di Godot)
+    const iframe = document.querySelector('iframe');
+    if (iframe && iframe.contentWindow) {
+      (iframe.contentWindow as any).postMessage({ type: 'input', value: text }, '*');
+    }
+
+    // 2. Auto-Copy ke Clipboard (Solusi Utama HP tanpa edit Godot)
+    if (text.length > 0 && navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopyStatus(true);
+        setTimeout(() => setCopyStatus(false), 2000);
+      }).catch(() => {});
+    }
+  };
+
   const handleItemClick = (id: string) => {
     if (activeTab === 'games') setActiveGameId(id);
     else if (activeTab === 'web') {
       setActiveWebId(id);
-      setShowIframe(false); // Reset iframe saat ganti game web
+      setShowIframe(false);
     }
     else setActiveBotId(id);
   };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setShowIframe(false); // Sembunyikan iframe saat pindah tab
+    setShowIframe(false);
   };
 
   return (
@@ -116,7 +137,6 @@ export default function Home() {
         <div>
           <h2 className="text-xl font-black text-blue-500 mb-4 md:mb-6 italic tracking-tighter uppercase">Artup STUDIO</h2>
           
-          {/* Navigasi Utama */}
           <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide mb-4">
             <button 
               onClick={() => handleTabChange('games')}
@@ -138,7 +158,6 @@ export default function Home() {
             </button>
           </nav>
 
-          {/* Tombol WhatsApp Dipisah agar tidak mengganggu scroll tab */}
           <a 
             href="https://wa.me/6281328343908?text=Hello%20Artup%20Studio" 
             target="_blank"
@@ -217,7 +236,6 @@ export default function Home() {
               {currentItem.descFull}
             </p>
             
-            {/* TOMBOL AKSI (PLAY ATAU DOWNLOAD) */}
             <div className="flex flex-col md:flex-row gap-4 items-center">
               {activeTab === 'web' ? (
                 <button 
@@ -235,19 +253,49 @@ export default function Home() {
 
             {/* AREA IFRAME (Khusus Web Games) */}
             {showIframe && activeTab === 'web' && (
-              <div className="mt-6 flex flex-col items-center w-full">
+              <div className="mt-6 flex flex-col items-center w-full relative animate-in fade-in zoom-in duration-300">
+                
+                {/* --- MOBILE KEYBOARD BRIDGE --- */}
+                <div className="w-full max-w-[450px] mb-6 p-4 bg-purple-900/10 border border-purple-500/30 rounded-2xl shadow-xl">
+                  <div className="flex justify-between items-center mb-2 px-1">
+                    <label className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">
+                      Input Bridge (Mobile)
+                    </label>
+                    {copyStatus && (
+                      <span className="text-[9px] font-bold text-green-400 animate-bounce">COPIED!</span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <input 
+                      type="text"
+                      placeholder="Type ID / Password here..."
+                      className="w-full bg-slate-900 border-2 border-slate-800 focus:border-purple-500 p-4 rounded-xl text-white outline-none transition-all placeholder:text-slate-600"
+                      value={inputText}
+                      onChange={(e) => handleMobileInput(e.target.value)}
+                    />
+                  </div>
+                  <p className="text-[9px] text-slate-500 mt-3 italic text-center leading-tight">
+                    Keyboard tak muncul? Ketik di atas, lalu <span className="text-purple-400 font-bold">Paste</span> di kolom game.
+                  </p>
+                </div>
+
                 <div className="w-full max-w-[450px] aspect-[720/1100] relative rounded-3xl overflow-hidden border-4 border-slate-900 shadow-2xl bg-black">
                   <iframe 
                     src={(currentItem as any).embedUrl} 
                     allowFullScreen
+                    allow="autoplay; focus-without-user-activation; clipboard-write"
                     className="absolute top-0 left-0 w-full h-full border-none"
                   />
                 </div>
+                
                 <button 
-                  onClick={() => setShowIframe(false)}
-                  className="mt-4 text-[10px] text-slate-500 hover:text-red-400 font-bold uppercase tracking-widest"
+                  onClick={() => {
+                    setShowIframe(false);
+                    setInputText("");
+                  }}
+                  className="mt-6 px-10 py-3 bg-red-500/10 border border-red-500/20 rounded-full text-[10px] text-red-400 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest transition-all"
                 >
-                  × Close Game
+                  × Close Session
                 </button>
               </div>
             )}
