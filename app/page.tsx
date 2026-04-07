@@ -264,7 +264,7 @@ export default function Home() {
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-5">Support My Work</p>
             <div className="flex justify-center gap-4 mb-8">
               <a href="https://paypal.me/put98" className="text-xs font-bold text-blue-400 bg-blue-500/10 px-5 py-2.5 rounded-xl border border-blue-500/20">PayPal</a>
-              <div className="text-xs font-bold text-purple-400 bg-purple-500/10 px-5 py-2.5 rounded-xl border border-purple-500/20">OVO</div>
+              <div className="text-xs font-bold text-purple-400 bg-purple-500/10 px-5 py-2.5 rounded-xl border border-purple-500/20">OVO: 0813-2834-3908</div>
             </div>
             
             <div className="mb-8 flex flex-col gap-2">
