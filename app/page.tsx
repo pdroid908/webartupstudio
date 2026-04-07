@@ -73,22 +73,18 @@ export default function Home() {
 
   const currentItem = currentItems.find(item => item.id === currentActiveId) || currentItems[0];
 
-  // FUNGSI KRITIKAL: Kirim ke Godot + Auto Copy untuk HP
+  // PERBAIKAN: Fungsi Input yang lebih stabil untuk HP
   const handleMobileInput = (text: string) => {
     setInputText(text);
     
-    // 1. Kirim via postMessage (Jika suatu saat kamu tambah listener di Godot)
-    const iframe = document.querySelector('iframe');
-    if (iframe && iframe.contentWindow) {
-      (iframe.contentWindow as any).postMessage({ type: 'input', value: text }, '*');
-    }
-
-    // 2. Auto-Copy ke Clipboard (Solusi Utama HP tanpa edit Godot)
+    // Auto-Copy ke Clipboard (Solusi Utama HP)
     if (text.length > 0 && navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
         setCopyStatus(true);
         setTimeout(() => setCopyStatus(false), 2000);
-      }).catch(() => {});
+      }).catch(() => {
+        // Fallback jika browser memblokir auto-copy
+      });
     }
   };
 
@@ -251,31 +247,41 @@ export default function Home() {
               )}
             </div>
 
-            {/* AREA IFRAME (Khusus Web Games) */}
+            {/* PERBAIKAN: Area Iframe dengan Keyboard Bridge yang lebih kuat */}
             {showIframe && activeTab === 'web' && (
               <div className="mt-6 flex flex-col items-center w-full relative animate-in fade-in zoom-in duration-300">
                 
-                {/* --- MOBILE KEYBOARD BRIDGE --- */}
+                {/* --- MOBILE KEYBOARD HELPER --- */}
                 <div className="w-full max-w-[450px] mb-6 p-4 bg-purple-900/10 border border-purple-500/30 rounded-2xl shadow-xl">
                   <div className="flex justify-between items-center mb-2 px-1">
-                    <label className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">
-                      Input Bridge (Mobile)
+                    <label className="text-[10px] font-bold text-purple-400 uppercase tracking-widest italic">
+                      Mobile Input Bridge
                     </label>
                     {copyStatus && (
-                      <span className="text-[9px] font-bold text-green-400 animate-bounce">COPIED!</span>
+                      <span className="text-[9px] font-bold text-green-400 animate-pulse">READY TO PASTE!</span>
                     )}
                   </div>
-                  <div className="relative">
+                  
+                  <div className="flex gap-2">
                     <input 
                       type="text"
-                      placeholder="Type ID / Password here..."
-                      className="w-full bg-slate-900 border-2 border-slate-800 focus:border-purple-500 p-4 rounded-xl text-white outline-none transition-all placeholder:text-slate-600"
+                      inputMode="text" // Memastikan keyboard teks muncul di HP
+                      placeholder="Type text here..."
+                      className="flex-1 bg-slate-900 border-2 border-slate-800 focus:border-purple-500 p-4 rounded-xl text-white outline-none transition-all placeholder:text-slate-600 text-sm"
                       value={inputText}
                       onChange={(e) => handleMobileInput(e.target.value)}
                     />
+                    
+                    <button 
+                      onClick={() => handleMobileInput(inputText)}
+                      className="bg-purple-600 hover:bg-purple-500 px-4 rounded-xl font-bold text-[10px] transition-transform active:scale-90 flex items-center justify-center min-w-[60px]"
+                    >
+                      {copyStatus ? "✔️" : "COPY"}
+                    </button>
                   </div>
+                  
                   <p className="text-[9px] text-slate-500 mt-3 italic text-center leading-tight">
-                    Keyboard tak muncul? Ketik di atas, lalu <span className="text-purple-400 font-bold">Paste</span> di kolom game.
+                    Ketik di atas, lalu klik <span className="text-purple-400 font-bold">COPY</span> dan <span className="text-purple-400 font-bold underline">Paste</span> di kolom game.
                   </p>
                 </div>
 
