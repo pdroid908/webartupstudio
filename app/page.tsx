@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-// --- DATA GAMES ---
+// --- DATA GAMES (DOWNLOADABLE) ---
 const MY_GAMES = [
   {
     id: "pixel-universe",
@@ -18,9 +18,22 @@ const MY_GAMES = [
     title: "Block Fight",
     descFull: "Combine, clash, and conquer! Block Fight is a fast-paced Match-3 puzzle game built with the Godot Engine.",
     tech: "Godot 4.6",
-    link: "https://drive.google.com/file/d/1Z-RrKKUofQ2yQI8jlFa7UQyKlN2CZS8t/view?usp=sharing",
+    link: "https://drive.google.com/file/d/1eeCR1z4p6NSYJuGj57cpiM5WqKHLw1k-/view?usp=sharing",
     iconFile: "ungull.png", 
     screenshots: ["bl1.jpg","2.jpg"] 
+  }
+];
+
+// --- DATA WEB GAMES (PLAYABLE IN BROWSER) ---
+const WEB_GAMES = [
+  {
+    id: "block-fight-web",
+    title: "Block Fight (Web)",
+    descFull: "Play directly in your browser! Align three or more identical pets to clear them from the board and score big combos.",
+    tech: "Godot 4.6 (HTML5)",
+    embedUrl: "https://itch.io/embed-upload/17083570?color=333333",
+    iconFile: "ungull.png", 
+    screenshots: ["bl1.jpg"] 
   }
 ];
 
@@ -38,19 +51,38 @@ const MY_BOTS = [
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('games'); // 'games' atau 'bots'
+  const [activeTab, setActiveTab] = useState('games'); // 'games', 'web', atau 'bots'
   const [activeGameId, setActiveGameId] = useState(MY_GAMES[0].id);
+  const [activeWebId, setActiveWebId] = useState(WEB_GAMES[0].id);
   const [activeBotId, setActiveBotId] = useState(MY_BOTS[0].id);
   const [isMuted, setIsMuted] = useState(true);
+  const [showIframe, setShowIframe] = useState(false);
 
   // Logika Data Dinamis
-  const currentItems = activeTab === 'games' ? MY_GAMES : MY_BOTS;
-  const currentActiveId = activeTab === 'games' ? activeGameId : activeBotId;
+  const currentItems = 
+    activeTab === 'games' ? MY_GAMES : 
+    activeTab === 'web' ? WEB_GAMES : 
+    MY_BOTS;
+
+  const currentActiveId = 
+    activeTab === 'games' ? activeGameId : 
+    activeTab === 'web' ? activeWebId : 
+    activeBotId;
+
   const currentItem = currentItems.find(item => item.id === currentActiveId) || currentItems[0];
 
   const handleItemClick = (id: string) => {
     if (activeTab === 'games') setActiveGameId(id);
+    else if (activeTab === 'web') {
+      setActiveWebId(id);
+      setShowIframe(false); // Reset iframe saat ganti game web
+    }
     else setActiveBotId(id);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setShowIframe(false); // Sembunyikan iframe saat pindah tab
   };
 
   return (
@@ -71,7 +103,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950"></div>
       </div>
 
-      {/* --- TOMBOL AUDIO (FIXED POJOK KANAN ATAS) --- */}
+      {/* --- TOMBOL AUDIO --- */}
       <button 
         onClick={() => setIsMuted(!isMuted)} 
         className="fixed top-6 right-6 z-50 p-4 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-full shadow-2xl active:scale-90 transition-all hover:bg-slate-800"
@@ -79,30 +111,34 @@ export default function Home() {
         <span className="text-xl md:text-2xl">{isMuted ? "🔇" : "🔊"}</span>
       </button>
 
-      {/* --- SIDEBAR (FIXED DI LAPTOP, ABSOLUTE DI HP) --- */}
+      {/* --- SIDEBAR --- */}
       <aside className="w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-6 bg-slate-950/90 md:bg-slate-950/80 backdrop-blur-xl z-30 flex flex-col justify-between">
         <div>
           <h2 className="text-xl font-black text-blue-500 mb-6 italic tracking-tighter uppercase">Artup STUDIO</h2>
           <nav className="flex flex-row md:flex-col gap-2.5 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide">
             <button 
-              onClick={() => setActiveTab('games')}
+              onClick={() => handleTabChange('games')}
               className={`px-4 py-2 rounded-full font-bold text-xs whitespace-nowrap transition-all ${activeTab === 'games' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-slate-500 hover:text-white'}`}
             >
-              🎮 Games
+              🎮 App Games 
             </button>
             <button 
-              onClick={() => setActiveTab('bots')}
+              onClick={() => handleTabChange('web')}
+              className={`px-4 py-2 rounded-full font-bold text-xs whitespace-nowrap transition-all ${activeTab === 'web' ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/50' : 'text-slate-500 hover:text-white'}`}
+            >
+              🌐 Web Games
+            </button>
+            <button 
+              onClick={() => handleTabChange('bots')}
               className={`px-4 py-2 rounded-full font-bold text-xs whitespace-nowrap transition-all ${activeTab === 'bots' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-slate-500 hover:text-white'}`}
             >
               🤖 Bot
             </button>
-            {/* TOMBOL WHATSAPP JASA (HIRE ME) */}
           <a 
             href="https://wa.me/6281328343908?text=Hello%20Artup%20Studio,%20I'm%20interested%20in%20your%20Web%20or%20Game%20development%20services." 
             target="_blank"
             className="px-4 py-2 rounded-full font-bold text-xs whitespace-nowrap transition-all bg-green-600/10 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white flex items-center gap-2"
           >
-            {/* Logo WA Sederhana menggunakan SVG agar ringan */}
             <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
             </svg>
@@ -111,7 +147,6 @@ export default function Home() {
           </nav>
         </div>
 
-        {/* BAWAH: DONASI & INFO (Hanya muncul di Sidebar Laptop) */}
         <div className="hidden md:flex flex-col gap-4 mt-auto ">
             <div className="space-y-2 bg-slate-900/50 p-3 rounded-2xl border border-slate-800">
               <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-1">Support Me</p>
@@ -133,12 +168,12 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* --- MAIN CONTENT (DENGAN MARGIN KIRI DI LAPTOP) --- */}
+      {/* --- MAIN CONTENT --- */}
       <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-48 md:pt-60 min-h-screen">
         
         <header className="mb-10">
           <h1 className="text-2xl font-bold tracking-tight uppercase">
-            {activeTab === 'games' ? 'My Games' : 'My Bots'}
+            {activeTab === 'games' ? 'My Games' : activeTab === 'web' ? 'Web Games' : 'My Bots'}
           </h1>
           <div className="h-1 w-10 bg-blue-600 mt-2 rounded-full"></div>
         </header>
@@ -178,11 +213,42 @@ export default function Home() {
               {currentItem.descFull}
             </p>
             
-            <a href={currentItem.link} target="_blank" className="w-full md:w-max bg-blue-600 hover:bg-blue-500 text-center text-white px-10 py-4 rounded-2xl font-black text-xs md:text-sm active:scale-95 transition-all shadow-lg uppercase tracking-widest">
-              📥 Download 
-            </a>
+            {/* TOMBOL AKSI (PLAY ATAU DOWNLOAD) */}
+            <div className="flex flex-col md:flex-row gap-4 items-center">
+              {activeTab === 'web' ? (
+                <button 
+                  onClick={() => setShowIframe(true)}
+                  className="w-full md:w-max bg-purple-600 hover:bg-purple-500 text-white px-10 py-4 rounded-2xl font-black text-xs md:text-sm active:scale-95 transition-all shadow-lg uppercase tracking-widest flex items-center gap-2"
+                >
+                  <span>🎮</span> Play Game
+                </button>
+              ) : (
+                <a href={currentItem.link} target="_blank" className="w-full md:w-max bg-blue-600 hover:bg-blue-500 text-center text-white px-10 py-4 rounded-2xl font-black text-xs md:text-sm active:scale-95 transition-all shadow-lg uppercase tracking-widest">
+                  📥 Download {activeTab === 'bots' ? 'Bot' : 'Game'}
+                </a>
+              )}
+            </div>
 
-            {/* Gallery (Hanya muncul jika ada screenshots) */}
+            {/* AREA IFRAME (Khusus Web Games) */}
+            {showIframe && activeTab === 'web' && (
+              <div className="mt-6 flex flex-col items-center w-full">
+                <div className="w-full max-w-[450px] aspect-[720/1100] relative rounded-3xl overflow-hidden border-4 border-slate-900 shadow-2xl bg-black">
+                  <iframe 
+                    src={(currentItem as any).embedUrl} 
+                    allowFullScreen
+                    className="absolute top-0 left-0 w-full h-full border-none"
+                  />
+                </div>
+                <button 
+                  onClick={() => setShowIframe(false)}
+                  className="mt-4 text-[10px] text-slate-500 hover:text-red-400 font-bold uppercase tracking-widest"
+                >
+                  × Close Game
+                </button>
+              </div>
+            )}
+
+            {/* Gallery */}
             {currentItem.screenshots && currentItem.screenshots.length > 0 && (
               <div className="mt-6">
                 <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mb-4">Gallery Preview</p>
@@ -196,7 +262,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* --- FOOTER MOBILE (Donasi muncul di sini saat di HP) --- */}
+        {/* --- FOOTER MOBILE --- */}
         <div className="md:hidden mt-10 p-6 bg-slate-900/90 backdrop-blur-md rounded-[2.5rem] border border-slate-800 shadow-2xl">
           <div className="flex flex-col items-center gap-2">
              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Support My Work</p>
@@ -206,25 +272,18 @@ export default function Home() {
              </div>
           </div>
           <div className="w-full flex flex-row justify-center items-center gap-8 mt-6">
-  
-  <a href="/privacy" className="text-[10px] font-bold text-slate-500 hover:text-blue-400 uppercase tracking-[0.15em] transition-colors">
-    Privacy Policy
-  </a>
-
-  {/* Garis Pembatas Kecil (Opsional agar lebih manis) */}
-  <div className="h-3 w-[1px] bg-slate-800"></div>
-
-  <a href="mailto:p1998nr@gmail.com" className="text-[10px] font-bold text-slate-500 hover:text-blue-400 uppercase tracking-[0.15em] transition-colors">
-    Contact Support
-  </a>
-  
-</div>
-
-{/* COPYRIGHT DI BAWAHNYA */}
-<p className="text-[8px] text-slate-700 font-mono text-center tracking-[0.2em] uppercase mt-4 leading-relaxed">
-  Artup Studio &copy; 2026<br/>
-  Honest and pure heart
-</p>
+            <a href="/privacy" className="text-[10px] font-bold text-slate-500 hover:text-blue-400 uppercase tracking-[0.15em] transition-colors">
+              Privacy Policy
+            </a>
+            <div className="h-3 w-[1px] bg-slate-800"></div>
+            <a href="mailto:p1998nr@gmail.com" className="text-[10px] font-bold text-slate-500 hover:text-blue-400 uppercase tracking-[0.15em] transition-colors">
+              Contact Support
+            </a>
+          </div>
+          <p className="text-[8px] text-slate-700 font-mono text-center tracking-[0.2em] uppercase mt-4 leading-relaxed">
+            Artup Studio &copy; 2026<br/>
+            Honest and pure heart
+          </p>
         </div>
 
       </section>
