@@ -29,7 +29,7 @@ const MY_GAMES: BaseItem[] = [
     title: "Cozy Block Fight",
     descFull: "A vibrant fusion of tactical strategy and satisfying Match-3 mechanics. Unleash powerful combos and conquer challenging levels in this polished 2D puzzle adventure.",
     tech: "Android",
-    link: "https://drive.google.com/file/d/19jrcUMRRdkcOuFbdSKMVc60b50f072TR/view?usp=sharing",
+    link: "https://drive.google.com/file/d/1ZLFQ1u_ia0h2HDSyW_3gEF4KxgUTqv1n/view?usp=sharing",
     iconFile: "ungull.png", 
     screenshots: ["bl1.jpg","2.jpg"] 
   }
@@ -41,7 +41,7 @@ const WEB_GAMES: BaseItem[] = [
     title: "Cozy Block Fight",
     descFull: "A fast-paced Match-3 puzzle challenge where strategy meets speed. Align identical blocks, trigger massive combos, and push your skills to the limit. Your goal is simple: achieve the ultimate high score and claim the #1 spot on the leaderboard!",
     tech: "Web Game, All device can play",
-    embedUrl: "https://itch.io/embed-upload/17094457?color=333333", 
+    embedUrl: "https://itch.io/embed-upload/17096265?color=333333", 
     iconFile: "ungull.png", 
     screenshots: ["bl1.jpg","ssblov1.png","blocss2.png","ssblo3.png"] 
   }
