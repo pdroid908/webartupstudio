@@ -43,7 +43,7 @@ const WEB_GAMES: BaseItem[] = [
     tech: "Web Game, All device can play",
     embedUrl: "https://itch.io/embed-upload/17094457?color=333333", 
     iconFile: "ungull.png", 
-    screenshots: ["bl1.jpg"] 
+    screenshots: ["bl1.jpg","ssblov1.png","blocss2.png","ssblo3.png"] 
   }
 ];
 
