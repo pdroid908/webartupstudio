@@ -29,7 +29,7 @@ const MY_GAMES: BaseItem[] = [
     title: "Cozy Block Fight",
     descFull: "A vibrant fusion of tactical strategy and satisfying Match-3 mechanics. Unleash powerful combos and conquer challenging levels in this polished 2D puzzle adventure.",
     tech: "Android",
-    link: "https://drive.google.com/file/d/1ZLFQ1u_ia0h2HDSyW_3gEF4KxgUTqv1n/view?usp=sharing",
+    link: "https://drive.google.com/file/d/16gjJGQsM72Roj19gAV1Gmw5kJ-B_Vt_o/view?usp=sharing",
     iconFile: "ungull.png", 
     screenshots: ["bl1.jpg","2.jpg"] 
   }
@@ -41,7 +41,7 @@ const WEB_GAMES: BaseItem[] = [
     title: "Cozy Block Fight",
     descFull: "A fast-paced Match-3 puzzle challenge where strategy meets speed. Align identical blocks, trigger massive combos, and push your skills to the limit. Your goal is simple: achieve the ultimate high score and claim the #1 spot on the leaderboard!",
     tech: "Web Game, All device can play",
-    embedUrl: "https://itch.io/embed-upload/17096265?color=333333", 
+    embedUrl: "https://itch.io/embed-upload/17103809?color=333333", 
     iconFile: "ungull.png", 
     screenshots: ["bl1.jpg","ssblov1.png","blocss2.png","ssblo3.png"] 
   }
@@ -124,8 +124,10 @@ export default function Home() {
       {/* --- SIDEBAR --- */}
       <aside className="w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col justify-between">
         <div>
-          <h2 className="text-xl font-black text-blue-500 mb-6 italic tracking-tighter uppercase">Artup STUDIO</h2>
-          
+         <h2 className="text-xl font-black text-blue-500 italic tracking-tighter uppercase">Artup STUDIO</h2>
+          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1 ml-0.5 mb-6">
+            Web and Game Developer
+          </p>
           <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide mb-6">
             <button onClick={() => handleTabChange('web')} className={`px-4 py-2 rounded-full font-bold text-[10px] md:text-xs whitespace-nowrap transition-all ${activeTab === 'web' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-500 bg-slate-900/50 hover:bg-slate-800'}`}>🌐 Web Games</button>
             <button onClick={() => handleTabChange('games')} className={`px-4 py-2 rounded-full font-bold text-[10px] md:text-xs whitespace-nowrap transition-all ${activeTab === 'games' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 bg-slate-900/50 hover:bg-slate-800'}`}>🎮 App Games</button>
