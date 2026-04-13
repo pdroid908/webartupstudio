@@ -7,7 +7,7 @@ export default function PrivacyPage() {
       {/* Tombol Back */}
       <div className="max-w-4xl mx-auto mb-10">
         <a href="/" className="text-blue-500 hover:text-blue-400 transition-all font-bold flex items-center gap-2">
-          <span>←</span> Kembali ke Artup Studio
+          <span>←</span> Back to Artup Studio
         </a>
       </div>
 
