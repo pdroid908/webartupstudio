@@ -114,7 +114,7 @@ export default function SecurityPage() {
                   ? "🚨 POSITIF PHISHING / MANIPULASI!"
                   : finalStatus === "ADA CELAH"
                     ? "⚠️ WASPADA: SITUS PUBLIK/UNVERIFIED"
-                    : "✅ LINK TERVERIFIKASI"}
+                    : "✅ LINK AMAN"}
               </h2>
 
               <div className="bg-black/60 backdrop-blur-md p-5 md:p-7 rounded-3xl space-y-5 border border-white/5">
@@ -123,13 +123,19 @@ export default function SecurityPage() {
                     GLOBAL ENGINE:
                   </span>
                   <span
-                    className={`font-black tracking-widest text-xs md:text-sm ${result.googleStatus === "BAHAYA" ? "text-red-500" : result.googleStatus === "ADA CELAH" ? "text-orange-500" : "text-green-500"}`}
+                    className={`font-black tracking-widest text-xs md:text-sm ${
+                      result.googleStatus === "BAHAYA"
+                        ? "text-red-500"
+                        : result.googleStatus === "ADA CELAH"
+                          ? "text-orange-500"
+                          : "text-green-500"
+                    }`}
                   >
                     {result.googleStatus === "BAHAYA"
                       ? "⚠️ BLACKLISTED"
                       : result.googleStatus === "ADA CELAH"
                         ? "❓ BELUM TERVERIFIKASI"
-                        : "✔️ CLEAN"}
+                        : "✔️ AMAN (GOOGLE VERIFIED)"}
                   </span>
                 </div>
 
@@ -172,7 +178,7 @@ export default function SecurityPage() {
                       ? isPublicHosting
                         ? "PERINGATAN: Jangan masukan data penting keuangan dan data diri sensitif atau kode rahasia, Kecuali percaya pada situs itu"
                         : "WASPADA: Jangan masukkan informasi keuangan atau kode rahasia, KECUALI PERCAYA PADA SITUS ITU."
-                      : "Domain induk terverifikasi dan struktur URL resmi."}
+                      : "Domain induk terverifikasi , Link AMAN."}
                 </p>
               </div>
             </div>
@@ -188,7 +194,7 @@ export default function SecurityPage() {
 
       <footer className="mt-20 text-center pb-10">
         <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.5em]">
-          Artup Studio Security Division &copy; 2026
+          ARTUP Studio Security Division &copy; 2026
         </p>
       </footer>
     </div>

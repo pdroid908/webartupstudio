@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const startTime = Date.now();
   try {
     let { url } = await req.json();
     if (!url)
@@ -19,7 +20,6 @@ export async function POST(req: Request) {
         : parts.slice(-2).join(".");
 
     const whitelist = [
-      // TEKNOLOGI & SOSIAL MEDIA (EXISTING)
       "google.com",
       "facebook.com",
       "github.com",
@@ -30,19 +30,16 @@ export async function POST(req: Request) {
       "gojek.com",
       "gopay.co.id",
       "ovo.id",
-
-      "id", // Menandakan domain .id (induk)
-      "ac.id", // Universitas/Akademik (Butuh SK Pendirian)
-      "sch.id", // Sekolah (Butuh surat izin dinas)
+      "id",
+      "ac.id",
+      "sch.id",
       "or.id",
-
-      // PERBANKAN UMUM INDONESIA
       "bca.co.id",
       "bankmandiri.co.id",
       "bni.co.id",
       "bri.co.id",
       "btn.co.id",
-      "banksyariahindonesia.co.id", // BSI
+      "banksyariahindonesia.co.id",
       "cimbniaga.co.id",
       "danamon.co.id",
       "permatabank.com",
@@ -52,22 +49,17 @@ export async function POST(req: Request) {
       "instagram.com",
       "bankjatim.co.id",
       "traveloka.com",
-
-      // EKOSISTEM NEGARA & OTORITAS (RESMI)
-      "go.id", // Seluruh domain pemerintahan (Kominfo, Kemenkeu, dll)
+      "go.id",
       "pajak.go.id",
-      "bi.go.id", // Bank Indonesia
-      "ojk.go.id", // Otoritas Jasa Keuangan
+      "bi.go.id",
+      "ojk.go.id",
       "polri.go.id",
       "indonesia.go.id",
       "kpu.go.id",
       "bpjs-kesehatan.go.id",
       "bpjsketenagakerjaan.go.id",
       "mahkamahagung.go.id",
-      "artup-studio.vercel.app",
     ];
-
-    // DAFTAR SITUS GRATISAN / HOSTING PUBLIK (TAMBAHAN VAR A)
     const hostingGratis = [
       "sites.google.com",
       "vercel.app",
@@ -77,8 +69,6 @@ export async function POST(req: Request) {
       "pantheonsite.io",
       "000webhostapp.com",
     ];
-
-    // KATA KUNCI SENSITIF UNTUK CEK PATH
     const sensitiveKeywords = [
       "bca",
       "bri",
@@ -94,8 +84,12 @@ export async function POST(req: Request) {
 
     const isWhitelisted = whitelist.includes(rootDomain);
     const isPublicHosting = hostingGratis.some((h) => domain.includes(h));
+    const isManipulated =
+      whitelist.some((w) => domain.includes(w)) && !isWhitelisted;
 
-    // 2. FUNGSI VIRUSTOTAL (VAR A)
+    console.log(`\n--- START SCAN: ${url} ---`);
+
+    // 2. FUNGSI VIRUSTOTAL DENGAN DEBUG LENGKAP
     const getVirusTotalData = async (targetUrl: string) => {
       const urlId = Buffer.from(targetUrl)
         .toString("base64")
@@ -103,126 +97,204 @@ export async function POST(req: Request) {
         .replace(/\+/g, "-")
         .replace(/\//g, "_");
       const headers = { "x-apikey": process.env.VIRUSTOTAL_API_KEY as string };
+
       try {
+        console.log(`[VT] Mengecek data untuk ID: ${urlId}`);
         let res = await fetch(
           `https://www.virustotal.com/api/v3/urls/${urlId}`,
           { headers },
         );
-        if (res.status === 404) {
-          await fetch(`https://www.virustotal.com/api/v3/urls`, {
-            method: "POST",
-            headers,
-            body: new URLSearchParams({ url: targetUrl }),
-          });
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-          res = await fetch(`https://www.virustotal.com/api/v3/urls/${urlId}`, {
-            headers,
-          });
+        let data = await res.json();
+
+        if (res.status === 404 || !data.data?.attributes?.last_analysis_stats) {
+          console.log(
+            `[VT] Data TIDAK ditemukan (404). Mencoba mengirim URL ke VT...`,
+          );
+
+          const postRes = await fetch(
+            `https://www.virustotal.com/api/v3/urls`,
+            {
+              method: "POST",
+              headers: {
+                ...headers,
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({ url: targetUrl }),
+            },
+          );
+
+          if (!postRes.ok) {
+            const errorText = await postRes.text();
+            console.error(
+              `[VT] GAGAL POST URL BARU: ${postRes.status} - ${errorText}`,
+            );
+            return null;
+          }
+
+          console.log(`[VT] Berhasil POST URL. Memulai Polling (Sabar ya)...`);
+
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            console.log(
+              `[VT] Polling percobaan ${attempt}/3... (Menunggu 5 detik)`,
+            );
+            await new Promise((r) => setTimeout(r, 5000));
+
+            const retryRes = await fetch(
+              `https://www.virustotal.com/api/v3/urls/${urlId}`,
+              { headers },
+            );
+            data = await retryRes.json();
+
+            if (data.data?.attributes?.last_analysis_stats) {
+              console.log(
+                `[VT] Data berhasil didapatkan pada percobaan ke-${attempt}!`,
+              );
+              break;
+            }
+          }
+        } else {
+          console.log(`[VT] Data ditemukan di database VT.`);
         }
-        return res.json();
+        return data;
       } catch (e) {
+        console.error("[VT] EXCEPTION ERROR:", e);
         return null;
       }
     };
 
-    // 3. EKSEKUSI PARALEL
-    const [googleRes, vtData] = await Promise.all([
-      fetch(
-        `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${process.env.GOOGLE_SAFE_BROWSING_API_KEY}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            client: { clientId: "artup-security", clientVersion: "1.0.0" },
-            threatInfo: {
-              threatTypes: ["MALWARE", "SOCIAL_ENGINEERING"],
-              platformTypes: ["ANY_PLATFORM"],
-              threatEntryTypes: ["URL"],
-              threatEntries: [{ url }],
-            },
-          }),
-        },
-      ),
+    // 3. FUNGSI GOOGLE DENGAN DEBUG LENGKAP
+    const fetchGoogleWithTimeout = async (targetUrl: string) => {
+      console.log(`[GOOGLE] Memulai pengecekan Safe Browsing...`);
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), 7000); // 7 detik biar lebih lega
+
+      try {
+        const res = await fetch(
+          `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${process.env.GOOGLE_SAFE_BROWSING_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              client: { clientId: "artup-security", clientVersion: "1.0.0" },
+              threatInfo: {
+                threatTypes: [
+                  "MALWARE",
+                  "SOCIAL_ENGINEERING",
+                  "UNWANTED_SOFTWARE",
+                  "POTENTIALLY_HARMFUL_APPLICATION",
+                ],
+                platformTypes: ["ANY_PLATFORM"],
+                threatEntryTypes: ["URL"],
+                threatEntries: [{ url: targetUrl }],
+              },
+            }),
+          },
+        );
+        clearTimeout(id);
+        const data = await res.json();
+
+        if (data.matches && data.matches.length > 0) {
+          console.log(
+            `[GOOGLE] HASIL: 🚩 BAHAYA! Ditemukan ${data.matches.length} ancaman.`,
+          );
+        } else {
+          console.log(
+            `[GOOGLE] HASIL: ✅ AMAN (Tidak ada ancaman terdeteksi).`,
+          );
+        }
+        return data;
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          console.error("[GOOGLE] TIMEOUT: Koneksi ke Google terlalu lama.");
+        } else {
+          console.error("[GOOGLE] ERROR:", err.message);
+        }
+        return { matches: [] };
+      }
+    };
+
+    // EKSEKUSI PARALEL
+    const [googleData, vtData] = await Promise.all([
+      fetchGoogleWithTimeout(url),
       getVirusTotalData(url),
     ]);
 
-    const googleData = await googleRes.json();
-    const vtStats = vtData?.data?.attributes?.last_analysis_stats || null;
-
-    // 4. ANALISIS GOOGLE
+    // --- 4. ANALISIS GOOGLE (MURNI HASIL API) ---
+    // Di sini Google hanya punya 2 kondisi: AMAN atau BAHAYA.
     let googleStatus = "AMAN";
-    if (googleData.matches && googleData.matches.length > 0) {
+    if (googleData && googleData.matches && googleData.matches.length > 0) {
       googleStatus = "BAHAYA";
-    } else if (!isWhitelisted || isPublicHosting) {
-      googleStatus = "ADA CELAH";
     }
+    // Tidak ada lagi perubahan variabel googleStatus setelah ini.
 
-    // 5. ANALISIS VIRUSTOTAL
+    // --- 5. ANALISIS VIRUSTOTAL ---
+    const vtStats = vtData?.data?.attributes?.last_analysis_stats;
+    console.log(
+      `[VT] STATS: Malicious=${vtStats?.malicious || 0}, Suspicious=${vtStats?.suspicious || 0}`,
+    );
+
     let vtStatus = "AMAN";
-    const malic = vtStats?.malicious || 0;
-    if (malic >= 1) {
-      vtStatus = "BAHAYA";
-    } else if (!vtStats) {
+    if (vtStats) {
+      if (vtStats.malicious >= 1 || vtStats.suspicious >= 2) {
+        vtStatus = "BAHAYA";
+      }
+    } else {
       vtStatus = "TIDAK ADA DATA";
     }
 
-    // 6. ARTUP HEURISTIC (LOGIKA BARU UNTUK SITUS GRATISAN)
+    // --- 6. ARTUP HEURISTIC (LOGIKA INTERNAL UNTUK CELAH) ---
     let artupHeuristic = "AMAN";
-
-    if (googleStatus === "BAHAYA" || vtStatus === "BAHAYA") {
+ 
+    if (googleStatus === "BAHAYA" || vtStatus === "BAHAYA" || isManipulated) {
+      artupHeuristic = "BAHAYA";
+    } else if (isPublicHosting) {
+      const fullPath = urlObj.href.toLowerCase();
+      const hasSensitiveWord = sensitiveKeywords.some((word) =>
+        fullPath.includes(word),
+      );
+      artupHeuristic = hasSensitiveWord ? "BAHAYA" : "ADA CELAH";
+    } else if (!isWhitelisted) {
+      // Di sinilah status "ADA CELAH" sebenarnya berasal
       artupHeuristic = "ADA CELAH";
-    } else {
-      // CEK MANIPULASI DOMAIN
-      const isManipulated =
-        whitelist.some((w) => domain.includes(w)) && !isWhitelisted;
-
-      if (isManipulated) {
-        artupHeuristic = "BAHAYA";
-      } else if (isPublicHosting) {
-        // LOGIKA BARU: Cek apakah di dalam path URL ada kata-kata bank/login
-        const fullPath = urlObj.href.toLowerCase();
-        const hasSensitiveWord = sensitiveKeywords.some((word) =>
-          fullPath.includes(word),
-        );
-
-        if (hasSensitiveWord) {
-          // Jika situs gratisan (sites.google) tapi bawa-bawa nama "bank" atau "login"
-          artupHeuristic = "BAHAYA";
-        } else {
-          // Jika situs gratisan biasa (portofolio orang dll)
-          artupHeuristic = "ADA CELAH";
-        }
-      } else if (!isWhitelisted) {
-        artupHeuristic = "ADA CELAH";
-      }
     }
 
-    // 7. FINAL SINKRONISASI
+    // --- 7. FINAL STATUS SINKRONISASI ---
     let finalStatus = "AMAN";
+
+    // Prioritas 1: Jika ada yang terdeteksi BAHAYA
     if (
       googleStatus === "BAHAYA" ||
       vtStatus === "BAHAYA" ||
       artupHeuristic === "BAHAYA"
     ) {
       finalStatus = "BAHAYA";
-    } else if (
-      googleStatus === "ADA CELAH" ||
-      vtStatus === "TIDAK ADA DATA" ||
-      artupHeuristic === "ADA CELAH"
-    ) {
+    }
+    // Prioritas 2: Jika tidak bahaya tapi ada celah keamanan atau data kurang
+    else if (vtStatus === "TIDAK ADA DATA" || artupHeuristic === "ADA CELAH") {
       finalStatus = "ADA CELAH";
     }
+    // Prioritas 3: Semua mesin setuju aman & terdaftar di whitelist
+    else {
+      finalStatus = "AMAN";
+    }
+
+    console.log(
+      `--- SCAN SELESAI (${Date.now() - startTime}ms) -> FINAL: ${finalStatus} ---\n`,
+    );
 
     return NextResponse.json({
-      googleStatus,
+      googleStatus, // Akan selalu AMAN jika tidak ada malware di database Google
       virusTotal: vtStatus,
       vtDetails: vtStats,
-      artupHeuristic,
+      artupHeuristic, // Penentu apakah statusnya Kuning (Ada Celah)
       finalStatus,
       details: { domain, rootDomain, isWhitelisted, isPublicHosting },
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("CRITICAL ERROR:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", msg: error.message },
       { status: 500 },
     );
   }
