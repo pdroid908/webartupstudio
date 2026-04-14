@@ -88,10 +88,11 @@ export async function POST(req: Request) {
       whitelist.some((w) => domain.includes(w)) && !isWhitelisted;
 
     console.log(`\n--- START SCAN: ${url} ---`);
-
-    // 2. FUNGSI VIRUSTOTAL DENGAN DEBUG LENGKAP
+    // 2. FUNGSI VIRUSTOTAL (DIPERBAIKI)
     const getVirusTotalData = async (targetUrl: string) => {
-      const urlId = Buffer.from(targetUrl)
+      // Gunakan URL yang sudah bersih dari spasi/titik untuk ID
+      const cleanUrl = targetUrl.trim().replace(/\s/g, "").replace(/\.+$/, "");
+      const urlId = Buffer.from(cleanUrl)
         .toString("base64")
         .replace(/=/g, "")
         .replace(/\+/g, "-")
@@ -99,16 +100,19 @@ export async function POST(req: Request) {
       const headers = { "x-apikey": process.env.VIRUSTOTAL_API_KEY as string };
 
       try {
-        console.log(`[VT] Mengecek data untuk ID: ${urlId}`);
         let res = await fetch(
           `https://www.virustotal.com/api/v3/urls/${urlId}`,
           { headers },
         );
         let data = await res.json();
 
-        if (res.status === 404 || !data.data?.attributes?.last_analysis_stats) {
+        // Jika 404 atau data lama (hasilnya 0), kita paksa scan ulang agar akurat
+        if (
+          res.status === 404 ||
+          data.data?.attributes?.last_analysis_stats?.malicious === 0
+        ) {
           console.log(
-            `[VT] Data TIDAK ditemukan (404). Mencoba mengirim URL ke VT...`,
+            `[VT] Data tidak ada atau mungkin outdate. Mengirim scan fresh...`,
           );
 
           const postRes = await fetch(
@@ -119,45 +123,39 @@ export async function POST(req: Request) {
                 ...headers,
                 "Content-Type": "application/x-www-form-urlencoded",
               },
-              body: new URLSearchParams({ url: targetUrl }),
+              body: new URLSearchParams({ url: cleanUrl }),
             },
           );
 
-          if (!postRes.ok) {
-            const errorText = await postRes.text();
-            console.error(
-              `[VT] GAGAL POST URL BARU: ${postRes.status} - ${errorText}`,
-            );
-            return null;
-          }
-
-          console.log(`[VT] Berhasil POST URL. Memulai Polling (Sabar ya)...`);
-
-          for (let attempt = 1; attempt <= 3; attempt++) {
+          if (postRes.ok) {
             console.log(
-              `[VT] Polling percobaan ${attempt}/3... (Menunggu 5 detik)`,
+              `[VT] Berhasil antre scan. Memulai Polling lebih lama...`,
             );
-            await new Promise((r) => setTimeout(r, 5000));
-
-            const retryRes = await fetch(
-              `https://www.virustotal.com/api/v3/urls/${urlId}`,
-              { headers },
-            );
-            data = await retryRes.json();
-
-            if (data.data?.attributes?.last_analysis_stats) {
-              console.log(
-                `[VT] Data berhasil didapatkan pada percobaan ke-${attempt}!`,
+            // Polling 3 kali, tiap kali menunggu 10 detik (Total 30 detik max)
+            for (let attempt = 1; attempt <= 3; attempt++) {
+              await new Promise((r) => setTimeout(r, 10000)); // Tunggu 10 detik
+              const retryRes = await fetch(
+                `https://www.virustotal.com/api/v3/urls/${urlId}`,
+                { headers },
               );
-              break;
+              data = await retryRes.json();
+
+              const stats = data.data?.attributes?.last_analysis_stats;
+              // Berhenti polling JIKA sudah ada deteksi malicious
+              if (stats && stats.malicious > 0) {
+                console.log(
+                  `[VT] Deteksi ditemukan pada percobaan ke-${attempt}!`,
+                );
+                break;
+              }
+              console.log(
+                `[VT] Polling ${attempt}: Masih menunggu hasil vendor...`,
+              );
             }
           }
-        } else {
-          console.log(`[VT] Data ditemukan di database VT.`);
         }
         return data;
       } catch (e) {
-        console.error("[VT] EXCEPTION ERROR:", e);
         return null;
       }
     };
@@ -220,23 +218,24 @@ export async function POST(req: Request) {
       getVirusTotalData(url),
     ]);
 
-    // --- 4. ANALISIS GOOGLE (MURNI HASIL API) ---
-    // Di sini Google hanya punya 2 kondisi: AMAN atau BAHAYA.
+    // --- 4. ANALISIS GOOGLE (SINKRONISASI 3 STATUS) ---
     let googleStatus = "AMAN";
     if (googleData && googleData.matches && googleData.matches.length > 0) {
-      googleStatus = "BAHAYA";
+      googleStatus = "BAHAYA"; // MERAH + DATA
+    } else if (!isWhitelisted) {
+      googleStatus = "ADA CELAH"; // LAMPU MERAH / NO DATA (Sesuai Transparency Report)
+    } else {
+      googleStatus = "AMAN"; // HIJAU (Terverifikasi di Whitelist)
     }
-    // Tidak ada lagi perubahan variabel googleStatus setelah ini.
 
     // --- 5. ANALISIS VIRUSTOTAL ---
     const vtStats = vtData?.data?.attributes?.last_analysis_stats;
-    console.log(
-      `[VT] STATS: Malicious=${vtStats?.malicious || 0}, Suspicious=${vtStats?.suspicious || 0}`,
-    );
-
     let vtStatus = "AMAN";
     if (vtStats) {
-      if (vtStats.malicious >= 1 || vtStats.suspicious >= 2) {
+      // Jika malicious >= 1, dia mutlak BAHAYA
+      if (vtStats.malicious >= 1) {
+        vtStatus = "BAHAYA";
+      } else if (vtStats.suspicious >= 2) {
         vtStatus = "BAHAYA";
       }
     } else {
@@ -245,7 +244,7 @@ export async function POST(req: Request) {
 
     // --- 6. ARTUP HEURISTIC (LOGIKA INTERNAL UNTUK CELAH) ---
     let artupHeuristic = "AMAN";
- 
+
     if (googleStatus === "BAHAYA" || vtStatus === "BAHAYA" || isManipulated) {
       artupHeuristic = "BAHAYA";
     } else if (isPublicHosting) {
@@ -259,10 +258,10 @@ export async function POST(req: Request) {
       artupHeuristic = "ADA CELAH";
     }
 
-    // --- 7. FINAL STATUS SINKRONISASI ---
+    // --- 7. FINAL SINKRONISASI (LOGIKA PRIORITAS) ---
     let finalStatus = "AMAN";
 
-    // Prioritas 1: Jika ada yang terdeteksi BAHAYA
+    // Jika ada satu saja yang bilang BAHAYA, hasil akhir wajib BAHAYA
     if (
       googleStatus === "BAHAYA" ||
       vtStatus === "BAHAYA" ||
@@ -270,11 +269,15 @@ export async function POST(req: Request) {
     ) {
       finalStatus = "BAHAYA";
     }
-    // Prioritas 2: Jika tidak bahaya tapi ada celah keamanan atau data kurang
-    else if (vtStatus === "TIDAK ADA DATA" || artupHeuristic === "ADA CELAH") {
+    // Jika tidak bahaya tapi ada indikasi celah/asing
+    else if (
+      googleStatus === "ADA CELAH" ||
+      vtStatus === "TIDAK ADA DATA" ||
+      artupHeuristic === "ADA CELAH"
+    ) {
       finalStatus = "ADA CELAH";
     }
-    // Prioritas 3: Semua mesin setuju aman & terdaftar di whitelist
+    // Semua bersih
     else {
       finalStatus = "AMAN";
     }

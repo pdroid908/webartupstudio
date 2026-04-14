@@ -135,7 +135,7 @@ export default function SecurityPage() {
                       ? "⚠️ BLACKLISTED"
                       : result.googleStatus === "ADA CELAH"
                         ? "❓ BELUM TERVERIFIKASI"
-                        : "✔️ AMAN (GOOGLE VERIFIED)"}
+                        : "✔️ GOOGLE VERIFIED"}
                   </span>
                 </div>
 
