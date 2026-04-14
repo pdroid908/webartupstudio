@@ -97,19 +97,25 @@ export default function Home() {
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
       {/* --- VIDEO BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <video
-          key={isMuted ? "m" : "u"}
-          autoPlay
-          muted={isMuted}
-          loop
-          playsInline
+        <img
+          src="1.gif"
+          alt="Background"
           className="w-full h-full object-cover opacity-100 transition-opacity duration-1000"
-        >
-          <source src="" type="video/mp4" />
-        </video>
+        />
+        {/* Overlay Gradient tetap sama agar konten depan terbaca */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-950"></div>
       </div>
-
+      <div className="hidden">
+        <audio
+          autoPlay
+          loop
+          controls={false} // Agar tidak muncul visual playernya
+        >
+          <source src="" type="audio/mpeg" />
+          Browser kamu tidak mendukung pemutar musik.
+        </audio>
+      </div>
+      );
       {/* --- AUDIO TOGGLE --- */}
       <button
         onClick={() => setIsMuted(!isMuted)}
@@ -117,7 +123,6 @@ export default function Home() {
       >
         <span className="text-xl">{isMuted ? "🔇" : "🔊"}</span>
       </button>
-
       {/* --- SIDEBAR --- */}
       <aside className="w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col justify-between">
         <div>
@@ -223,7 +228,6 @@ export default function Home() {
           </div>
         </div>
       </aside>
-
       {/* --- MAIN CONTENT --- */}
       <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-44 md:pt-56 min-h-screen">
         <header className="mb-10">
