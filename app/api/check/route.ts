@@ -6,177 +6,215 @@ export async function POST(req: Request) {
     if (!url)
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
 
-    // 1. NORMALISASI
+    // 1. NORMALISASI & EKSTRAKSI DOMAIN
     url = url.trim().toLowerCase();
     if (!url.startsWith("http")) url = "https://" + url;
 
     const urlObj = new URL(url);
-    const domain = urlObj.hostname;
-    const path = urlObj.pathname;
-    const fullUrl = urlObj.href;
+    const domain = urlObj.hostname.replace("www.", "");
+    const parts = domain.split(".");
 
-    // --- 2. DATABASE RADAR ARTUP ---
-    const whitelist = [
-      "google.com",
-      "facebook.com",
-      "instagram.com",
-      "github.com",
-      "artup-studio.vercel.app",
-      "vercel.com",
-      "nextjs.org",
-      "bca.co.id",
-      "bankmandiri.co.id",
-      "bri.co.id",
-      "bni.co.id",
-      "shopee.co.id",
-      "xaman.app",
-    ];
+    const rootDomain =
+      domain.endsWith(".co.id") || domain.endsWith(".net.id")
+        ? parts.slice(-3).join(".")
+        : parts.slice(-2).join(".");
 
-    const officialBrands = [
-      "bca",
-      "mandiri",
-      "bri",
-      "bni",
-      "dana",
-      "ovo",
-      "shopee",
-      "paypal",
-      "microsoft",
-      "google",
-      "viva",
-      "pln",
-    ];
-    // Tambahkan kata pancingan spesifik dari temuanmu (race, speed, cobranca)
-    const baitKeywords = [
-      "login",
-      "verify",
-      "update",
-      "account",
-      "banking",
-      "secure",
-      "confirm",
-      "office",
+    // DATABASE WHITELIST (Domain yang 100% kita percaya)
+   const whitelist = [
+     // --- GLOBAL & TECH (RAKSASA TEKNOLOGI) ---
+     "google.com",
+     "facebook.com",
+     "github.com",
+     "vercel.app",
+     "github.io",
+     "openai.com",
+     "youtube.com",
+     "microsoft.com",
+     "apple.com",
+     "instagram.com",
+     "twitter.com",
+     "x.com",
+     "linkedin.com",
+     "whatsapp.com",
+     "discord.com",
+     "telegram.org",
+
+     // --- PERBANKAN INDONESIA (UTAMA) ---
+     "bca.co.id",
+     "bankmandiri.co.id",
+     "bri.co.id",
+     "bni.co.id",
+     "bankbsi.co.id",
+     "btn.co.id",
+     "cimbniaga.com",
+     "danamon.co.id",
+     "bankpermata.com",
+     "ocbc.id",
+     "panin.co.id",
+
+     // --- BANK DAERAH (KHUSUS JOGJA & SEKITARNYA) ---
+     "bpddiy.co.id",
+     "bankjogja.com",
+     "banksleman.co.id",
+     "bankbantul.co.id",
+
+     // --- FINTECH & DOMPET DIGITAL INDONESIA ---
+     "dana.id",
+     "ovo.id",
+     "linkaja.id",
+     "gopay.co.id",
+     "shopeepay.co.id",
+     "flip.id",
+     "bibit.id",
+     "pluang.com",
+     "ajaib.co.id",
+     "midtrans.com",
+
+     // --- PEMERINTAHAN (INSTITUSI NEGARA) ---
+     "go.id",
+     "pajak.go.id",
+     "bpjs-kesehatan.go.id",
+     "bpjsketenagakerjaan.go.id",
+     "indonesia.go.id",
+     "kemkes.go.id",
+     "polri.go.id",
+     "kemenkeu.go.id",
+     "kominfo.go.id",
+     "bi.go.id",
+     "ojk.go.id",
+
+     // --- E-COMMERCE & LAYANAN POPULER INDONESIA ---
+     "tokopedia.com",
+     "shopee.co.id",
+     "bukalapak.com",
+     "blibli.com",
+     "lazada.co.id",
+     "gojek.com",
+     "grab.com",
+     "traveloka.com",
+     "tiket.com",
+   ];
+
+    const publicSubdomains = [
+      "sites",
+      "forms",
       "docs",
-      "view",
-      "race",
-      "speed",
-      "cobranca",
-    ];
-    const suspiciousPaths = [
-      "/docs/",
-      "/view/",
-      "/share/",
-      "/edible/",
-      "/secure/",
-      "/p%c3%a1gina-inicial",
+      "storage",
+      "firebaseapp",
+      "vercel",
+      "github",
+      "pages",
     ];
 
-    // --- 3. ANALISIS HEURISTIK MENDALAM ---
-    const isBaseWhitelisted = whitelist.some(
-      (w) => domain === w || domain.endsWith("." + w),
-    );
-    const hasBaitInUrl = baitKeywords.some((word) => fullUrl.includes(word));
-    const hasSuspiciousFolder = suspiciousPaths.some((p) => path.includes(p));
-    const isImpersonating =
-      officialBrands.some((brand) => fullUrl.includes(brand)) &&
-      !isBaseWhitelisted;
+    // 2. FUNGSI VIRUSTOTAL (Disederhanakan untuk efisiensi)
+    const getVirusTotalData = async (targetUrl: string) => {
+      const urlId = Buffer.from(targetUrl)
+        .toString("base64")
+        .replace(/=/g, "")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_");
+      const headers = { "x-apikey": process.env.VIRUSTOTAL_API_KEY as string };
+      try {
+        let res = await fetch(
+          `https://www.virustotal.com/api/v3/urls/${urlId}`,
+          { headers },
+        );
+        return res.json();
+      } catch (e) {
+        return null;
+      }
+    };
 
-    // Deteksi Karakter Acak (Entropy) untuk menangkap link seperti manalmoe
-    const hasHighEntropy =
-      (domain.match(/[0-9]/g) || []).length > 3 ||
-      (path.match(/[0-9a-z]{15,}/g) || []).length > 0;
+    // 3. EKSEKUSI PARALEL
+    const [googleRes, vtData] = await Promise.all([
+      fetch(
+        `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${process.env.GOOGLE_SAFE_BROWSING_API_KEY}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            client: { clientId: "artup-security", clientVersion: "1.0.0" },
+            threatInfo: {
+              threatTypes: ["MALWARE", "SOCIAL_ENGINEERING"],
+              platformTypes: ["ANY_PLATFORM"],
+              threatEntryTypes: ["URL"],
+              threatEntries: [{ url }],
+            },
+          }),
+        },
+      ),
+      getVirusTotalData(url),
+    ]);
 
-    // --- 4. INTEGRASI ENGINE GLOBAL ---
-    const urlId = Buffer.from(url)
-      .toString("base64")
-      .replace(/=/g, "")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
-
-    const vtRes = await fetch(
-      `https://www.virustotal.com/api/v3/urls/${urlId}`,
-      {
-        headers: { "x-apikey": process.env.VIRUSTOTAL_API_KEY as string },
-      },
-    );
-    const vtData = await vtRes.json();
+    const googleData = await googleRes.json();
     const vtStats = vtData?.data?.attributes?.last_analysis_stats || null;
 
-    const googleRes = await fetch(
-      `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${process.env.GOOGLE_SAFE_BROWSING_API_KEY}`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          client: { clientId: "artup-security", clientVersion: "1.0.0" },
-          threatInfo: {
-            threatTypes: ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE"],
-            platformTypes: ["ANY_PLATFORM"],
-            threatEntryTypes: ["URL"],
-            threatEntries: [{ url }],
-          },
-        }),
-      },
-    );
-    const googleData = await googleRes.json();
+    // ---------------------------------------------------------
+    // 4. ANALISIS STATUS GOOGLE (MENANGKAP LAMPU MERAH)
+    // ---------------------------------------------------------
+    let googleStatus = "AMAN";
+    const isWhitelisted = whitelist.includes(rootDomain);
 
-    // --- 5. LOGIKA SINKRONISASI ENGINE (PENTING!) ---
-    const isGoogleBad = googleData.matches && googleData.matches.length > 0;
-    const isVTBad =
-      vtStats && (vtStats.malicious > 0 || vtStats.suspicious > 0);
+    // STATUS 1: BAHAYA (Google Resmi mem-Blacklist)
+    if (googleData.matches && googleData.matches.length > 0) {
+      googleStatus = "BAHAYA";
+    }
+    // STATUS 2: ADA CELAH (Menangkap "Lampu Merah" di foto kamu)
+    // Jika Google "No Data" TAPI domain bukan whitelist (misal .cfd), anggap ADA CELAH
+    else if (!isWhitelisted) {
+      googleStatus = "ADA CELAH";
+    }
+    // STATUS 3: AMAN (Hanya untuk domain di Whitelist)
+    else {
+      googleStatus = "AMAN";
+    }
 
-    // Cek apakah database benar-benar punya data tentang link ini
-    const hasGlobalRecord =
-      vtStats && vtStats.malicious + vtStats.suspicious + vtStats.harmless > 0;
+    // 5. STATUS VIRUSTOTAL
+    let vtStatus = "AMAN";
+    const hasVTRecord =
+      vtStats && vtStats.malicious + vtStats.harmless + vtStats.suspicious > 0;
+    if (vtStats && (vtStats.malicious > 0 || vtStats.suspicious > 0)) {
+      vtStatus = "BAHAYA";
+    } else if (!hasVTRecord) {
+      vtStatus = "TIDAK ADA DATA";
+    }
 
+    // 6. ARTUP LOGIC (HEURISTIC)
     let artupHeuristic = "AMAN";
+    const isManipulated =
+      whitelist.some((w) => domain.includes(w)) && !isWhitelisted;
 
-    // Walaupun Google Sites (Whitelisted), jika ada path mencurigakan/kata pancingan, statusnya BUKAN AMAN
-    if (isBaseWhitelisted) {
-      if (hasBaitInUrl || hasSuspiciousFolder) {
-        artupHeuristic = "ADA CELAH"; // Menurunkan level kepercayaan Google Sites palsu
-      }
-    } else {
-      if (isImpersonating || (hasHighEntropy && hasBaitInUrl)) {
-        artupHeuristic = "BAHAYA";
-      } else if (hasBaitInUrl || hasSuspiciousFolder || path.length > 30) {
+    if (googleStatus === "BAHAYA" || vtStatus === "BAHAYA" || isManipulated) {
+      artupHeuristic = "BAHAYA";
+    } else if (isWhitelisted) {
+      const subdomain = parts[0];
+      if (publicSubdomains.includes(subdomain) && rootDomain !== domain) {
         artupHeuristic = "ADA CELAH";
       }
+    } else {
+      artupHeuristic = "ADA CELAH";
     }
 
-    // Penentuan Status Global Engine untuk UI agar tidak menipu
-    let globalStatusUI = "CLEAN";
-    if (isGoogleBad || isVTBad) {
-      globalStatusUI = "BAHAYA"; // Merah & Valid
-    } else if (!hasGlobalRecord && !isGoogleBad) {
-      globalStatusUI = "TIDAK ADA DATA"; // Orange/Kuning (Bukan Hijau!)
-    }
-
-    // --- 6. FINAL DECISION (RADAR ARTUP) ---
+    // ---------------------------------------------------------
+    // FINAL STATUS (SINKRONISASI TOTAL)
+    // ---------------------------------------------------------
     let finalStatus = "AMAN";
-
-    // Jika salah satu engine bilang BAHAYA, atau Heuristik kita bilang BAHAYA, maka MERAH
-    if (globalStatusUI === "BAHAYA" || artupHeuristic === "BAHAYA") {
+    if (artupHeuristic === "BAHAYA" || googleStatus === "BAHAYA") {
       finalStatus = "BAHAYA";
-    }
-    // Jika tidak ada data global atau Heuristik kita menemukan celah, maka ORANGE
-    else if (
-      globalStatusUI === "TIDAK ADA DATA" ||
-      artupHeuristic === "ADA CELAH"
+    } else if (
+      artupHeuristic === "ADA CELAH" ||
+      googleStatus === "ADA CELAH" ||
+      vtStatus === "TIDAK ADA DATA"
     ) {
       finalStatus = "ADA CELAH";
     }
 
     return NextResponse.json({
-      googleStatus: globalStatusUI, // Akan sinkron: BAHAYA (Merah), CLEAN (Hijau), atau TIDAK ADA DATA (Orange)
-      virusTotal: vtStats,
+      googleStatus,
+      virusTotal: vtStatus,
+      vtDetails: vtStats,
       artupHeuristic,
       finalStatus,
-      details: {
-        isBaseWhitelisted,
-        hasBaitInUrl,
-        hasSuspiciousFolder,
-        hasGlobalRecord,
-      },
+      details: { domain, rootDomain, isWhitelisted },
     });
   } catch (error) {
     return NextResponse.json(
