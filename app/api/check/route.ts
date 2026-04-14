@@ -6,107 +6,84 @@ export async function POST(req: Request) {
     if (!url)
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
 
-    // 1. NORMALISASI & EKSTRAKSI DOMAIN
+    // 1. NORMALISASI
     url = url.trim().toLowerCase();
     if (!url.startsWith("http")) url = "https://" + url;
 
     const urlObj = new URL(url);
     const domain = urlObj.hostname.replace("www.", "");
     const parts = domain.split(".");
-
     const rootDomain =
       domain.endsWith(".co.id") || domain.endsWith(".net.id")
         ? parts.slice(-3).join(".")
         : parts.slice(-2).join(".");
 
-    // DATABASE WHITELIST (Domain yang 100% kita percaya)
-   const whitelist = [
-     // --- GLOBAL & TECH (RAKSASA TEKNOLOGI) ---
-     "google.com",
-     "facebook.com",
-     "github.com",
-     "vercel.app",
-     "github.io",
-     "openai.com",
-     "youtube.com",
-     "microsoft.com",
-     "apple.com",
-     "instagram.com",
-     "twitter.com",
-     "x.com",
-     "linkedin.com",
-     "whatsapp.com",
-     "discord.com",
-     "telegram.org",
+    const whitelist = [
+      // TEKNOLOGI & SOSIAL MEDIA (EXISTING)
+      "google.com",
+      "facebook.com",
+      "github.com",
+      "vercel.app",
+      "youtube.com",
+      "dana.id",
 
-     // --- PERBANKAN INDONESIA (UTAMA) ---
-     "bca.co.id",
-     "bankmandiri.co.id",
-     "bri.co.id",
-     "bni.co.id",
-     "bankbsi.co.id",
-     "btn.co.id",
-     "cimbniaga.com",
-     "danamon.co.id",
-     "bankpermata.com",
-     "ocbc.id",
-     "panin.co.id",
+      // PERBANKAN UMUM INDONESIA
+      "bca.co.id",
+      "bankmandiri.co.id",
+      "bni.co.id",
+      "bri.co.id",
+      "btn.co.id",
+      "banksyariahindonesia.co.id", // BSI
+      "cimbniaga.co.id",
+      "danamon.co.id",
+      "permatabank.com",
+      "bpddiy.co.id",
+      "bankdki.co.id",
+      "bankjateng.co.id",
+      "bankjatim.co.id",
 
-     // --- BANK DAERAH (KHUSUS JOGJA & SEKITARNYA) ---
-     "bpddiy.co.id",
-     "bankjogja.com",
-     "banksleman.co.id",
-     "bankbantul.co.id",
-
-     // --- FINTECH & DOMPET DIGITAL INDONESIA ---
-     "dana.id",
-     "ovo.id",
-     "linkaja.id",
-     "gopay.co.id",
-     "shopeepay.co.id",
-     "flip.id",
-     "bibit.id",
-     "pluang.com",
-     "ajaib.co.id",
-     "midtrans.com",
-
-     // --- PEMERINTAHAN (INSTITUSI NEGARA) ---
-     "go.id",
-     "pajak.go.id",
-     "bpjs-kesehatan.go.id",
-     "bpjsketenagakerjaan.go.id",
-     "indonesia.go.id",
-     "kemkes.go.id",
-     "polri.go.id",
-     "kemenkeu.go.id",
-     "kominfo.go.id",
-     "bi.go.id",
-     "ojk.go.id",
-
-     // --- E-COMMERCE & LAYANAN POPULER INDONESIA ---
-     "tokopedia.com",
-     "shopee.co.id",
-     "bukalapak.com",
-     "blibli.com",
-     "lazada.co.id",
-     "gojek.com",
-     "grab.com",
-     "traveloka.com",
-     "tiket.com",
-   ];
-
-    const publicSubdomains = [
-      "sites",
-      "forms",
-      "docs",
-      "storage",
-      "firebaseapp",
-      "vercel",
-      "github",
-      "pages",
+      // EKOSISTEM NEGARA & OTORITAS (RESMI)
+      "go.id", // Seluruh domain pemerintahan (Kominfo, Kemenkeu, dll)
+      "pajak.go.id",
+      "bi.go.id", // Bank Indonesia
+      "ojk.go.id", // Otoritas Jasa Keuangan
+      "polri.go.id",
+      "indonesia.go.id",
+      "kpu.go.id",
+      "bpjs-kesehatan.go.id",
+      "bpjsketenagakerjaan.go.id",
+      "mahkamahagung.go.id",
     ];
 
-    // 2. FUNGSI VIRUSTOTAL (Disederhanakan untuk efisiensi)
+    // DAFTAR SITUS GRATISAN / HOSTING PUBLIK (TAMBAHAN VAR A)
+    const hostingGratis = [
+      "sites.google.com",
+      "vercel.app",
+      "github.io",
+      "firebaseapp.com",
+      "web.app",
+      "pantheonsite.io",
+      "000webhostapp.com",
+    ];
+
+    // KATA KUNCI SENSITIF UNTUK CEK PATH
+    const sensitiveKeywords = [
+      "bca",
+      "bri",
+      "mandiri",
+      "bni",
+      "bank",
+      "login",
+      "verifikasi",
+      "akun",
+      "portal",
+      "update",
+    ];
+
+    const isWhitelisted = whitelist.includes(rootDomain);
+    const isPublicHosting = hostingGratis.some((h) => domain.includes(h));
+
+    // 2. FUNGSI VIRUSTOTAL (VAR A)
     const getVirusTotalData = async (targetUrl: string) => {
       const urlId = Buffer.from(targetUrl)
         .toString("base64")
@@ -119,6 +96,17 @@ export async function POST(req: Request) {
           `https://www.virustotal.com/api/v3/urls/${urlId}`,
           { headers },
         );
+        if (res.status === 404) {
+          await fetch(`https://www.virustotal.com/api/v3/urls`, {
+            method: "POST",
+            headers,
+            body: new URLSearchParams({ url: targetUrl }),
+          });
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          res = await fetch(`https://www.virustotal.com/api/v3/urls/${urlId}`, {
+            headers,
+          });
+        }
         return res.json();
       } catch (e) {
         return null;
@@ -148,62 +136,66 @@ export async function POST(req: Request) {
     const googleData = await googleRes.json();
     const vtStats = vtData?.data?.attributes?.last_analysis_stats || null;
 
-    // ---------------------------------------------------------
-    // 4. ANALISIS STATUS GOOGLE (MENANGKAP LAMPU MERAH)
-    // ---------------------------------------------------------
+    // 4. ANALISIS GOOGLE
     let googleStatus = "AMAN";
-    const isWhitelisted = whitelist.includes(rootDomain);
-
-    // STATUS 1: BAHAYA (Google Resmi mem-Blacklist)
     if (googleData.matches && googleData.matches.length > 0) {
       googleStatus = "BAHAYA";
-    }
-    // STATUS 2: ADA CELAH (Menangkap "Lampu Merah" di foto kamu)
-    // Jika Google "No Data" TAPI domain bukan whitelist (misal .cfd), anggap ADA CELAH
-    else if (!isWhitelisted) {
+    } else if (!isWhitelisted || isPublicHosting) {
       googleStatus = "ADA CELAH";
     }
-    // STATUS 3: AMAN (Hanya untuk domain di Whitelist)
-    else {
-      googleStatus = "AMAN";
-    }
 
-    // 5. STATUS VIRUSTOTAL
+    // 5. ANALISIS VIRUSTOTAL
     let vtStatus = "AMAN";
-    const hasVTRecord =
-      vtStats && vtStats.malicious + vtStats.harmless + vtStats.suspicious > 0;
-    if (vtStats && (vtStats.malicious > 0 || vtStats.suspicious > 0)) {
+    const malic = vtStats?.malicious || 0;
+    if (malic >= 1) {
       vtStatus = "BAHAYA";
-    } else if (!hasVTRecord) {
+    } else if (!vtStats) {
       vtStatus = "TIDAK ADA DATA";
     }
 
-    // 6. ARTUP LOGIC (HEURISTIC)
+    // 6. ARTUP HEURISTIC (LOGIKA BARU UNTUK SITUS GRATISAN)
     let artupHeuristic = "AMAN";
-    const isManipulated =
-      whitelist.some((w) => domain.includes(w)) && !isWhitelisted;
 
-    if (googleStatus === "BAHAYA" || vtStatus === "BAHAYA" || isManipulated) {
-      artupHeuristic = "BAHAYA";
-    } else if (isWhitelisted) {
-      const subdomain = parts[0];
-      if (publicSubdomains.includes(subdomain) && rootDomain !== domain) {
+    if (googleStatus === "BAHAYA" || vtStatus === "BAHAYA") {
+      artupHeuristic = "ADA CELAH";
+    } else {
+      // CEK MANIPULASI DOMAIN
+      const isManipulated =
+        whitelist.some((w) => domain.includes(w)) && !isWhitelisted;
+
+      if (isManipulated) {
+        artupHeuristic = "BAHAYA";
+      } else if (isPublicHosting) {
+        // LOGIKA BARU: Cek apakah di dalam path URL ada kata-kata bank/login
+        const fullPath = urlObj.href.toLowerCase();
+        const hasSensitiveWord = sensitiveKeywords.some((word) =>
+          fullPath.includes(word),
+        );
+
+        if (hasSensitiveWord) {
+          // Jika situs gratisan (sites.google) tapi bawa-bawa nama "bank" atau "login"
+          artupHeuristic = "BAHAYA";
+        } else {
+          // Jika situs gratisan biasa (portofolio orang dll)
+          artupHeuristic = "ADA CELAH";
+        }
+      } else if (!isWhitelisted) {
         artupHeuristic = "ADA CELAH";
       }
-    } else {
-      artupHeuristic = "ADA CELAH";
     }
 
-    // ---------------------------------------------------------
-    // FINAL STATUS (SINKRONISASI TOTAL)
-    // ---------------------------------------------------------
+    // 7. FINAL SINKRONISASI
     let finalStatus = "AMAN";
-    if (artupHeuristic === "BAHAYA" || googleStatus === "BAHAYA") {
+    if (
+      googleStatus === "BAHAYA" ||
+      vtStatus === "BAHAYA" ||
+      artupHeuristic === "BAHAYA"
+    ) {
       finalStatus = "BAHAYA";
     } else if (
-      artupHeuristic === "ADA CELAH" ||
       googleStatus === "ADA CELAH" ||
-      vtStatus === "TIDAK ADA DATA"
+      vtStatus === "TIDAK ADA DATA" ||
+      artupHeuristic === "ADA CELAH"
     ) {
       finalStatus = "ADA CELAH";
     }
@@ -214,7 +206,7 @@ export async function POST(req: Request) {
       vtDetails: vtStats,
       artupHeuristic,
       finalStatus,
-      details: { domain, rootDomain, isWhitelisted },
+      details: { domain, rootDomain, isWhitelisted, isPublicHosting },
     });
   } catch (error) {
     return NextResponse.json(
