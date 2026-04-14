@@ -23,9 +23,18 @@ export async function POST(req: Request) {
       "google.com",
       "facebook.com",
       "github.com",
-      "vercel.app",
       "youtube.com",
       "dana.id",
+      "whatsapp.com",
+      "tokopedia.com",
+      "gojek.com",
+      "gopay.co.id",
+      "ovo.id",
+
+      "id", // Menandakan domain .id (induk)
+      "ac.id", // Universitas/Akademik (Butuh SK Pendirian)
+      "sch.id", // Sekolah (Butuh surat izin dinas)
+      "or.id",
 
       // PERBANKAN UMUM INDONESIA
       "bca.co.id",
@@ -40,7 +49,9 @@ export async function POST(req: Request) {
       "bpddiy.co.id",
       "bankdki.co.id",
       "bankjateng.co.id",
+      "instagram.com",
       "bankjatim.co.id",
+      "traveloka.com",
 
       // EKOSISTEM NEGARA & OTORITAS (RESMI)
       "go.id", // Seluruh domain pemerintahan (Kominfo, Kemenkeu, dll)
@@ -53,6 +64,7 @@ export async function POST(req: Request) {
       "bpjs-kesehatan.go.id",
       "bpjsketenagakerjaan.go.id",
       "mahkamahagung.go.id",
+      "artup-studio.vercel.app",
     ];
 
     // DAFTAR SITUS GRATISAN / HOSTING PUBLIK (TAMBAHAN VAR A)

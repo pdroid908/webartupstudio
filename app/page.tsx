@@ -105,7 +105,7 @@ export default function Home() {
           playsInline
           className="w-full h-full object-cover opacity-100 transition-opacity duration-1000"
         >
-          <source src="videomiku.mp4" type="video/mp4" />
+          <source src="BG.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-950"></div>
       </div>

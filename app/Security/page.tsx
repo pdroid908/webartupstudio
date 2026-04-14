@@ -158,7 +158,7 @@ export default function SecurityPage() {
                     {result.artupHeuristic === "BAHAYA"
                       ? "🚨 MANIPULATION DETECTED"
                       : result.artupHeuristic === "ADA CELAH"
-                        ? "⚠️ Jangan masukan data penting, karna mereka bisa melihat itu "
+                        ? "⚠️ WEB PUBLIK YANG BAIK TIDAK MINTA DATA SENSITIF ATAU PASSWORD,  "
                         : "🛡️ VERIFIKASI AMAN"}
                   </span>
                 </div>
@@ -170,8 +170,8 @@ export default function SecurityPage() {
                     ? "Sistem mendeteksi pola PENCURIAN DATA . Jangan masukkan data apa pun!"
                     : finalStatus === "ADA CELAH"
                       ? isPublicHosting
-                        ? "PERINGATAN: Ini adalah layanan situs gratisan (siapa pun bisa membuat halaman di sini). Gunakan dengan sangat hati-hati!"
-                        : "WASPADA: Jangan masukkan informasi keuangan atau kode rahasia, KECUALI PERCAYA PADA PENGEMBANG ITU."
+                        ? "PERINGATAN: Jangan masukan data penting keuangan dan data diri sensitif atau kode rahasia, Kecuali percaya pada situs itu"
+                        : "WASPADA: Jangan masukkan informasi keuangan atau kode rahasia, KECUALI PERCAYA PADA SITUS ITU."
                       : "Domain induk terverifikasi dan struktur URL resmi."}
                 </p>
               </div>
