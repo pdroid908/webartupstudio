@@ -89,8 +89,18 @@ export default function Home() {
   };
 
   const handleTabChange = (tab: "web" | "games") => {
-    setActiveTab(tab);
-    setShowIframe(false);
+    // Beri jeda 200ms agar animasi 'active:scale' terlihat
+    setTimeout(() => {
+      setActiveTab(tab);
+      setShowIframe(false);
+    }, 200);
+  };
+
+  const handleSecurityClick = () => {
+    // Kamu bisa tambah state 'loading' di sini jika mau efek lebih kompleks
+    setTimeout(() => {
+      window.location.href = "/Security";
+    }, 400); // Jeda sedikit lebih lama (0.4 detik) agar efek klik mantap
   };
 
   return (
@@ -105,42 +115,29 @@ export default function Home() {
         {/* Overlay Gradient tetap sama agar konten depan terbaca */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-950"></div>
       </div>
-      <div className="hidden">
-        <audio
-          autoPlay
-          loop
-          controls={false} // Agar tidak muncul visual playernya
-        >
-          <source src="" type="audio/mpeg" />
-          Browser kamu tidak mendukung pemutar musik.
-        </audio>
-      </div>
+      
       );
       {/* --- AUDIO TOGGLE --- */}
-      <button
-        onClick={() => setIsMuted(!isMuted)}
-        className="fixed top-6 right-6 z-50 p-4 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-full shadow-2xl active:scale-95 transition-all hover:bg-slate-800"
-      >
-        <span className="text-xl">{isMuted ? "🔇" : "🔊"}</span>
-      </button>
+      
       {/* --- SIDEBAR --- */}
       <aside className="w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col justify-between">
         <div>
           <h2 className="text-xl font-black text-blue-500 italic tracking-tighter uppercase">
             Artup STUDIO
           </h2>
-          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1 ml-0.5 mb-6">
-            Web and Game Developer
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 ml-0.5 mb-6">
+            HIGH-TECH
           </p>
           <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide mb-6">
+            {/* Tombol Web Games */}
             <button
               onClick={() => handleTabChange("web")}
-              className={`px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-95 flex items-center gap-3 border-2 w-full
-      ${
-        activeTab === "web"
-          ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-          : "bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-blue-600 hover:border-blue-400 hover:text-white hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-      }`}
+              className={`px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-90 flex items-center gap-3 border-2 w-full
+    ${
+      activeTab === "web"
+        ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+        : "bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-blue-600 hover:text-white"
+    }`}
             >
               <span className="text-sm md:text-base">🌐</span> Web Games
             </button>
@@ -148,24 +145,26 @@ export default function Home() {
             {/* Tombol App Games */}
             <button
               onClick={() => handleTabChange("games")}
-              className={`px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-95 flex items-center gap-3 border-2 w-full
-      ${
-        activeTab === "games"
-          ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-          : "bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-blue-600 hover:border-blue-400 hover:text-white hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-      }`}
+              className={`px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-90 flex items-center gap-3 border-2 w-full
+    ${
+      activeTab === "games"
+        ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+        : "bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-blue-600 hover:text-white"
+    }`}
             >
               <span className="text-sm md:text-base">🎮</span> App Games
             </button>
 
-            {/* Tombol Security Scan */}
-            <a
-              href="/Security"
-              className="px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-95 flex items-center gap-3 border-2 w-full
-      bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-blue-600 hover:border-blue-400 hover:text-white hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+            {/* Tombol Security Scan (SEKARANG PAKAI BUTTON + ANIMASI) */}
+            <button
+              onClick={handleSecurityClick}
+              className="px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-90 active:bg-red-600 active:border-red-400 flex items-center gap-3 border-2 w-full bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-red-600/20 hover:text-red-400 hover:border-red-500/50"
             >
-              <span className="text-sm md:text-base">🛡️</span> Security Scan
-            </a>
+              <span className="text-sm md:text-base group-active:animate-ping">
+                🛡️
+              </span>
+              Security Scan
+            </button>
           </nav>
 
           <a

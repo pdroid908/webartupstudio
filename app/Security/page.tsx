@@ -6,7 +6,21 @@ export default function SecurityPage() {
   const [urlInput, setUrlInput] = useState("");
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+
   const [statusText, setStatusText] = useState("SCAN LINK SEKARANG");
+
+  
+  const [manualVideo, setManualVideo] = useState("dPLPqVGCF-4"); // Ganti ID_VIDEO_DEFAULT
+  // 1. Simpan ID video tadi di variable atau state
+  const videoId = "dPLPqVGCF-4";
+
+  const handleManualVideo = (id: string) => {
+    setManualVideo(id);
+    // Scroll otomatis ke video agar terlihat di HP
+    const element = document.getElementById("video-section");
+    element?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -55,7 +69,82 @@ export default function SecurityPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-10 font-sans selection:bg-red-600/40 relative overflow-x-hidden">
-      <div className="max-w-4xl mx-auto mb-10 pt-4">
+      {/* --- SIDEBAR/DOCK MEDSOS (Responsive) --- */}
+      <aside className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-auto md:top-1/2 md:right-4 md:left-auto z-50 flex flex-row md:flex-col gap-3 bg-zinc-900/80 md:bg-transparent p-3 md:p-0 rounded-full md:rounded-none border border-zinc-800 md:border-none backdrop-blur-md md:backdrop-blur-none shadow-2xl md:shadow-none">
+        <a
+          href="https://www.facebook.com/profile.php?id=61580560360762&locale=id_ID"
+          className="p-3 bg-blue-600 rounded-full hover:scale-110 transition-all text-xs font-black"
+        >
+          FACEEBOOK
+        </a>
+        <a
+          href="https://www.tiktok.com/@artupstudio"
+          className="p-3 bg-pink-600 rounded-full hover:scale-110 transition-all text-xs font-black"
+        >
+          TikTok
+        </a>
+        <a
+          href="https://www.youtube.com/@Artup-STUDIO"
+          className=" p-3 bg-red-600 rounded-full hover:scale-110 transition-all text-xs font-black"
+        >
+          YouTube
+        </a>
+      </aside>
+
+      <div className="max-w-2xl mx-auto mb-10 pt-4">
+        {/* --- TOMBOL EDUKASI MANUAL --- */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <button
+            onClick={() => setManualVideo("0idNc-BXE54")}
+            className="py-3 px-2 rounded-xl bg-red-950/30 border border-red-900/50 text-[9px] font-black uppercase tracking-tighter hover:bg-red-600 transition-all active:scale-95"
+          >
+            🚨 JIKA PHISING?
+          </button>
+          <button
+            onClick={() => setManualVideo("0idNc-BXE54")}
+            className="py-3 px-2 rounded-xl bg-orange-950/30 border border-orange-900/50 text-[9px] font-black uppercase tracking-tighter hover:bg-orange-600 transition-all active:scale-95"
+          >
+            ⚠️ JIKA ADA CELAH?
+          </button>
+        </div>
+
+        {/* --- AREA IFRAME YOUTUBE --- */}
+        <div className="mb-10">
+          <div className="bg-zinc-900/40 p-3 rounded-[2rem] border border-zinc-800 backdrop-blur-sm shadow-2xl">
+            <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-inner border border-white/5">
+              <iframe
+                key={manualVideo}
+                src={`https://www.youtube.com/embed/${manualVideo}?autoplay=1&mute=1&rel=0&modestbranding=1`}
+                title="Artup Security Education"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <p className="mt-2 text-[8px] text-center font-bold text-zinc-600 uppercase tracking-[0.2em]">
+              Auto-playing: Educational Content
+            </p>
+          </div>
+        </div>
+        {/* --- IFRAME VIDEO SECTION --- */}
+        <div
+          id="video-section"
+          className="mb-10 animate-in fade-in duration-1000"
+        >
+          <div className="flex justify-center my-8 px-4">
+            <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-white/5 bg-black">
+              <iframe
+                key={manualVideo} // Ini wajib ada agar iframe refresh saat ganti video
+                src={`https://www.youtube-nocookie.com/embed/${manualVideo}?autoplay=1&mute=1`}
+                title="Artup Security Education"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
         <Link
           href="/"
           className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-100 hover:text-white hover:bg-red-600 hover:border-red-500 transition-all duration-300 text-[10px] font-black uppercase tracking-[0.2em] group shadow-lg shadow-black"
