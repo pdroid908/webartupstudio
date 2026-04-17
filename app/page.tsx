@@ -112,17 +112,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
-
-
-
-
       {/* --- VIDEO BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <img
           src="bgrun.png"
           alt="Background"
-
-
           /* object-cover: Mengunci rasio gambar agar tidak gepeng. 
        object-center: Memastikan bagian tengah GIF selalu di tengah layar.
     */
@@ -159,7 +153,7 @@ export default function Home() {
       ${
         activeTab === "web"
           ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-2 border-blue-400"
-          : "bg-slate-950 text-slate-500 hover:text-white"
+          : "bg-slate-950 text-slate-500 hover:text-white hover:bg-blue-600"
       }`}
               >
                 <span className="text-sm">🌐</span> Web Games
