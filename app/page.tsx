@@ -112,11 +112,17 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
+
+
+
+
       {/* --- VIDEO BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <img
-          src="1.gif"
+          src="bgrun.png"
           alt="Background"
+
+
           /* object-cover: Mengunci rasio gambar agar tidak gepeng. 
        object-center: Memastikan bagian tengah GIF selalu di tengah layar.
     */
