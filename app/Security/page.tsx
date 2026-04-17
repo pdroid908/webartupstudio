@@ -99,18 +99,13 @@ export default function SecurityPage() {
       </aside>
 
       <Link
-        onClick={() => {
-          // 1. Matikan loading lokal jika ada
-          setLoading(false);
-          // 2. Kirim sinyal ke browser bahwa kita berpindah secara bersih
-          // Ini membantu memicu event 'pageshow' di halaman tujuan
-        }}
+        onClick={() => setLoading(false)}
         href="/"
-        // Gunakan replace agar history tidak menumpuk jika diperlukan,
-        // tapi href="/" saja sudah cukup jika page.tsx utama sudah diperbaiki
-
-        /* --- CLASS UTAMA YANG DIUBAH (Tambahan Layering & Overfow) --- */
-        className="relative inline-flex items-center justify-center p-[2px] rounded-full overflow-hidden transition-all duration-300 text-[10px] font-black uppercase tracking-[0.2em] group shadow-lg shadow-black group active:scale-95"
+        /* Ganti mb-18 (tidak ada) menjadi mb-12 untuk HP.
+     Ganti md:mb-12 menjadi md:mb-20 untuk Laptop agar lebih lega.
+     Tambahkan block atau flex agar margin bekerja maksimal.
+  */
+        className="relative mb-12 md:mb-20 inline-flex items-center justify-center p-[3px] rounded-full overflow-hidden transition-all duration-300 text-[10px] font-black uppercase tracking-[0.2em] group shadow-lg shadow-black active:scale-90"
       >
         {/* 1. LAYER ANIMASI WARNA BERPUTAR (DIAM GERAK-GERAK) */}
         <div
@@ -122,7 +117,7 @@ export default function SecurityPage() {
 
         {/* 2. LAYER BACKROUND HITAM (Agar Teks Terbaca & Hover Effect) */}
         <div
-          className="flex h-full w-full items-center gap-3 rounded-full bg-zinc-900 px-6 py-2.5 transition-all duration-300 z-10 
+          className="flex h-full w-full items-center gap-3 rounded-full bg-zinc-900 px-3 py-2.5 transition-all duration-300 z-10 
     group-hover:bg-red-600/10 group-hover:backdrop-blur-sm"
         >
           {/* Icon Panah */}
@@ -145,10 +140,10 @@ export default function SecurityPage() {
 
       <div className="max-w-2xl mx-auto">
         <header className="text-center mb-8 md:mb-12">
-          <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter text-blue-600 mb-3 drop-shadow-[0_0_15px_rgba(37,99,235,0.3)] uppercase">
+          <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-blue-600 mb-3 drop-shadow-[0_0_15px_rgba(37,99,235,0.3)] uppercase">
             🛡️ ARTUP SECURITY
           </h1>
-          <p className="text-zinc-500 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] px-4">
+          <p className="text-zinc-500 text-[10px] md:text-[10px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] px-4">
             Multi-Engine Real-time Verification System
           </p>
         </header>

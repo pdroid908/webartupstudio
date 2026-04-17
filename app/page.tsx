@@ -112,7 +112,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
-      {/* --- VIDEO BACKGROUND --- */}
+      {/* --- BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <img
           src="bgrun.png"
@@ -288,7 +288,7 @@ export default function Home() {
         </div>
       </aside>
       {/* --- MAIN CONTENT --- */}
-      <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-44 md:pt-56 min-h-screen">
+      <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-20 md:pt-56 min-h-screen">
         <header className="mb-10">
           <h1 className="text-2xl md:text-3xl font-black tracking-tight uppercase italic text-zinc-100">
             {activeTab === "web" ? "Web Games" : "My Games"}
