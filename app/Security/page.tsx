@@ -7,13 +7,11 @@ export default function SecurityPage() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-
   const [statusText, setStatusText] = useState("SCAN LINK SEKARANG");
 
-  
-  const [manualVideo, setManualVideo] = useState("dPLPqVGCF-4"); // Ganti ID_VIDEO_DEFAULT
+  const [manualVideo, setManualVideo] = useState("tzYhNOu7Bdg"); // Video default saat pertama buka
   // 1. Simpan ID video tadi di variable atau state
-  const videoId = "dPLPqVGCF-4";
+  const videoId = "tzYhNOu7Bdg";
 
   const handleManualVideo = (id: string) => {
     setManualVideo(id);
@@ -45,9 +43,10 @@ export default function SecurityPage() {
   }, [loading]);
 
   const handleCekKeamanan = async () => {
-    if (!urlInput) return alert("Masukkan LINK Jika Ingin Check!");
+    if (!urlInput) return; // Jangan jalan kalau kosong
+
     setLoading(true);
-    setResult(null);
+    setResult(null); // Reset hasil lama agar tidak tumpang tindih
 
     try {
       const response = await fetch("/api/check", {
@@ -55,15 +54,17 @@ export default function SecurityPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: urlInput }),
       });
+
       const data = await response.json();
       setResult(data);
     } catch (error) {
       setResult({ error: "Gagal menyambung ke Artup Infrastructure" });
     } finally {
       setLoading(false);
+      // PENTING: Kembalikan teks tombol agar UI sadar proses sudah selesai
+      setStatusText("SCAN LINK SEKARANG");
     }
   };
-
   const finalStatus = result?.finalStatus;
   const isPublicHosting = result?.details?.isPublicHosting; // Ambil data dari backend
 
@@ -73,88 +74,74 @@ export default function SecurityPage() {
       <aside className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-auto md:top-1/2 md:right-4 md:left-auto z-50 flex flex-row md:flex-col gap-3 bg-zinc-900/80 md:bg-transparent p-3 md:p-0 rounded-full md:rounded-none border border-zinc-800 md:border-none backdrop-blur-md md:backdrop-blur-none shadow-2xl md:shadow-none">
         <a
           href="https://www.facebook.com/profile.php?id=61580560360762&locale=id_ID"
+          target="_blank"
+          rel="noopener noreferrer" // Tambahkan ini agar aman
           className="p-3 bg-blue-600 rounded-full hover:scale-110 transition-all text-xs font-black"
         >
           FACEEBOOK
         </a>
         <a
           href="https://www.tiktok.com/@artupstudio"
+          target="_blank"
+          rel="noopener noreferrer" // Tambahkan ini agar aman
           className="p-3 bg-pink-600 rounded-full hover:scale-110 transition-all text-xs font-black"
         >
           TikTok
         </a>
         <a
           href="https://www.youtube.com/@Artup-STUDIO"
+          target="_blank"
+          rel="noopener noreferrer" // Tambahkan ini agar aman
           className=" p-3 bg-red-600 rounded-full hover:scale-110 transition-all text-xs font-black"
         >
           YouTube
         </a>
       </aside>
 
-      <div className="max-w-2xl mx-auto mb-10 pt-4">
-        {/* --- TOMBOL EDUKASI MANUAL --- */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <button
-            onClick={() => setManualVideo("0idNc-BXE54")}
-            className="py-3 px-2 rounded-xl bg-red-950/30 border border-red-900/50 text-[9px] font-black uppercase tracking-tighter hover:bg-red-600 transition-all active:scale-95"
-          >
-            🚨 JIKA PHISING?
-          </button>
-          <button
-            onClick={() => setManualVideo("0idNc-BXE54")}
-            className="py-3 px-2 rounded-xl bg-orange-950/30 border border-orange-900/50 text-[9px] font-black uppercase tracking-tighter hover:bg-orange-600 transition-all active:scale-95"
-          >
-            ⚠️ JIKA ADA CELAH?
-          </button>
-        </div>
+      <Link
+        onClick={() => {
+          // 1. Matikan loading lokal jika ada
+          setLoading(false);
+          // 2. Kirim sinyal ke browser bahwa kita berpindah secara bersih
+          // Ini membantu memicu event 'pageshow' di halaman tujuan
+        }}
+        href="/"
+        // Gunakan replace agar history tidak menumpuk jika diperlukan,
+        // tapi href="/" saja sudah cukup jika page.tsx utama sudah diperbaiki
 
-        {/* --- AREA IFRAME YOUTUBE --- */}
-        <div className="mb-10">
-          <div className="bg-zinc-900/40 p-3 rounded-[2rem] border border-zinc-800 backdrop-blur-sm shadow-2xl">
-            <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-inner border border-white/5">
-              <iframe
-                key={manualVideo}
-                src={`https://www.youtube.com/embed/${manualVideo}?autoplay=1&mute=1&rel=0&modestbranding=1`}
-                title="Artup Security Education"
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <p className="mt-2 text-[8px] text-center font-bold text-zinc-600 uppercase tracking-[0.2em]">
-              Auto-playing: Educational Content
-            </p>
-          </div>
-        </div>
-        {/* --- IFRAME VIDEO SECTION --- */}
+        /* --- CLASS UTAMA YANG DIUBAH (Tambahan Layering & Overfow) --- */
+        className="relative inline-flex items-center justify-center p-[2px] rounded-full overflow-hidden transition-all duration-300 text-[10px] font-black uppercase tracking-[0.2em] group shadow-lg shadow-black group active:scale-95"
+      >
+        {/* 1. LAYER ANIMASI WARNA BERPUTAR (DIAM GERAK-GERAK) */}
         <div
-          id="video-section"
-          className="mb-10 animate-in fade-in duration-1000"
-        >
-          <div className="flex justify-center my-8 px-4">
-            <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-white/5 bg-black">
-              <iframe
-                key={manualVideo} // Ini wajib ada agar iframe refresh saat ganti video
-                src={`https://www.youtube-nocookie.com/embed/${manualVideo}?autoplay=1&mute=1`}
-                title="Artup Security Education"
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-        </div>
+          className="absolute inset-[-1000%] animate-[spin_5s_linear_infinite] 
+    bg-[conic-gradient(from_90deg_at_50%_50%,#334155_0%,#ef4444_20%,#3b82f6_50%,#ef4444_80%,#334155_100%)]
+    /* Saat Hover: Warna Berubah jadi Merah Terang */
+    group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#ef4444_0%,#f97316_50%,#ef4444_100%)]"
+        />
 
-        <Link
-          href="/"
-          className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-zinc-800/50 border border-zinc-700 text-zinc-100 hover:text-white hover:bg-red-600 hover:border-red-500 transition-all duration-300 text-[10px] font-black uppercase tracking-[0.2em] group shadow-lg shadow-black"
+        {/* 2. LAYER BACKROUND HITAM (Agar Teks Terbaca & Hover Effect) */}
+        <div
+          className="flex h-full w-full items-center gap-3 rounded-full bg-zinc-900 px-6 py-2.5 transition-all duration-300 z-10 
+    group-hover:bg-red-600/10 group-hover:backdrop-blur-sm"
         >
-          <span className="text-red-500 group-hover:text-white transition-colors text-base">
+          {/* Icon Panah */}
+          <span className="relative z-20 text-red-500 group-hover:text-white transition-colors text-base">
             ←
           </span>
-          Kembali
-        </Link>
-      </div>
+
+          {/* Teks */}
+          <span className="relative z-20 text-zinc-100 group-hover:text-white transition-colors">
+            Kembali
+          </span>
+        </div>
+
+        {/* 3. LAYER GLOW (Cahaya di Belakang) */}
+        <div
+          className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-300 
+    bg-blue-600/10 group-hover:bg-red-600/20 blur-xl z-0"
+        />
+      </Link>
 
       <div className="max-w-2xl mx-auto">
         <header className="text-center mb-8 md:mb-12">
@@ -183,7 +170,7 @@ export default function SecurityPage() {
                 : "bg-red-700 hover:bg-red-600 shadow-[0_10px_40px_rgba(185,28,28,0.2)] text-white"
             }`}
           >
-            {loading ? statusText : "SCAN LINK SEKARANG"}
+            {loading ? statusText : "LINK / WEBSITE SCANNER"}
           </button>
         </div>
 
@@ -230,7 +217,7 @@ export default function SecurityPage() {
 
                 <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
                   <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                    Virus ENGINE:
+                    VIRUS ENGINE:
                   </span>
                   <span
                     className={`font-black tracking-widest text-xs md:text-sm ${result.virusTotal === "BAHAYA" ? "text-red-500" : result.virusTotal === "TIDAK ADA DATA" ? "text-orange-500" : "text-green-500"}`}
@@ -253,7 +240,7 @@ export default function SecurityPage() {
                     {result.artupHeuristic === "BAHAYA"
                       ? "🚨 MANIPULATION DETECTED"
                       : result.artupHeuristic === "ADA CELAH"
-                        ? "⚠️ WEB PUBLIK YANG BAIK TIDAK MINTA DATA SENSITIF ATAU PASSWORD,  "
+                        ? "⚠️ WEB PUBLIK JANGAN MASUKAN DATA SENSITIF,  "
                         : "🛡️ VERIFIKASI AMAN"}
                   </span>
                 </div>
@@ -267,7 +254,7 @@ export default function SecurityPage() {
                       ? isPublicHosting
                         ? "PERINGATAN: Jangan masukan data penting keuangan dan data diri sensitif atau kode rahasia, Kecuali percaya pada situs itu"
                         : "WASPADA: Jangan masukkan informasi keuangan atau kode rahasia, KECUALI PERCAYA PADA SITUS ITU."
-                      : "Domain induk terverifikasi , Link AMAN."}
+                      : "Terverifikasi , Link AMAN."}
                 </p>
               </div>
             </div>
@@ -281,9 +268,73 @@ export default function SecurityPage() {
         )}
       </div>
 
+      <div className="max-w-2xl mx-auto mb-10 pt-4">
+        {/* --- TOMBOL EDUKASI (Trigger Ganti Video) --- */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <button
+            onClick={() => setManualVideo("eIa6zppZ03A")} // ID Video Phishing
+            className={`py-3 px-2 rounded-xl border transition-all active:scale-95 text-[9px] font-black uppercase tracking-tighter ${
+              manualVideo === "eIa6zppZ03A"
+                ? "bg-red-600 border-red-400 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+                : "bg-red-950/30 border-red-900/50 text-red-500 hover:bg-red-900/40"
+            }`}
+          >
+            🚨 JIKA PHISING?
+          </button>
+          <button
+            onClick={() => setManualVideo("tzYhNOu7Bdg")} // ID Video Celah/Default
+            className={`py-3 px-2 rounded-xl border transition-all active:scale-95 text-[9px] font-black uppercase tracking-tighter ${
+              manualVideo === "tzYhNOu7Bdgy"
+                ? "bg-orange-600 border-orange-400 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]"
+                : "bg-orange-950/30 border-orange-900/50 text-orange-500 hover:bg-orange-900/40"
+            }`}
+          >
+            ⚠️ JIKA ADA CELAH?
+          </button>
+        </div>
+
+        {/* --- SINGLE VIDEO PLAYER SECTION --- */}
+        <div className="mb-10 group">
+          <div className="bg-zinc-900/40 p-3 rounded-[2rem] border border-zinc-800 backdrop-blur-sm shadow-2xl relative overflow-hidden">
+            {/* Dekorasi Cahaya di Belakang Video */}
+            <div
+              className={`absolute inset-0 opacity-10 blur-[80px] transition-colors duration-700 ${
+                manualVideo === "eIa6zppZ03A" ? "bg-red-600" : "bg-orange-600"
+              }`}
+            />
+
+            <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-inner border border-white/5 relative z-10 bg-black">
+              <iframe
+                key={manualVideo} // Key ini penting agar Iframe refresh & autoplay jalan saat ID berubah
+                src={`https://www.youtube-nocookie.com/embed/${manualVideo}?autoplay=0&mute=1&rel=0&modestbranding=1`}
+                title="Artup Security Education"
+                className="w-full h-full"
+                allow="accelerometer;  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+
+            <div className="mt-3 flex justify-between items-center px-2 relative z-10">
+              <p className="text-[8px] font-bold text-zinc-500 uppercase tracking-[0.2em]">
+                Mode:{" "}
+                {manualVideo === "eIa6zppZ03A"
+                  ? "PERGI SAJA"
+                  : "WASPADA PUBLIK"}
+              </p>
+              <div className="flex gap-1">
+                <div
+                  className={`w-1.5 h-1.5 rounded-full animate-pulse ${manualVideo === "eIa6zppZ03A4" ? "bg-red-500" : "bg-orange-500"}`}
+                />
+                <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <footer className="mt-20 text-center pb-10">
         <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.5em]">
-          ARTUP Studio Security Division &copy; 2026
+          ARTUP STUDIO Security Division &copy; 2026
         </p>
       </footer>
     </div>

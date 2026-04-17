@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 // --- INTERFACE UNTUK TYPE SAFETY ---
 interface BaseItem {
   id: string;
@@ -12,6 +12,7 @@ interface BaseItem {
   screenshots: string[];
   link?: string; // Opsional untuk App
   embedUrl?: string; // Khusus untuk Web
+  videoId?: string;
 }
 
 const MY_GAMES: BaseItem[] = [
@@ -23,6 +24,7 @@ const MY_GAMES: BaseItem[] = [
     tech: "Android",
     link: "https://drive.google.com/file/d/1297vtnwaJKCdRf2u6ftLAb-Tjy2CtoqY/view?usp=sharing",
     iconFile: "logo.png",
+    videoId: "gIep-OxzPvA",
     screenshots: ["9(1435).png"],
   },
   {
@@ -33,6 +35,7 @@ const MY_GAMES: BaseItem[] = [
     tech: "Android",
     link: "https://drive.google.com/file/d/16gjJGQsM72Roj19gAV1Gmw5kJ-B_Vt_o/view?usp=sharing",
     iconFile: "ungull.png",
+    videoId: "2XC5AdWQZf8",
     screenshots: ["bl1.jpg", "2.jpg"],
   },
 ];
@@ -46,34 +49,36 @@ const WEB_GAMES: BaseItem[] = [
     tech: "Web Game, All device can play",
     embedUrl: "https://itch.io/embed-upload/17103809?color=333333",
     iconFile: "ungull.png",
+    videoId: "2XC5AdWQZf8",
     screenshots: ["bl1.jpg", "ssblov1.png", "blocss2.png", "ssblo3.png"],
   },
 ];
 
 export default function Home() {
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"web" | "games">("web");
   const [activeGameId, setActiveGameId] = useState(MY_GAMES[0].id);
   const [activeWebId, setActiveWebId] = useState(WEB_GAMES[0].id);
   const [isMuted, setIsMuted] = useState(true);
   const [showIframe, setShowIframe] = useState(false);
 
-  const getItemsByTab = () => {
-    switch (activeTab) {
-      case "games":
-        return MY_GAMES;
-      default:
-        return WEB_GAMES;
-    }
-  };
+  useEffect(() => {
+    
+    setLoading(false);
 
-  const getActiveIdByTab = () => {
-    switch (activeTab) {
-      case "games":
-        return activeGameId;
-      default:
-        return activeWebId;
-    }
-  };
+    const handleFocus = () => setLoading(false);
+    window.addEventListener("pageshow", handleFocus);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("pageshow", handleFocus);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
+
+  const getItemsByTab = () => (activeTab === "games" ? MY_GAMES : WEB_GAMES);
+  const getActiveIdByTab = () =>
+    activeTab === "games" ? activeGameId : activeWebId;
 
   const currentItems = getItemsByTab();
   const currentActiveId = getActiveIdByTab();
@@ -89,7 +94,8 @@ export default function Home() {
   };
 
   const handleTabChange = (tab: "web" | "games") => {
-    // Beri jeda 200ms agar animasi 'active:scale' terlihat
+    // Reset loading setiap ganti tab agar tidak nyangkut
+    setLoading(false);
     setTimeout(() => {
       setActiveTab(tab);
       setShowIframe(false);
@@ -97,10 +103,11 @@ export default function Home() {
   };
 
   const handleSecurityClick = () => {
-    // Kamu bisa tambah state 'loading' di sini jika mau efek lebih kompleks
+    // Aktifkan loading HANYA sebelum pindah halaman
+    
     setTimeout(() => {
       window.location.href = "/Security";
-    }, 400); // Jeda sedikit lebih lama (0.4 detik) agar efek klik mantap
+    }, 400);
   };
 
   return (
@@ -110,15 +117,17 @@ export default function Home() {
         <img
           src="1.gif"
           alt="Background"
-          className="w-full h-full object-cover opacity-100 transition-opacity duration-1000"
+          /* object-cover: Mengunci rasio gambar agar tidak gepeng. 
+       object-center: Memastikan bagian tengah GIF selalu di tengah layar.
+    */
+          className="w-full h-full object-cover object-center opacity-100 transition-opacity duration-1000"
         />
-        {/* Overlay Gradient tetap sama agar konten depan terbaca */}
+
+        {/* Overlay agar teks tetap terbaca */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-950"></div>
       </div>
-      
-      );
+
       {/* --- AUDIO TOGGLE --- */}
-      
       {/* --- SIDEBAR --- */}
       <aside className="w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col justify-between">
         <div>
@@ -128,43 +137,94 @@ export default function Home() {
           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 ml-0.5 mb-6">
             HIGH-TECH
           </p>
-          <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide mb-6">
-            {/* Tombol Web Games */}
+          <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide mb-6 w-full">
+            {/* --- TOMBOL WEB GAMES --- */}
             <button
               onClick={() => handleTabChange("web")}
-              className={`px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-90 flex items-center gap-3 border-2 w-full
-    ${
-      activeTab === "web"
-        ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-        : "bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-blue-600 hover:text-white"
-    }`}
+              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
             >
-              <span className="text-sm md:text-base">🌐</span> Web Games
+              {/* Efek Gerak muncul HANYA saat TIDAK terpilih (activeTab !== "web") */}
+              {activeTab !== "web" && (
+                <div className="absolute inset-[-1000%] animate-[spin_5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#1e293b_0%,#3b82f6_50%,#1e293b_100%)]" />
+              )}
+
+              <div
+                className={`flex h-full w-full items-center justify-center gap-3 rounded-2xl px-5 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-300 z-10
+      ${
+        activeTab === "web"
+          ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-2 border-blue-400"
+          : "bg-slate-950 text-slate-500 hover:text-white"
+      }`}
+              >
+                <span className="text-sm">🌐</span> Web Games
+              </div>
             </button>
 
-            {/* Tombol App Games */}
+            {/* --- TOMBOL APP GAMES --- */}
             <button
               onClick={() => handleTabChange("games")}
-              className={`px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-90 flex items-center gap-3 border-2 w-full
-    ${
-      activeTab === "games"
-        ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-        : "bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-blue-600 hover:text-white"
-    }`}
+              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
             >
-              <span className="text-sm md:text-base">🎮</span> App Games
+              {/* Efek Gerak muncul HANYA saat TIDAK terpilih */}
+              {activeTab !== "games" && (
+                <div className="absolute inset-[-1000%] animate-[spin_5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#1e293b_0%,#3b82f6_50%,#1e293b_100%)]" />
+              )}
+
+              <div
+                className={`flex h-full w-full items-center justify-center gap-3 rounded-2xl px-5 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-300 z-10
+      ${
+        activeTab === "games"
+          ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-2 border-blue-400"
+          : "bg-slate-950 text-slate-400 hover:text-white hover:bg-blue-600 "
+      }`}
+              >
+                <span className="text-sm">🎮</span> App Games
+              </div>
             </button>
 
-            {/* Tombol Security Scan (SEKARANG PAKAI BUTTON + ANIMASI) */}
-            <button
-              onClick={handleSecurityClick}
-              className="px-5 py-3 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 active:scale-90 active:bg-red-600 active:border-red-400 flex items-center gap-3 border-2 w-full bg-slate-900/50 border-slate-800 text-slate-500 hover:bg-red-600/20 hover:text-red-400 hover:border-red-500/50"
+            {/* --- TOMBOL SECURITY SCAN (PEMBERANI/MERAH) --- */}
+            <Link
+              href="/Security"
+              onClick={() => {
+                setLoading(true);
+                setTimeout(() => setLoading(false), 1000);
+              }}
+              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 shadow-lg shadow-orange-500/5 hover:shadow-red-500/20"
             >
-              <span className="text-sm md:text-base group-active:animate-ping">
-                🛡️
-              </span>
-              Security Scan
-            </button>
+              {/* 1. ANIMASI BORDER (GERAK TERUS) */}
+              <div
+                className="absolute inset-[-1000%] 
+    /* SAAT DIAM: Putar Kuning-Orange (Efek Standby) */
+    animate-[spin_6s_linear_infinite] 
+    bg-[conic-gradient(from_90deg_at_50%_50%,#78350f_0%,#f59e0b_50%,#78350f_100%)] 
+    
+    /* SAAT HOVER: Putar Merah-Orange Cepat (Efek Alert) */
+    group-hover:animate-[spin_2s_linear_infinite]
+    group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#ef4444_0%,#f97316_50%,#ef4444_100%)]"
+              />
+
+              {/* 2. ISI TOMBOL */}
+              <div
+                className="flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 transition-all duration-500 z-10 
+    group-hover:bg-red-950/20 group-hover:backdrop-blur-sm"
+              >
+                {/* Icon Shield - Kuning saat diam, Merah saat hover */}
+                <span className="text-orange-500 group-hover:text-red-500 animate-pulse group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] transition-all duration-300">
+                  🛡️
+                </span>
+
+                {/* Teks */}
+                <span className="font-black text-[10px] md:text-xs uppercase tracking-[0.2em] text-orange-200/70 group-hover:text-white transition-all duration-300">
+                  LINK SCANNER
+                </span>
+              </div>
+
+              {/* 3. GLOW DI BELAKANG */}
+              <div
+                className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-500 
+    bg-orange-500/10 group-hover:bg-red-500/30 blur-2xl z-0"
+              />
+            </Link>
           </nav>
 
           <a
@@ -310,17 +370,37 @@ export default function Home() {
                 )}
               </div>
 
+              {/* --- BAGIAN SHOWCASE VIDEO & SCREENSHOTS --- */}
               {currentItem.screenshots.length > 0 && (
-                <div className="mt-6">
-                  <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.3em] mb-5">
-                    Project Screenshots
+                <div className="mt-10">
+                  <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.3em] mb-5 px-1">
+                    Project Trailer & Screenshots
                   </p>
-                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+
+                  <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide items-start">
+                    {/* 1. Tampilkan Iframe Video Jika Ada ID Video */}
+                    {currentItem.videoId && (
+                      <div className="flex-shrink-0 w-[300px] md:w-[480px] aspect-video rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-black">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          // Menggunakan autoplay, mute (agar autoplay jalan), dan loop
+                          src={`https://www.youtube-nocookie.com/embed/${currentItem.videoId}?autoplay=0&mute=1&loop=1&playlist=${currentItem.videoId}`}
+                          title="Artup Studio Showcase"
+                          frameBorder="0"
+                          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-full"
+                        ></iframe>
+                      </div>
+                    )}
+
+                    {/* 2. Loop Screenshot Seperti Biasa */}
                     {currentItem.screenshots.map((ss, i) => (
                       <img
                         key={i}
                         src={`/${ss}`}
-                        className="h-40 md:h-64 rounded-2xl border border-slate-800 shadow-2xl hover:scale-[1.02] transition-transform"
+                        className="h-[168px] md:h-[270px] w-auto rounded-3xl border border-slate-800 shadow-2xl object-cover hover:scale-[1.02] transition-transform duration-500"
                         alt={`screenshot-${i}`}
                       />
                     ))}
@@ -388,6 +468,20 @@ export default function Home() {
           </div>
         </footer>
       </section>
+
+      {/* --- SATU OVERLAY GLOBAL (DI LUAR SECTION) --- */}
+      {/* --- SATU OVERLAY GLOBAL --- */}
+      {/* Overlay Loading */}
+      <div
+        className={`fixed inset-0 z-[9999] transition-opacity duration-500 
+  ${loading ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      >
+        {loading && (
+          <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center">
+            {/* Isi spinner kamu */}
+          </div>
+        )}
+      </div>
     </main>
   );
 }
