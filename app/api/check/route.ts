@@ -5,13 +5,43 @@ export async function POST(req: Request) {
   try {
     let { url } = await req.json();
     if (!url)
-      return NextResponse.json({ error: "URL is required" }, { status: 400 });
+      return NextResponse.json({ error: "Nice try diddy" }, { status: 400 });
 
-    // 1. NORMALISASI
+    // 1. NORMALISASI & FILTER KARAKTER (Mencegah XSS/Luci)
     url = url.trim().toLowerCase();
+
+    if (
+      url.includes("<") ||
+      url.includes(">") ||
+      url.includes('"') ||
+      url.includes(" ")
+    ) {
+      return NextResponse.json(
+        {
+          error: "Input mengandung karakter terlarang atau spasi!",
+          finalStatus: "BAHAYA",
+        },
+        { status: 400 },
+      );
+    }
+
     if (!url.startsWith("http")) url = "https://" + url;
 
-    const urlObj = new URL(url);
+    // 2. VALIDASI STRUKTUR URL (Biar nggak meledak)
+    let urlObj;
+    try {
+      urlObj = new URL(url);
+    } catch (e) {
+      return NextResponse.json(
+        {
+          error: "Format URL hancur / tidak valid",
+          finalStatus: "BAHAYA",
+        },
+        { status: 400 },
+      );
+    }
+
+    // 3. AMBIL DOMAIN
     const domain = urlObj.hostname.replace("www.", "");
     const parts = domain.split(".");
     const rootDomain =
@@ -21,12 +51,12 @@ export async function POST(req: Request) {
 
     const whitelist = [
       // --- KOMUNIKASI & MEDSOS (Hanya Domain Induk Resmi) ---
-      "whatsapp.com", 
-      "facebook.com", 
-      "instagram.com", 
-      "x.com", 
-      "twitter.com", 
-      "telegram.org", 
+      "whatsapp.com",
+      "facebook.com",
+      "instagram.com",
+      "x.com",
+      "twitter.com",
+      "telegram.org",
 
       // --- INFRASTRUKTUR DIGITAL GLOBAL ---
       "google.com",
@@ -39,12 +69,12 @@ export async function POST(req: Request) {
       "paypal.com",
 
       // --- PEMERINTAH & PENDIDIKAN (Paling Aman / Zero Trust) ---
-      "go.id", 
-      "ac.id", 
-      "sch.id", 
-      "mil.id", 
-      "gov", 
-      "edu", 
+      "go.id",
+      "ac.id",
+      "sch.id",
+      "mil.id",
+      "gov",
+      "edu",
 
       // --- PERBANKAN INDONESIA (Resmi Terdaftar OJK) ---
       "bca.co.id",
@@ -54,7 +84,7 @@ export async function POST(req: Request) {
       "bni.co.id", // BNI
       "btn.co.id", // BTN
       "banksyariahindonesia.co.id", // BSI
-      "bpddiy.co.id", 
+      "bpddiy.co.id",
       "bankdki.co.id",
       "bankjateng.co.id",
       "bankjatim.co.id",
@@ -63,7 +93,7 @@ export async function POST(req: Request) {
       "maybank.co.id",
       "permatabank.com",
       "bi.go.id",
-      "ojk.go.id", 
+      "ojk.go.id",
 
       // --- EKOSISTEM DIGITAL & DOMPET RESMI ---
       "tokopedia.com",
@@ -76,10 +106,10 @@ export async function POST(req: Request) {
 
       // --- BUMN & LAYANAN VITAL ---
       "kai.id",
-      "pertamina.com", 
-      "pln.co.id", 
-      "telkom.co.id", 
-      "telkomsel.com", 
+      "pertamina.com",
+      "pln.co.id",
+      "telkom.co.id",
+      "telkomsel.com",
       "posindonesia.co.id",
       "garuda-indonesia.com",
     ];
@@ -97,16 +127,16 @@ export async function POST(req: Request) {
       "blogspot.com",
       "netlify.app",
       "wordpress.com",
-      "linktr.ee", 
+      "linktr.ee",
       "bit.ly",
-      "tinyurl.com", 
-      "form.gle", 
-      "forms.gle", 
-      "t.me", 
-      "drive.google.com", 
-      "dropbox.com", 
-      "s.id", 
-      "rebrand.ly", 
+      "tinyurl.com",
+      "form.gle",
+      "forms.gle",
+      "t.me",
+      "drive.google.com",
+      "dropbox.com",
+      "s.id",
+      "rebrand.ly",
     ];
     const sensitiveKeywords = [
       // --- PERBANKAN & KEUANGAN (Target Utama) ---
