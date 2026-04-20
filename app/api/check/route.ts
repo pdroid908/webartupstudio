@@ -5,9 +5,9 @@ export async function POST(req: Request) {
   try {
     let { url } = await req.json();
     if (!url)
-      return NextResponse.json({ error: "Nice try diddy" }, { status: 400 });
+      return NextResponse.json({ error: "URL is required" }, { status: 400 });
 
-    // 1. NORMALISASI & FILTER KARAKTER (Mencegah XSS/Luci)
+    // 1. NORMALISASI & FILTER KARAKTER
     url = url.trim().toLowerCase();
 
     if (
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     if (!url.startsWith("http")) url = "https://" + url;
 
-    // 2. VALIDASI STRUKTUR URL (Biar nggak meledak)
+    // 2. VALIDASI STRUKTUR URL
     let urlObj;
     try {
       urlObj = new URL(url);
