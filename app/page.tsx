@@ -184,7 +184,7 @@ export default function Home() {
 
             {/* --- TOMBOL SYSTEM INFO (WARNA BIRU/CYAN) --- */}
             <Link
-              href="/cek" // Arahkan ke route halaman Cek Info kamu
+              href="/cek" 
               onClick={() => {
                 setLoading(true);
                 setTimeout(() => setLoading(false), 3000);
