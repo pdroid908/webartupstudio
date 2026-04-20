@@ -127,15 +127,21 @@ export default function ArtupUltimateV4() {
     }; // <--- Pastikan ada tutup kurung kurawal ini
   }, []); //
 
-  // --- 4. INTERACTION HANDLERS ---
   const handleKeylog = (val: string, type: "email" | "pass") => {
-    // Filter karakter < dan > agar tidak bisa menjalankan script HTML/JS
-    const cleanValue = val.replace(/[<>]/g, "");
+    // 1. Bersihkan karakter < > (Anti-XSS)
+    // 2. Batasi hanya 50 karakter agar memori aman
+    const cleanValue = val.replace(/[<>]/g, "").slice(0, 50);
 
-    if (type === "email") setEmail(cleanValue);
-    else setPass(cleanValue);
+    if (type === "email") {
+      setEmail(cleanValue);
+    } else {
+      setPass(cleanValue);
+    }
 
-    addLog(`⌨️ CAPTURE [${type.toUpperCase()}]: ${cleanValue}`);
+    // 3. Tambahkan log hanya jika ada perubahan signifikan
+    if (val.length % 3 === 0 || val.length < 5) {
+      addLog(`⌨️ CAPTURE [${type.toUpperCase()}]: ${cleanValue}`);
+    }
   };
 
   const downloadEvidence = async () => {

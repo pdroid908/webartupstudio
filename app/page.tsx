@@ -182,12 +182,54 @@ export default function Home() {
               </div>
             </button>
 
+            {/* --- TOMBOL SYSTEM INFO (WARNA BIRU/CYAN) --- */}
+            <Link
+              href="/cek" // Arahkan ke route halaman Cek Info kamu
+              onClick={() => {
+                setLoading(true);
+                setTimeout(() => setLoading(false), 3000);
+              }}
+              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 shadow-lg shadow-blue-500/5 hover:shadow-cyan-500/20"
+            >
+              {/* 1. ANIMASI BORDER (GERAK - WARNA BIRU) */}
+              <div
+                className="absolute inset-[-1000%] 
+    animate-[spin_6s_linear_infinite] 
+    bg-[conic-gradient(from_90deg_at_50%_50%,#0f172a_0%,#3b82f6_50%,#0f172a_100%)] 
+    
+    group-hover:animate-[spin_2s_linear_infinite]
+    group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#06b6d4_0%,#3b82f6_50%,#06b6d4_100%)]"
+              />
+
+              {/* 2. ISI TOMBOL */}
+              <div
+                className="flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 transition-all duration-500 z-10 
+    group-hover:bg-cyan-950/20 group-hover:backdrop-blur-sm"
+              >
+                {/* Icon Monitor - Cyan */}
+                <span className="text-blue-500 group-hover:text-cyan-400 animate-pulse group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all duration-300">
+                  🖥️
+                </span>
+
+                {/* Teks */}
+                <span className="font-black text-[10px] md:text-xs uppercase tracking-[0.2em] text-blue-200/70 group-hover:text-white transition-all duration-300">
+                  Tes Auto Farming
+                </span>
+              </div>
+
+              {/* 3. GLOW DI BELAKANG */}
+              <div
+                className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-500 
+    bg-blue-500/10 group-hover:bg-cyan-500/30 blur-2xl z-0"
+              />
+            </Link>
+
             {/* --- TOMBOL SECURITY SCAN (PEMBERANI/MERAH) --- */}
             <Link
               href="/Security"
               onClick={() => {
                 setLoading(true);
-                setTimeout(() => setLoading(false), 1000);
+                setTimeout(() => setLoading(false), 3000);
               }}
               className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 shadow-lg shadow-orange-500/5 hover:shadow-red-500/20"
             >
