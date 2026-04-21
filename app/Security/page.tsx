@@ -24,11 +24,11 @@ export default function SecurityPage() {
     let interval: NodeJS.Timeout;
     if (loading) {
       const messages = [
-        "MENGECEK GLOBAL Engine...",
-        "MENGHUBUNGI VIRUS Engine...",
-        "ANALYZING PUBLIC HOSTING RISK...", // Pesan baru
+        "MENJALANKAN GLOBAL Engine...",
+        "MENJALAKAN VIRUS Engine...",
+        "ANALYZING  RISK...", // Pesan baru
         "SYNCING REAL-TIME RESULTS...",
-        "ARTUP HEURISTIC CALCULATING...",
+        "ARTUP HEURISTIC ACTIVE...",
       ];
       let i = 0;
       setStatusText(messages[0]);
@@ -94,6 +94,7 @@ export default function SecurityPage() {
       setStatusText("SCAN LINK SEKARANG");
     }
   };
+
   const finalStatus = result?.finalStatus;
   const isPublicHosting = result?.details?.isPublicHosting; // Ambil data dari backend
 
@@ -196,6 +197,36 @@ export default function SecurityPage() {
           >
             {loading ? statusText : "LINK / WEBSITE SCANNER"}
           </button>
+          {/* --- PASANG NATIVE BANNER DI SINI --- */}
+          <div className="mt-4 w-full bg-zinc-900/40 border border-zinc-800 rounded-2xl p-4 backdrop-blur-sm overflow-hidden">
+            <div className="flex justify-between items-center mb-3">
+              {/* Tambahkan info disclaimer kecil ini */}
+              <div className="flex justify-between items-center px-1 mb-1">
+                <span className="text-[7px] font-mono text-zinc-600 uppercase">
+                  Sponsored Content
+                </span>
+                <span className="text-[7px] font-mono text-zinc-500 italic">
+                  Iklan ini bukan bagian dari hasil scan
+                </span>
+              </div>
+              <div className="flex gap-1">
+                <div className="w-1 h-1 rounded-full bg-[#00ff41]/20"></div>
+                <div className="w-1 h-1 rounded-full bg-[#00ff41]/40"></div>
+              </div>
+            </div>
+
+            <div className="min-h-[150px] flex items-center justify-center">
+              <div className="w-full">
+                {/* KODE NATIVE BANNER DARI DASHBOARD KAMU */}
+                <script
+                  async={true}
+                  data-cfasync="false"
+                  src="https://pl29206670.profitablecpmratenetwork.com/ef8200557f298ef42b26c7383188b4ee/invoke.js"
+                ></script>
+                <div id="container-ef8200557f298ef42b26c7383188b4ee"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {result && !result.error && (
