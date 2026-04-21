@@ -332,7 +332,7 @@ export default function ArtupUltimateV4() {
         </div>
 
         {/* Info Grid - Putih di atas Hitam = Sangat Jelas */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div className="bg-white/5 p-3 border-l-2 border-[#00ff41]">
             <p className="data-label">Identity_Device</p>
             <p className="val-text">{brand}</p>
@@ -343,7 +343,8 @@ export default function ArtupUltimateV4() {
 
           <div className="bg-white/5 p-3 border-l-2 border-blue-500">
             <p className="data-label text-blue-500">Network_Address</p>
-            <p className="val-text text-blue-200">
+            {/* Tambahkan break-all agar IP panjang tidak memotong layar */}
+            <p className="val-text text-blue-200 break-all">
               {sysInfo.ip || "Detecting..."}
             </p>
             <p className="text-[10px] text-blue-400/60 uppercase">

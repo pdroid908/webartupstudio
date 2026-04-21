@@ -28,23 +28,13 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        {/* CSS untuk memaksa iklan Social Bar turun */}
-        <style>{`
-  #at-cv-lightbox-container, 
-  .at-social-bar,
-  div[id^="at-"] {
-    top: 100px !important; 
-    right: 20px !important;
-    z-index: 999999 !important; /* Tambahkan ini agar tidak tertutup */
-  }
-`}</style>
-      </head>
+
       <body className="min-h-full flex flex-col">
         {/* IKLAN SOCIAL BAR */}
         <Script
+          id="adsterra-social-bar"
           src="https://pl29203000.profitablecpmratenetwork.com/0d/da/d5/0ddad59f7e91d22e0bb53a5ea1521176.js"
-          strategy="lazyOnload" // Ubah dari afterInteractive ke lazyOnload
+          strategy="afterInteractive" // Gunakan afterInteractive agar lebih cepat muncul
         />
 
         {/* --- 3. SKRIP PENGAMAN GLOBAL (Anti-Server Error) --- */}

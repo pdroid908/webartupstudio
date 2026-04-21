@@ -129,7 +129,7 @@ export default function Home() {
 
       {/* --- AUDIO TOGGLE --- */}
       {/* --- SIDEBAR --- */}
-      <aside className="w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col justify-between">
+      <aside className="pt-20 w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col justify-between">
         <div>
           <h2 className="text-xl font-black text-blue-500 italic tracking-tighter uppercase">
             Artup STUDIO
