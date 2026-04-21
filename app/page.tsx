@@ -509,7 +509,7 @@ export default function Home() {
       {/* --- SATU OVERLAY GLOBAL --- */}
       {/* Overlay Loading */}
       <div
-        className={`fixed inset-0 z-[9999] transition-opacity duration-500 
+        className={`fixed inset-0 z-40 transition-opacity duration-500 
   ${loading ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
       >
         {loading && (

@@ -28,13 +28,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-
       <body className="min-h-full flex flex-col">
         {/* IKLAN SOCIAL BAR */}
         <Script
           id="adsterra-social-bar"
           src="https://pl29203000.profitablecpmratenetwork.com/0d/da/d5/0ddad59f7e91d22e0bb53a5ea1521176.js"
-          strategy="afterInteractive" // Gunakan afterInteractive agar lebih cepat muncul
+          strategy="afterInteractive"
         />
 
         {/* --- 3. SKRIP PENGAMAN GLOBAL (Anti-Server Error) --- */}
