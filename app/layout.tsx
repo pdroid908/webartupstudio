@@ -29,7 +29,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {/* --- 1. IKLAN POPUNDER (Uang Terbesar) --- */}
+      
         {/* IKLAN SOCIAL BAR */}
         <Script
           src="https://pl29203000.profitablecpmratenetwork.com/0d/da/d5/0ddad59f7e91d22e0bb53a5ea1521176.js"
