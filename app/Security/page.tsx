@@ -202,11 +202,8 @@ export default function SecurityPage() {
             <div className="flex justify-between items-center mb-3">
               {/* Tambahkan info disclaimer kecil ini */}
               <div className="flex justify-between items-center px-1 mb-1">
-                <span className="text-[7px] font-mono text-zinc-600 uppercase">
+                <span className="text-[7px] font-mono text-[#00ff41] uppercase tracking-widest opacity-80">
                   Sponsored Content
-                </span>
-                <span className="text-[7px] font-mono text-zinc-500 italic">
-                  Iklan ini bukan bagian dari hasil scan
                 </span>
               </div>
               <div className="flex gap-1">
