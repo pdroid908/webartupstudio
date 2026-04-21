@@ -137,11 +137,13 @@ export default function Home() {
           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 ml-0.5 mb-6">
             HIGH-TECH
           </p>
-          <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide mb-6 w-full">
-            {/* --- TOMBOL WEB GAMES --- */}
+
+          {/* NAVIGASI: Flex-row dan overflow-x-auto agar memanjang ke kanan di HP */}
+          <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide mb-6 w-full">
+            {/* Tombol Web Games */}
             <button
               onClick={() => handleTabChange("web")}
-              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
+              className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
             >
               {/* Efek Gerak muncul HANYA saat TIDAK terpilih (activeTab !== "web") */}
               {activeTab !== "web" && (
@@ -163,7 +165,7 @@ export default function Home() {
             {/* --- TOMBOL APP GAMES --- */}
             <button
               onClick={() => handleTabChange("games")}
-              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
+              className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
             >
               {/* Efek Gerak muncul HANYA saat TIDAK terpilih */}
               {activeTab !== "games" && (
@@ -184,12 +186,12 @@ export default function Home() {
 
             {/* --- TOMBOL SYSTEM INFO (WARNA BIRU/CYAN) --- */}
             <Link
-              href="/cek" 
+              href="/cek"
               onClick={() => {
                 setLoading(true);
                 setTimeout(() => setLoading(false), 1000);
               }}
-              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 shadow-lg shadow-blue-500/5 hover:shadow-cyan-500/20"
+              className="flex-shrink-0 group relative h-12 w-[160px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
             >
               {/* 1. ANIMASI BORDER (GERAK - WARNA BIRU) */}
               <div
@@ -202,18 +204,10 @@ export default function Home() {
               />
 
               {/* 2. ISI TOMBOL */}
-              <div
-                className="flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 transition-all duration-500 z-10 
-    group-hover:bg-cyan-950/20 group-hover:backdrop-blur-sm"
-              >
-                {/* Icon Monitor - Cyan */}
-                <span className="text-blue-500 group-hover:text-cyan-400 animate-pulse group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all duration-300">
-                  🖥️
-                </span>
-
-                {/* Teks */}
-                <span className="font-black text-[10px] md:text-xs uppercase tracking-[0.2em] text-blue-200/70 group-hover:text-white transition-all duration-300">
-                  Tes Auto Farming
+              <div className="hover:bg-blue-600 flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 z-10">
+                <span className="text-blue-500">🖥️</span>
+                <span className="font-black text-[10px] uppercase tracking-[0.1em] text-blue-200/70">
+                  Auto Farming
                 </span>
               </div>
 
@@ -231,7 +225,7 @@ export default function Home() {
                 setLoading(true);
                 setTimeout(() => setLoading(false), 1000);
               }}
-              className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 shadow-lg shadow-orange-500/5 hover:shadow-red-500/20"
+              className="flex-shrink-0 group relative h-12 w-[160px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
             >
               {/* 1. ANIMASI BORDER (GERAK TERUS) */}
               <div
