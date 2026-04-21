@@ -187,7 +187,7 @@ export default function Home() {
               href="/cek" 
               onClick={() => {
                 setLoading(true);
-                setTimeout(() => setLoading(false), 3000);
+                setTimeout(() => setLoading(false), 1000);
               }}
               className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 shadow-lg shadow-blue-500/5 hover:shadow-cyan-500/20"
             >
@@ -229,7 +229,7 @@ export default function Home() {
               href="/Security"
               onClick={() => {
                 setLoading(true);
-                setTimeout(() => setLoading(false), 3000);
+                setTimeout(() => setLoading(false), 1000);
               }}
               className="group relative h-12 w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 shadow-lg shadow-orange-500/5 hover:shadow-red-500/20"
             >

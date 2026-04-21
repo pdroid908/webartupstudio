@@ -161,26 +161,27 @@ export default function ArtupUltimateV4() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-    /* --- GOOGLE STYLE AUTH (KIRI) --- */
+    /* --- GOOGLE STYLE AUTH (KIRI - Tetap) --- */
     .g-card { background: white; border-radius: 8px; width: 100%; max-width: 450px; padding: 48px 40px 36px; border: 1px solid #dadce0; }
     .g-input { width: 100%; border: 1px solid #dadce0; border-radius: 4px; padding: 13px 15px; font-size: 16px; color: #202124 !important; background: white !important; transition: border 0.2s; }
     .g-input:focus { border: 2px solid #1a73e8; outline: none; }
     .btn-blue { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-weight: 500; cursor: pointer; transition: 0.2s; }
     .btn-blue:hover { background: #1765cc; }
 
-    /* --- HACKER MONITOR PANEL (KANAN) --- */
+    /* --- HACKER MONITOR PANEL (KANAN - UPGRADED) --- */
     .edu-panel { 
-      background: #050505; /* Hitam lebih pekat agar teks putih/hijau cerah menonjol */
+      background: #000000; /* Hitam pekat sempurna */
       color: #00ff41; 
       width: 100%; 
-      padding: 30px; 
+      padding: 40px; /* Padding lebih besar */
       font-family: 'JetBrains Mono', 'Fira Code', monospace; 
       border-top: 4px solid #00ff41; 
       position: relative;
       overflow: hidden;
+      box-shadow: inset 0 0 100px rgba(0, 255, 65, 0.1); /* Efek vignette hijau */
     }
 
-    /* Efek Garis Monitor (Scanline) */
+    /* Efek Garis Monitor (Scanline - Lebih Tipis) */
     .edu-panel::before {
       content: " ";
       display: block;
@@ -188,59 +189,61 @@ export default function ArtupUltimateV4() {
       top: 0; left: 0; bottom: 0; right: 0;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
       z-index: 10;
-      background-size: 100% 3px;
+      background-size: 100% 2px;
       pointer-events: none;
-      opacity: 0.3;
+      opacity: 0.15;
     }
 
     @media (min-width: 1024px) {
-      .edu-panel { width: 480px; height: 100vh; border-top: none; border-left: 2px solid #00ff41; position: sticky; top: 0; }
+      .edu-panel { width: 550px; height: 100vh; border-top: none; border-left: 2px solid #00ff41; position: sticky; top: 0; }
     }
 
-    /* Efek Teks Menyala */
-    .log-line { 
-      font-size: 11px;
-      color: #00ff41;
-      opacity: 0.9;
-      border-left: 2px solid #004411;
-      padding-left: 8px;
-      margin-bottom: 3px;
-      line-height: 1.2;
-    }
+    /* --- GAYA TEKS BARU (LEBIH BESAR & BOLD) --- */
     
     .data-label { 
-      color: #008f11; /* Hijau tua untuk label (tujuan: pendukung) */
+      color: #00ff41; /* Hijau neon terang */
       text-transform: uppercase; 
-      font-size: 10px; 
-      font-weight: 800;
-      margin-bottom: 2px; 
-      letter-spacing: 1.5px;
+      font-size: 14px; /* Lebih besar */
+      font-weight: 900; /* Sangat tebal */
+      margin-bottom: 6px; 
+      letter-spacing: 2px;
+      opacity: 0.7; /* Sedikit pudar untuk label */
     }
 
     .val-text { 
-      color: #ffffff !important; /* Putih murni agar terbaca jelas di video/layar */
-      font-size: 16px;
-      font-weight: bold; 
-      text-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+      color: #ffffff !important; /* Putih murni */
+      font-size: 24px; /* Sangat Besar */
+      font-weight: 900; /* Sangat tebal */
+      text-shadow: 0 0 15px rgba(0, 255, 65, 0.7), 0 0 5px #ffffff; /* Efek Glow Kuat */
       display: block;
+      line-height: 1.1;
     }
 
-    /* Tanda Bahaya Berkedip */
+    /* Sub-text untuk info tambahan */
+    .sub-val-text {
+      font-size: 12px;
+      color: #00ff41;
+      opacity: 0.5;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    /* Tanda Bahaya Berkedip (Lebih Intens) */
     .danger-val { 
-      color: #ff0000; 
-      font-weight: bold; 
-      text-shadow: 0 0 10px #ff0000;
-      animation: blink 0.8s infinite;
+      color: #ff0000 !important; 
+      font-weight: 900; 
+      text-shadow: 0 0 20px #ff0000, 0 0 5px #ffffff;
+      animation: blink 0.5s infinite;
     }
 
     @keyframes blink {
-      50% { opacity: 0.3; }
+      50% { opacity: 0.1; }
     }
 
     /* Scrollbar Hacker Style */
-    .edu-panel::-webkit-scrollbar { width: 4px; }
+    .edu-panel::-webkit-scrollbar { width: 6px; }
     .edu-panel::-webkit-scrollbar-track { background: #000; }
-    .edu-panel::-webkit-scrollbar-thumb { background: #003b00; }
+    .edu-panel::-webkit-scrollbar-thumb { background: #004411; border-radius: 3px; }
     .edu-panel::-webkit-scrollbar-thumb:hover { background: #00ff41; }
   `,
         }}
@@ -390,7 +393,7 @@ export default function ArtupUltimateV4() {
 
         {/* Console Logs */}
         <div className="border-t border-white/10 pt-4">
-          <p className="text-[#008f11] text-[10px] mb-2 font-bold uppercase tracking-widest">
+          <p className="text-[#008f11] text-[20px] mb-2 font-bold uppercase tracking-widest">
             Activity_Console:
           </p>
           <div className="h-[200px] overflow-y-auto scrollbar-hide">
