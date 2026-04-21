@@ -203,7 +203,7 @@ export default function SecurityPage() {
               {/* Tambahkan info disclaimer kecil ini */}
               <div className="flex justify-between items-center px-1 mb-1">
                 <span className="text-[7px] font-mono text-[#00ff41] uppercase tracking-widest opacity-80">
-                  Sponsored Content
+                  CUEKIN - SCROLL KEBAWAH untuk jawaban!
                 </span>
               </div>
               <div className="flex gap-1">

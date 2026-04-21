@@ -505,8 +505,6 @@ export default function Home() {
         </footer>
       </section>
 
-      {/* --- SATU OVERLAY GLOBAL (DI LUAR SECTION) --- */}
-      {/* --- SATU OVERLAY GLOBAL --- */}
       {/* Overlay Loading */}
       <div
         className={`fixed inset-0 z-40 transition-opacity duration-500 

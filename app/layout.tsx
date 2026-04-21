@@ -20,33 +20,31 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        {/* IKLAN SOCIAL BAR */}
-        <Script
-          id="adsterra-social-bar"
-          src="https://pl29203000.profitablecpmratenetwork.com/0d/da/d5/0ddad59f7e91d22e0bb53a5ea1521176.js"
-          strategy="afterInteractive"
-        />
-
-        {/* --- 3. SKRIP PENGAMAN GLOBAL (Anti-Server Error) --- */}
+      <body className="min-h-full flex flex-col pb-24 overflow-x-visible">
         <Script id="security-layer" strategy="beforeInteractive">
           {`
-            window.onerror = function(message, source, lineno, colno, error) {
-              console.log("System protected a crash:", message);
-              return true; // Mencegah website blank putih jika ada error skrip jahat
+            window.onerror = function(message) {
+              console.warn("Captured Error:", message);
+              return false;
             };
           `}
         </Script>
 
         {children}
+
+        <Script
+          id="adsterra-social-bar"
+          src="https://pl29203000.profitablecpmratenetwork.com/0d/da/d5/0ddad59f7e91d22e0bb53a5ea1521176.js"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
