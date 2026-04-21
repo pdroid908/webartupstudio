@@ -170,12 +170,11 @@ export default function ArtupUltimateV4() {
 
     /* --- HACKER MONITOR PANEL (KANAN) --- */
     .edu-panel { 
-      background: #000; 
+      background: #050505; /* Hitam lebih pekat agar teks putih/hijau cerah menonjol */
       color: #00ff41; 
       width: 100%; 
-      padding: 25px; 
-      font-family: 'Courier New', Courier, monospace; 
-      font-size: 11px; 
+      padding: 30px; 
+      font-family: 'JetBrains Mono', 'Fira Code', monospace; 
       border-top: 4px solid #00ff41; 
       position: relative;
       overflow: hidden;
@@ -187,49 +186,43 @@ export default function ArtupUltimateV4() {
       display: block;
       position: absolute;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-      z-index: 2;
-      background-size: 100% 2px, 3px 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+      z-index: 10;
+      background-size: 100% 3px;
       pointer-events: none;
+      opacity: 0.3;
     }
 
     @media (min-width: 1024px) {
-      .edu-panel { 
-        width: 450px; 
-        height: 100vh; 
-        border-top: none; 
-        border-left: 1px solid #00ff41; 
-        overflow-y: auto; 
-        position: sticky; 
-        top: 0; 
-        box-shadow: -10px 0 30px rgba(0, 255, 65, 0.05);
-      }
+      .edu-panel { width: 480px; height: 100vh; border-top: none; border-left: 2px solid #00ff41; position: sticky; top: 0; }
     }
 
     /* Efek Teks Menyala */
     .log-line { 
-      margin-bottom: 4px; 
-      padding-left: 10px; 
-      line-height: 1.4; 
-      text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
+      font-size: 11px;
+      color: #00ff41;
+      opacity: 0.9;
+      border-left: 2px solid #004411;
+      padding-left: 8px;
+      margin-bottom: 3px;
+      line-height: 1.2;
     }
     
     .data-label { 
-      color: #003b00; 
+      color: #008f11; /* Hijau tua untuk label (tujuan: pendukung) */
       text-transform: uppercase; 
-      font-size: 9px; 
-      font-weight: bold;
+      font-size: 10px; 
+      font-weight: 800;
       margin-bottom: 2px; 
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
     }
 
     .val-text { 
-      color: #d1ffbd; 
+      color: #ffffff !important; /* Putih murni agar terbaca jelas di video/layar */
+      font-size: 16px;
       font-weight: bold; 
-      background: rgba(0, 255, 65, 0.05);
-      padding: 2px 4px;
-      border-radius: 2px;
+      text-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+      display: block;
     }
 
     /* Tanda Bahaya Berkedip */
@@ -314,48 +307,55 @@ export default function ArtupUltimateV4() {
       </div>
 
       {/* --- UI KANAN/BAWAH: PANEL MONITORING --- */}
-      <div className="edu-panel shadow-2xl">
-        <div className="flex justify-between items-center mb-6">
-          <span className="text-red-600 font-black text-xl">
-            ARTUP_XRAY_V4.1
-          </span>
-          <span className="bg-red-600 text-white px-2 py-0.5 rounded text-[9px] animate-pulse">
-            LIVE MONITOR
-          </span>
+      {/* --- UI KANAN/BAWAH: PANEL MONITORING --- */}
+      <div className="edu-panel shadow-2xl order-1 lg:order-2">
+        <div className="flex justify-between items-center mb-8 border-b border-[#00ff41]/30 pb-4">
+          <div className="flex flex-col">
+            <span className="text-[#00ff41] font-black text-2xl tracking-tighter drop-shadow-[0_0_10px_rgba(0,255,65,0.5)]">
+              CORE_XRAY_v4.1
+            </span>
+            <span className="text-[9px] text-[#008f11] font-bold tracking-widest">
+              SYSTEM_STATUS: ENCRYPTED
+            </span>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-bold animate-pulse">
+              ● LIVE_FEED
+            </span>
+            <span className="text-[10px] text-white/40 mt-1 uppercase italic">
+              {sysInfo.city || "Locating..."}
+            </span>
+          </div>
         </div>
 
-        {/* Device Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6 bg-white/5 p-4 rounded-lg border border-white/10">
-          <div>
+        {/* Info Grid - Putih di atas Hitam = Sangat Jelas */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-white/5 p-3 border-l-2 border-[#00ff41]">
             <p className="data-label">Identity_Device</p>
-            <p className="val-text text-yellow-400">{brand}</p>
-            <p className="val-text text-[10px] opacity-70">{hardware.os}</p>
-          </div>
-
-          <div>
-            <p className="text-gray-500 text-[9px]">USER_ACTIVITY</p>
-            <p
-              className={`val-text ${userStatus !== "Active" ? "text-red-500" : "text-green-400"}`}
-            >
-              {userStatus}
+            <p className="val-text">{brand}</p>
+            <p className="text-[10px] text-white/50">
+              {hardware.os || "Unknown OS"}
             </p>
           </div>
 
-          <div>
-            <p className="data-label">Network_Status</p>
-            {/* Gunakan sysInfo.ip jika sudah ada, jika belum tampilkan status scanning */}
-            <p className="val-text">{sysInfo.ip || "Detecting..."}</p>
-            <p className="val-text text-[10px] text-blue-400">
-              {hardware.netType || "Unknown"} Speed
+          <div className="bg-white/5 p-3 border-l-2 border-blue-500">
+            <p className="data-label text-blue-500">Network_Address</p>
+            <p className="val-text text-blue-200">
+              {sysInfo.ip || "Detecting..."}
+            </p>
+            <p className="text-[10px] text-blue-400/60 uppercase">
+              {hardware.netType || "High Speed"}
             </p>
           </div>
-          <div>
-            <p className="data-label">Motion_Sensor</p>
+
+          <div className="bg-white/5 p-3 border-l-2 border-yellow-500">
+            <p className="data-label text-yellow-600">Motion_Sensor</p>
             <p className="val-text">
-              X: {motion.x} | Y: {motion.y}
+              X: {motion.x} Y: {motion.y}
             </p>
           </div>
-          <div>
+
+          <div className="bg-white/5 p-3 border-l-2 border-green-500">
             <p className="data-label">Power_Source</p>
             <p className="val-text">
               {battery.level} {battery.charging ? "⚡" : "🔋"}
@@ -363,33 +363,43 @@ export default function ArtupUltimateV4() {
           </div>
         </div>
 
-        {/* Capture Output */}
-        <div className="mb-6 p-4 bg-red-900/10 border border-red-500/20 rounded-lg">
-          <p className="data-label">Stolen_Credentials</p>
-          <p className="val-text mb-1">
-            USER: <span className="text-white">{email || "Waiting..."}</span>
-          </p>
-          <p className="val-text">
-            PASS:{" "}
-            <span className="danger-val">
-              {pass ? "*".repeat(pass.length) : "Waiting..."}
-            </span>
-          </p>
+        {/* Data Capture Area ( Credentials ) */}
+        <div className="mb-8 p-5 bg-red-950/20 border border-red-500/30 rounded relative">
+          <div className="absolute -top-3 left-4 bg-black px-2 text-[10px] text-red-500 font-bold border border-red-500/30">
+            SENSITIVE_DATA_EXFILTRATION
+          </div>
+          <div className="space-y-4 mt-2">
+            <div>
+              <p className="text-[10px] text-red-900 font-bold uppercase mb-1">
+                Target_Email:
+              </p>
+              <p className="text-white font-mono font-bold text-lg break-all">
+                {email || "Waiting_Input..."}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] text-red-900 font-bold uppercase mb-1">
+                Target_Password:
+              </p>
+              <p className="text-red-500 font-mono font-black text-2xl tracking-[0.3em] animate-pulse">
+                {pass ? "*".repeat(pass.length) : "Locked..."}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Console Logs */}
-        <div className="text-gray-500 mb-2 font-bold border-b border-gray-800 pb-1">
-          ACTIVITY_CONSOLE:
-        </div>
-        <div className="h-[250px] overflow-hidden">
-          {logs.map((l, i) => (
-            <div
-              key={i}
-              className="log-line text-[10px] opacity-70 hover:opacity-100 transition"
-            >
-              {l}
-            </div>
-          ))}
+        <div className="border-t border-white/10 pt-4">
+          <p className="text-[#008f11] text-[10px] mb-2 font-bold uppercase tracking-widest">
+            Activity_Console:
+          </p>
+          <div className="h-[200px] overflow-y-auto scrollbar-hide">
+            {logs.map((l, i) => (
+              <div key={i} className="log-line">
+                <span className="opacity-30 mr-2">{">"}</span> {l}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

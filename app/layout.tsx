@@ -38,7 +38,7 @@ export default function RootLayout({
 
         {/* IKLAN POPUNDER (Jangan lupa yang satu lagi dipasang juga) */}
         <Script
-          src="https://pl29203001.profitablecpmratenetwork.com/8f/fb/a6/8ffba6782c1e502c487acd7fda21216f.js"
+          //src="https://pl29203001.profitablecpmratenetwork.com/8f/fb/a6/8ffba6782c1e502c487acd7fda21216f.js"
           strategy="afterInteractive"
         />
 

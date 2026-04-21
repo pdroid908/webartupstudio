@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json(
         {
-          error: "Input mengandung karakter terlarang atau spasi!",
+          error: "Nice Try Diddy >_<",
           finalStatus: "BAHAYA",
         },
         { status: 400 },

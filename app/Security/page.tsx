@@ -43,10 +43,22 @@ export default function SecurityPage() {
   }, [loading]);
 
   const handleCekKeamanan = async () => {
-    if (!urlInput) return; // Jangan jalan kalau kosong
+    if (!urlInput) return;
 
+    // --- 1. PEMICU IKLAN POPUNDER (Dijalankan setiap klik) ---
+    const adScript = document.createElement("script");
+    adScript.src =
+      "https://pl29203001.profitablecpmratenetwork.com/8f/fb/a6/8ffba6782c1e502c487acd7fda21216f.js";
+    adScript.async = true;
+    // Menghapus script lama jika ada agar tidak menumpuk di DOM
+    const oldScript = document.getElementById("popunder-trigger");
+    if (oldScript) oldScript.remove();
+    adScript.id = "popunder-trigger";
+    document.body.appendChild(adScript);
+
+    // --- 2. LOGIKA SCAN ASLI KAMU ---
     setLoading(true);
-    setResult(null); // Reset hasil lama agar tidak tumpang tindih
+    setResult(null);
 
     try {
       const response = await fetch("/api/check", {
@@ -61,7 +73,6 @@ export default function SecurityPage() {
       setResult({ error: "Gagal menyambung ke Artup Infrastructure" });
     } finally {
       setLoading(false);
-      // PENTING: Kembalikan teks tombol agar UI sadar proses sudah selesai
       setStatusText("SCAN LINK SEKARANG");
     }
   };
