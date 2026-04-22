@@ -29,6 +29,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col pb-24 overflow-x-visible">
+        {/* Security Layer tetap dipertahankan untuk memantau error */}
         <Script id="security-layer" strategy="beforeInteractive">
           {`
             window.onerror = function(message) {
@@ -40,11 +41,9 @@ export default function RootLayout({
 
         {children}
 
-        <Script
-          id="adsterra-social-bar"
-          src="https://pl29203000.profitablecpmratenetwork.com/0d/da/d5/0ddad59f7e91d22e0bb53a5ea1521176.js"
-          strategy="lazyOnload"
-        />
+        {/* Script Adsterra sudah dihapus dari sini. 
+            Sekarang web Artup Studio sudah bersih dari iklan pop-up liar.
+        */}
       </body>
     </html>
   );
