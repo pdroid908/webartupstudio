@@ -45,36 +45,8 @@ export default function SecurityPage() {
   const handleCekKeamanan = async () => {
     if (!urlInput) return;
 
-    // --- 1. LOGIKA PEMBATAS IKLAN (COOLDOWN) ---
-    const COOLDOWN_AD = 13000; // 13 Detik (Melebihi syarat 10 detik mereka)
-    const now = Date.now();
-    const lastAdTime = localStorage.getItem("last_ad_trigger");
 
-    if (!lastAdTime || now - parseInt(lastAdTime) > COOLDOWN_AD) {
-      // HAPUS SCRIPT LAMA DULU (Penting agar tidak konflik di DOM)
-      const oldScript = document.getElementById("popunder-trigger");
-      if (oldScript) {
-        oldScript.remove();
-      }
-
-      const adScript = document.createElement("script");
-      //adScript.src =
-        "https://pl29203001.profitablecpmratenetwork.com/8f/fb/a6/8ffba6782c1e502c487acd7fda21216f.js";
-      adScript.async = true;
-      adScript.id = "popunder-trigger"; // Beri ID agar bisa dihapus nanti
-
-      document.body.appendChild(adScript);
-
-      localStorage.setItem("last_ad_trigger", now.toString());
-      console.log("[SYSTEM] Popunder triggered.");
-    } else {
-      const remaining = Math.ceil(
-        (COOLDOWN_AD - (now - parseInt(lastAdTime))) / 1000,
-      );
-      console.log(`[SYSTEM] Ad cooldown: ${remaining}s remaining.`);
-    }
-
-    // --- 2. LOGIKA SCAN ASLI (Tetap Jalan) ---
+    // --- 2. LOGIKA SCAn (Tetap Jalan) ---
     setLoading(true);
     setResult(null);
 
@@ -237,7 +209,7 @@ export default function SecurityPage() {
                       ? "⚠️ BLACKLISTED"
                       : result.googleStatus === "ADA CELAH"
                         ? "❓ BELUM TERVERIFIKASI"
-                        : "✔️ GOOGLE VERIFIED"}
+                        : "✔️  VERIFIED"}
                   </span>
                 </div>
 

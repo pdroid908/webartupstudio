@@ -10,6 +10,17 @@ export async function POST(req: Request) {
     // 1. NORMALISASI & FILTER KARAKTER
     url = url.trim().toLowerCase();
 
+    // --- PROTEKSI PINTU DEPAN ---
+    if (url.length > 2000 || url.includes("@")) {
+      return NextResponse.json(
+        {
+          error: "Deteksi Karakter Terlarang atau URL Terlalu Panjang!",
+          finalStatus: "BAHAYA",
+        },
+        { status: 400 },
+      );
+    }
+
     if (
       url.includes("<") ||
       url.includes(">") ||
@@ -48,6 +59,16 @@ export async function POST(req: Request) {
       domain.endsWith(".co.id") || domain.endsWith(".net.id")
         ? parts.slice(-3).join(".")
         : parts.slice(-2).join(".");
+    // --- PROTEKSI BIAR SERVER GAK PINGSAN (SELF-SCAN) ---
+    if (domain.includes("artup-security.vercel.app")) {
+      return NextResponse.json(
+        {
+          error: "Sistem dilarang men-scan infrastruktur Artup sendiri!",
+          finalStatus: "AMAN",
+        },
+        { status: 400 },
+      );
+    }
 
     const whitelist = [
       // --- KOMUNIKASI & MEDSOS (Official Only) ---
