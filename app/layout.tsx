@@ -29,21 +29,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col pb-24 overflow-x-visible">
-        {/* Security Layer tetap dipertahankan untuk memantau error */}
-        <Script id="security-layer" strategy="beforeInteractive">
-          {`
-            window.onerror = function(message) {
-              console.warn("Captured Error:", message);
-              return false;
-            };
-          `}
-        </Script>
+  
 
         {children}
 
-        {/* Script Adsterra sudah dihapus dari sini. 
-            Sekarang web Artup Studio sudah bersih dari iklan pop-up liar.
-        */}
+        
       </body>
     </html>
   );
