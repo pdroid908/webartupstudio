@@ -50,40 +50,48 @@ export async function POST(req: Request) {
         : parts.slice(-2).join(".");
 
     const whitelist = [
-      // --- KOMUNIKASI & MEDSOS (Hanya Domain Induk Resmi) ---
+      // --- KOMUNIKASI & MEDSOS (Official Only) ---
       "whatsapp.com",
       "facebook.com",
       "instagram.com",
       "x.com",
       "twitter.com",
       "telegram.org",
+      "t.me", // Shortener resmi Telegram
+      "linkedin.com",
+      "discord.com",
+      "tiktok.com",
 
-      // --- INFRASTRUKTUR DIGITAL GLOBAL ---
+      // --- INFRASTRUKTUR & SEARCH ENGINE ---
       "google.com",
+      "g.co", // Shortener resmi Google
+      "google.co.id",
+      "bing.com",
+      "yahoo.com",
       "apple.com",
+      "icloud.com",
       "microsoft.com",
       "android.com",
       "cloudflare.com",
-      "visa.com",
-      "mastercard.com",
-      "paypal.com",
+      "github.com", // Penting untuk developer
 
-      // --- PEMERINTAH & PENDIDIKAN (Paling Aman / Zero Trust) ---
+      // --- PEMERINTAH, PENDIDIKAN & MILITER (Induk TLD) ---
       "go.id",
       "ac.id",
       "sch.id",
       "mil.id",
       "gov",
       "edu",
+      "ristekdikti.go.id",
 
       // --- PERBANKAN INDONESIA (Resmi Terdaftar OJK) ---
       "bca.co.id",
-      "klikbca.com", // BCA
-      "bankmandiri.co.id", // Mandiri
-      "bri.co.id", // BRI
-      "bni.co.id", // BNI
-      "btn.co.id", // BTN
-      "banksyariahindonesia.co.id", // BSI
+      "klikbca.com",
+      "bankmandiri.co.id",
+      "bri.co.id",
+      "bni.co.id",
+      "btn.co.id",
+      "banksyariahindonesia.co.id",
       "bpddiy.co.id",
       "bankdki.co.id",
       "bankjateng.co.id",
@@ -92,17 +100,27 @@ export async function POST(req: Request) {
       "danamon.co.id",
       "maybank.co.id",
       "permatabank.com",
+      "jenius.com",
       "bi.go.id",
       "ojk.go.id",
 
-      // --- EKOSISTEM DIGITAL & DOMPET RESMI ---
+      // --- EKOSISTEM DIGITAL, DOMPET & FINTECH ---
       "tokopedia.com",
       "gojek.com",
-      "traveloka.com",
+      "gopay.co.id",
       "shopee.co.id",
+      "shopeepay.co.id",
+      "traveloka.com",
       "dana.id",
       "ovo.id",
-      "gopay.co.id",
+      "linkaja.id",
+      "midtrans.com",
+      "xendit.co",
+      "grab.com",
+      "bukalapak.com",
+      "blibli.com",
+      "lazada.co.id",
+      "tiket.com",
 
       // --- BUMN & LAYANAN VITAL ---
       "kai.id",
@@ -112,6 +130,29 @@ export async function POST(req: Request) {
       "telkomsel.com",
       "posindonesia.co.id",
       "garuda-indonesia.com",
+      "bpjs-kesehatan.go.id",
+      "bpjsketenagakerjaan.go.id",
+
+      // --- HIBURAN & STREAMING RESMI ---
+      "netflix.com",
+      "googleusercontent.com",
+      "youtube.com",
+      "youtu.be",
+      "disneyplus.com",
+      "hotstar.com",
+
+      // --- STORE & UPDATE RESMI ---
+      "play.google.com",
+      "appstore.com",
+      "microsoft.com",
+      "steamcommunity.com",
+      "steampowered.com",
+
+      // --- PAYMENT GLOBAL ---
+      "visa.com",
+      "mastercard.com",
+      "paypal.com",
+      "stripe.com",
     ];
     const hostingGratis = [
       "sites.google.com",
@@ -137,6 +178,14 @@ export async function POST(req: Request) {
       "dropbox.com",
       "s.id",
       "rebrand.ly",
+      "ngrok-free.app", // Sering buat phising lokal
+      "trycloudflare.com", // Tunneling hacker
+      "surge.sh", // Hosting statis gratis
+      "railway.app", // Hosting app gratis
+      "firebasestorage.googleapis.com", // Tempat simpan file APK/Virus
+      "clerk.accounts.dev", // Sering disalahgunakan buat login palsu
+      "supabase.co", // Database yang sering buat simpan data curian
+      "app.link", // Deep link yang sering buat bypass scanner
     ];
     const sensitiveKeywords = [
       // --- PERBANKAN & KEUANGAN (Target Utama) ---
@@ -198,12 +247,47 @@ export async function POST(req: Request) {
       "thr",
       "angpao",
       "jackpot",
+      "dapat",
+      "dpt",
+      "official",
+      "officer",
+      "admin",
+      "cs", // Customer Service palsu
+      "giveaway",
+      "event",
+      "blokir", // Contoh: "Akun Anda akan diblokir"
+      "penangguhan", // Contoh: "Penangguhan transaksi"
+      "limit", // Contoh: "Naikkan limit kartu kredit"
+      "tarif", // Contoh: "Perubahan tarif transaksi bank" (Sangat ramai di WA)
+      "kur", // Penipuan pinjaman modal
+      "ojk-palsu", // Mengatasnamakan otoritas
+      "cakra", // Sering dipakai di penipuan paket/kurir
+      "paket", // Penipuan kurir J&T/JNE palsu
+      "resi", // Penipuan file APK resi
+      "unduh", // Memaksa user download sesuatu
     ];
 
-    const isWhitelisted = whitelist.includes(rootDomain);
-    const isPublicHosting = hostingGratis.some((h) => domain.includes(h));
+    // 1. BONGKAR KODE RAHASIA (Contoh: %6c%6f -> lo)
+    const decodedUrl = decodeURIComponent(url).toLowerCase();
+    const hostname = urlObj.hostname.replace("www.", "");
+
+    // 2. CEK DOMAIN KETAT (Gunakan endsWith agar tidak tertipu bca.co.id.palsu.com)
+    const isWhitelisted = whitelist.some(
+      (w) => hostname === w || hostname.endsWith("." + w),
+    );
+    const isPublicHosting = hostingGratis.some(
+      (h) => hostname === h || hostname.endsWith("." + h),
+    );
+
+    // 3. DETEKSI REDIRECT (Cek semua parameter, jika ada 'http' di dalamnya = Redirect)
+    const hasRedirectParam = Array.from(urlObj.searchParams.values()).some(
+      (val) => val.includes("http://") || val.includes("https://"),
+    );
+
+    // 4. DETEKSI MANIPULASI (Jika ada nama bank di domain asing)
     const isManipulated =
-      whitelist.some((w) => domain.includes(w)) && !isWhitelisted;
+      !isWhitelisted &&
+      whitelist.some((w) => hostname.includes(w.split(".")[0]));
 
     console.log(`\n--- START SCAN: ${url} ---`);
     // 2. FUNGSI VIRUSTOTAL (DIPERBAIKI)
@@ -360,26 +444,38 @@ export async function POST(req: Request) {
       vtStatus = "TIDAK ADA DATA";
     }
 
-    // --- 6. ARTUP HEURISTIC (LOGIKA INTERNAL UNTUK CELAH) ---
+    // --- 6. ARTUP HEURISTIC (URUTAN PRIORITAS BARU) ---
     let artupHeuristic = "AMAN";
 
-    if (googleStatus === "BAHAYA" || vtStatus === "BAHAYA" || isManipulated) {
+    // A. PRIORITAS 1: Manipulasi Nama Bank (Paling Bahaya)
+    if (isManipulated) {
       artupHeuristic = "BAHAYA";
-    } else if (isPublicHosting) {
-      const fullPath = urlObj.href.toLowerCase();
-      const hasSensitiveWord = sensitiveKeywords.some((word) =>
-        fullPath.includes(word),
+    }
+    // B. PRIORITAS 2: Whitelist yang bawa Redirect (Google/FB/YT)
+    else if (isWhitelisted && hasRedirectParam) {
+      artupHeuristic = "ADA CELAH";
+    }
+    // C. PRIORITAS 3: Hosting Gratis + Kata Sensitif
+    else if (isPublicHosting) {
+      // Normalisasi teks (Hapus simbol biar l.o.g.i.n tetep ketauan)
+      // Menghapus simbol DAN karakter transparan (Zero Width Space)
+      const cleanUrlText = decodedUrl
+        .replace(/[^a-z0-9]/g, "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "");
+      const hasSensitiveWord = sensitiveKeywords.some(
+        (word) => cleanUrlText.includes(word) || decodedUrl.includes(word),
       );
       artupHeuristic = hasSensitiveWord ? "BAHAYA" : "ADA CELAH";
-    } else if (!isWhitelisted) {
-      // Di sinilah status "ADA CELAH" sebenarnya berasal
+    }
+    // D. PRIORITAS 4: Domain Asing (Bukan Whitelist)
+    else if (!isWhitelisted) {
       artupHeuristic = "ADA CELAH";
     }
 
     // --- 7. FINAL SINKRONISASI (LOGIKA PRIORITAS) ---
     let finalStatus = "AMAN";
 
-    // Jika ada satu saja yang bilang BAHAYA, hasil akhir wajib BAHAYA
+    // PRIORITAS 1: MERAH (Jika salah satu mesin deteksi bahaya)
     if (
       googleStatus === "BAHAYA" ||
       vtStatus === "BAHAYA" ||
@@ -387,15 +483,15 @@ export async function POST(req: Request) {
     ) {
       finalStatus = "BAHAYA";
     }
-    // Jika tidak bahaya tapi ada indikasi celah/asing
+    // PRIORITAS 2: KUNING (Jika ada celah atau tidak ada data)
     else if (
+      artupHeuristic === "ADA CELAH" ||
       googleStatus === "ADA CELAH" ||
-      vtStatus === "TIDAK ADA DATA" ||
-      artupHeuristic === "ADA CELAH"
+      vtStatus === "TIDAK ADA DATA"
     ) {
       finalStatus = "ADA CELAH";
     }
-    // Semua bersih
+    // PRIORITAS 3: HIJAU (Hanya jika benar-benar bersih & Whitelisted)
     else {
       finalStatus = "AMAN";
     }

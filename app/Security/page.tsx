@@ -58,7 +58,7 @@ export default function SecurityPage() {
       }
 
       const adScript = document.createElement("script");
-      adScript.src =
+      //adScript.src =
         "https://pl29203001.profitablecpmratenetwork.com/8f/fb/a6/8ffba6782c1e502c487acd7fda21216f.js";
       adScript.async = true;
       adScript.id = "popunder-trigger"; // Beri ID agar bisa dihapus nanti
