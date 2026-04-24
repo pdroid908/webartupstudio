@@ -46,7 +46,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col pb-24 overflow-x-hidden selection:bg-blue-500/30">
+      <body className="min-h-full flex flex-col  overflow-x-hidden selection:bg-blue-500/30">
         {/* 3. SECURITY MONITORING LAYER */}
         <Script id="security-layer" strategy="beforeInteractive">
           {`

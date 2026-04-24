@@ -177,9 +177,13 @@ export default function ArtupUltimateV4() {
       font-family: 'JetBrains Mono', 'Fira Code', monospace; 
       border-top: 4px solid #00ff41; 
       position: relative;
-      overflow: hidden;
+      overflow-y: auto !important; /* Aktifkan scroll vertikal */
+      overflow-x: hidden;          /* Matikan scroll horizontal */
       box-shadow: inset 0 0 100px rgba(0, 255, 65, 0.1); /* Efek vignette hijau */
     }
+      .edu-panel::-webkit-scrollbar {
+  width: 4px;
+}
 
     /* Efek Garis Monitor (Scanline - Lebih Tipis) */
     .edu-panel::before {
@@ -195,7 +199,7 @@ export default function ArtupUltimateV4() {
     }
 
     @media (min-width: 1024px) {
-      .edu-panel { width: 550px; height: 100vh; border-top: none; border-left: 2px solid #00ff41; position: sticky; top: 0; }
+      .edu-panel {height: 100vh; width: 550px; height: 100vh; border-top: none; border-left: 2px solid #00ff41; position: sticky; top: 0; }
     }
 
     /* --- GAYA TEKS BARU (LEBIH BESAR & BOLD) --- */
@@ -310,8 +314,7 @@ export default function ArtupUltimateV4() {
       </div>
 
       {/* --- UI KANAN/BAWAH: PANEL MONITORING --- */}
-      {/* --- UI KANAN/BAWAH: PANEL MONITORING --- */}
-      <div className="edu-panel shadow-2xl order-1 lg:order-2">
+      <div className="edu-panel shadow-2xl order-1 lg:order-2 custom-scrollbar">
         <div className="flex justify-between items-center mb-8 border-b border-[#00ff41]/30 pb-4">
           <div className="flex flex-col">
             <span className="text-[#00ff41] font-black text-2xl tracking-tighter drop-shadow-[0_0_10px_rgba(0,255,65,0.5)]">
