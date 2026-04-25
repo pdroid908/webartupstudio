@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import GameContainer from "./src/components/Game/GameContainer";
 // --- INTERFACE UNTUK TYPE SAFETY ---
 interface BaseItem {
   id: string;
@@ -10,9 +11,11 @@ interface BaseItem {
   tech: string;
   iconFile: string;
   screenshots: string[];
-  link?: string; // Opsional untuk App
-  embedUrl?: string; // Khusus untuk Web
+  link?: string;
+  embedUrl?: string;
   videoId?: string;
+  isInternal?: boolean; // TAMBAHKAN BARIS INI (Pake tanda tanya)
+  route?: string;
 }
 
 const MY_GAMES: BaseItem[] = [
@@ -41,6 +44,17 @@ const MY_GAMES: BaseItem[] = [
 ];
 
 const WEB_GAMES: BaseItem[] = [
+  {
+    id: "bird-mystery",
+    title: "Bird Mystery",
+    descFull:
+      "Uji ketangkasanmu dalam petualangan terbang yang adiktif! Kendalikan burung melewati celah pipa yang muncul secara acak dan tak terduga. Jangan biarkan konsentrasimu pecah, raih skor tertinggi, dan buktikan kemampuanmu dengan memuncaki Ranking Dunia melawan pemain lainnya!",
+    tech: "Next.js & Firebase",
+    iconFile: "bird2.png",
+    screenshots: ["bird1.png","bird2.png"],
+    isInternal: true, // TAMBAHKAN PENANDA INI
+    route: "/BirdMystery",
+  },
   {
     id: "block-fight-web",
     title: "Cozy Block Fight",
@@ -348,23 +362,37 @@ export default function Home() {
                 {currentItem.descFull}
               </p>
 
+              {/* --- AREA TOMBOL DI DISPLAY PANEL --- */}
               <div className="flex flex-col md:flex-row gap-4 items-center">
-                {activeTab === "web" && currentItem.embedUrl ? (
+                {activeTab === "web" &&
+                currentItem?.isInternal &&
+                currentItem?.route ? (
+                  /* JIKA GAME INTERNAL, PINDAH HALAMAN SAAT DIKLIK */
+                  <Link
+                    href={currentItem.route}
+                    className="w-full md:w-max bg-blue-600 hover:bg-blue-500 text-white px-14 py-4 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-500/20"
+                  >
+                    <span>🎮</span> Play Now
+                  </Link>
+                ) : activeTab === "web" && currentItem?.embedUrl ? (
+                  /* JIKA GAME LUAR (ITCH.IO), PAKAI IFRAME SEPERTI BIASA */
                   <button
                     onClick={() => setShowIframe(true)}
-                    className="w-full md:w-max bg-purple-600 hover:bg-purple-500 text-white px-14 py-4 rounded-2xl font-black text-xs md:text-sm active:scale-95 transition-all shadow-xl shadow-purple-900/20 uppercase tracking-widest flex items-center gap-3"
+                    className="w-full md:w-max bg-purple-600 hover:bg-purple-500 text-white px-14 py-4 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-3 transition-all"
                   >
                     <span>🎮</span> Play Now
                   </button>
                 ) : (
-                  <a
-                    href={currentItem.link || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full md:w-max bg-blue-600 hover:bg-blue-500 text-center text-white px-12 py-4 rounded-2xl font-black text-xs md:text-sm active:scale-95 transition-all shadow-xl shadow-blue-900/20 uppercase tracking-widest"
-                  >
-                    📥 Download
-                  </a>
+                  /* TOMBOL DOWNLOAD UNTUK ANDROID */
+                  currentItem?.link && (
+                    <a
+                      href={currentItem.link}
+                      target="_blank"
+                      className="w-full md:w-max bg-blue-600 hover:bg-blue-500 text-center text-white px-12 py-4 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest transition-all"
+                    >
+                      📥 Download
+                    </a>
+                  )
                 )}
               </div>
 
