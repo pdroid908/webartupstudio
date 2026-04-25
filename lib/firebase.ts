@@ -2,7 +2,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAE3DLbvAeAWzh5uV0im41c7nDPRAs3EAo",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "bird-fly-29513.firebaseapp.com",
   projectId: "bird-fly-29513",
   storageBucket: "bird-fly-29513.firebasestorage.app",
