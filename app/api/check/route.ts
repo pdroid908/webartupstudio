@@ -9,12 +9,31 @@ export async function POST(req: Request) {
 
     // 1. NORMALISASI & FILTER KARAKTER
     url = url.trim().toLowerCase();
+    function isBase64(str: string) {
+      try {
+        return btoa(atob(str)) === str;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    if (isBase64(url)) {
+      try {
+        const decoded = Buffer.from(url, "base64").toString("utf-8");
+        if (decoded.startsWith("http")) {
+          url = decoded; // Ganti url acak jadi url asli (misal: google.com)
+          console.log(`[DECODER] Berhasil membongkar Base64: ${url}`);
+        }
+      } catch (e) {
+        console.log("[DECODER] Teks bukan Base64 URL valid.");
+      }
+    }
 
     // --- PROTEKSI PINTU DEPAN ---
     if (url.length > 2000 || url.includes("@")) {
       return NextResponse.json(
         {
-          error: "Deteksi Karakter Terlarang atau URL Terlalu Panjang!",
+          error: "Deteksi Karakter Terlarang URL Terlalu Panjang!",
           finalStatus: "BAHAYA",
         },
         { status: 400 },
@@ -45,7 +64,7 @@ export async function POST(req: Request) {
     } catch (e) {
       return NextResponse.json(
         {
-          error: "Format URL hancur / tidak valid",
+          error: "URL / LINK MACAM APA ITU HA ??",
           finalStatus: "BAHAYA",
         },
         { status: 400 },
@@ -63,7 +82,7 @@ export async function POST(req: Request) {
     if (domain.includes("artup-security.vercel.app")) {
       return NextResponse.json(
         {
-          error: "Sistem dilarang men-scan infrastruktur Artup sendiri!",
+          error: "MODE PERTAHANAN DIRI DARI HACKER !!",
           finalStatus: "AMAN",
         },
         { status: 400 },
@@ -73,6 +92,7 @@ export async function POST(req: Request) {
     const whitelist = [
       // --- KOMUNIKASI & MEDSOS (Official Only) ---
       "whatsapp.com",
+      "artup-studio.vercel.app",
       "facebook.com",
       "instagram.com",
       "x.com",
@@ -237,7 +257,7 @@ export async function POST(req: Request) {
       "portal",
       "update",
       "confirm",
-      "secure",
+
       "registrasi",
       "daftar",
       "aktivasi",

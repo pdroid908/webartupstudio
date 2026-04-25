@@ -24,11 +24,12 @@ export default function SecurityPage() {
     let interval: NodeJS.Timeout;
     if (loading) {
       const messages = [
-        "MENJALANKAN GLOBAL Engine...",
-        "MENJALAKAN VIRUS Engine...",
-        "ANALYZING  RISK...", // Pesan baru
-        "SYNCING REAL-TIME RESULTS...",
-        "ARTUP HEURISTIC ACTIVE...",
+        "INITIALIZING ARTUP NEURAL CORE...",
+        "DECRYPTING PACKET OBFUSCATION...",
+        "SCANNING DATABASE REPUTATION...",
+        "EXTRACTING HEURISTIC PATTERNS...",
+        "CALCULATING RISK PROBABILITY...",
+        "FINALIZING SECURITY INTEGRITY...",
       ];
       let i = 0;
       setStatusText(messages[0]);
