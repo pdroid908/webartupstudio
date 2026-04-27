@@ -22,6 +22,9 @@ const GameContainer = () => {
   const [playerName, setPlayerName] = useState("");
   const [playerId, setPlayerId] = useState<string>("");
   const [globalScores, setGlobalScores] = useState<any[]>([]);
+  const [isGameOverAnim, setIsGameOverAnim] = useState(false);
+  const gameOverLockRef = useRef(false);
+  const [isInvincible, setIsInvincible] = useState(false);
 
   // SISTEM BARU: MENGGUNAKAN ARRAY UNTUK MULTI-OBSTACLE & KOIN
   const [obstacles, setObstacles] = useState<any[]>([]);
@@ -41,10 +44,10 @@ const GameContainer = () => {
 
   // KONFIGURASI GAME
   const GRAVITY = 0.15;
-  const JUMP_FORCE = -5.5;
+  const JUMP_FORCE = -3.5;
   const OBSTACLE_WIDTH = 80; // Lebih tipis agar muat banyak
   const OBSTACLE_GAP = 350; // Celah burung
-  const OBSTACLE_SPEED = 3; // Kecepatan gerak
+  const OBSTACLE_SPEED = 6; // Kecepatan gerak
   const SPAWN_DISTANCE = 450; // Jarak antar pipa muncul
 
   const particles = useRef(
@@ -59,105 +62,119 @@ const GameContainer = () => {
   const getTheme = () => {
     const level = Math.floor(score / 100);
     const themes = [
-  // ... 3 tema awal milikmu ...
-  
-  // 4. RETRO VAPORWAVE (Pink & Cyan - Sangat Aesthetic)
-  {
-    bg: ["#ff71ce", "#01cdfe", "#05ffa1"],
-    pipe: "linear-gradient(#b967ff, #fffb96)",
-    coin: "#fff",
-  },
-  
-  // 5. MIDNIGHT CHERRY (Merah Gelap & Hitam - Mewah)
-  {
-    bg: ["#000000", "#434343", "#a71d31"],
-    pipe: "linear-gradient(#ff416c, #ff4b2b)",
-    coin: "#ffd700",
-  },
+      // 1. FOREST MIST (Hijau Lumut & Kabut - Tenang & Alami)
+      {
+        bg: ["#0b2027", "#1f4a4a", "#40798c"], // Hijau tua kebiruan, hijau lumut, biru kabut
+        pipe: "linear-gradient(#71b280, #134e5e)", // Hijau daun muda ke hijau tua kebiruan
+        coin: "#f9d423", // Kuning emas (seperti cahaya matahari menembus kabut)
+      },
 
-  // 6. CYBERPUNK NEON (Kuning & Biru Elektrik)
-  {
-    bg: ["#000000", "#1a1a2e", "#16213e"],
-    pipe: "linear-gradient(#f9d423, #ff4e50)",
-    coin: "#00fff2",
-  },
+      // 2. MIDNIGHT SKY (Biru Malam & Ungu Gelap - Misterius & Tenang)
+      {
+        bg: ["#000000", "#1a1a2e", "#16213e"], // Hitam, biru tua, biru keunguan
+        pipe: "linear-gradient(#3c1053, #ad5389)", // Ungu tua ke ungu kemerahan lembut
+        coin: "#ffffff", // Putih (seperti bintang)
+      },
 
-  // 7. SOFT PASTEL COTTON CANDY (Bikin Burung Ungu Terlihat Kontras)
-  {
-    bg: ["#ff9a9e", "#fecfef", "#a1c4fd"],
-    pipe: "linear-gradient(#cfd9df, #e2ebf0)",
-    coin: "#ff6b6b",
-  },
+      // 3. SOFT SUNSET (Oranye Lembut & Pink Pastel - Hangat & Damai)
+      {
+        bg: ["#ff9a9e", "#fad0c4", "#ffdde1"], // Pink lembut, oranye peach, pink pudar
+        pipe: "linear-gradient(#ff758c, #ff7eb3)", // Pink cerah lembut ke pink medium
+        coin: "#ffe4b5", // Moccasin (kuning krem lembut)
+      },
 
-  // 8. FOREST MIST (Hijau Lumut & Kabut)
-  {
-    bg: ["#000000", "#0b2027", "#40798c"],
-    pipe: "linear-gradient(#71b280, #134e5e)",
-    coin: "#f9d423",
-  },
+      // 4. TWILIGHT LAVENDER (Ungu Lembayung & Biru Senja - Tenang & Romantis)
+      {
+        bg: ["#a1c4fd", "#c2e9fb", "#d8bfd8"], // Biru muda, biru langit pudar, lavender muda
+        pipe: "linear-gradient(#6a11cb, #2575fc)", // Ungu tua ke biru cerah (lebih kontras sedikit)
+        coin: "#fafad2", // Kuning keemasan muda
+      },
 
-  // 9. SUNSET SILHOUETTE (Oranye & Ungu Muda)
-  {
-    bg: ["#f12711", "#f5af19", "#833ab4"],
-    pipe: "linear-gradient(#2c3e50, #000000)",
-    coin: "#ffffff",
-  },
+      // 5. OCEAN BLISS (Biru Laut & Teal - Segar & Menenangkan)
+      {
+        bg: ["#e0ffff", "#afeeee", "#40e0d0"], // Cyan muda, turquoise pucat, turquoise
+        pipe: "linear-gradient(#00ced1, #1e90ff)", // Dark turquoise ke biru laut
+        coin: "#ffffed", // Kuning gading (seperti pasir pantai)
+      },
 
-  // 10. DEEP OCEAN (Biru Laut Dalam)
-  {
-    bg: ["#021b79", "#0575e6", "#021b79"],
-    pipe: "linear-gradient(#78ffd6, #a8ff78)",
-    coin: "#ffd700",
-  }
-];
-    
+      // 6. EARTHY STONE (Coklat Tanah & Abu-abu - Alami & Kokoh)
+      {
+        bg: ["#d3b8ae", "#bcaaa4", "#a1887f"], // Coklat muda, coklat keabu-abuan, coklat medium
+        pipe: "linear-gradient(#8d6e63, #5d4037)", // Coklat tanah ke coklat tua
+        coin: "#fff8dc", // Cornsilk (kuning pucat)
+      },
+
+      // 7. DESERT SAND (Kuning Pasir & Peach - Hangat & Luas)
+      {
+        bg: ["#ffeb3b", "#fff176", "#ffe082"], // Kuning cerah, kuning muda, kuning peach
+        pipe: "linear-gradient(#ffb74d, #ffa726)", // Oranye muda ke oranye
+        coin: "#ffffff", // Putih
+      },
+    ];
+
     return themes[level % themes.length];
   };
   const theme = getTheme();
 
+  // --- PERCONST: HARD RESET MEMORY (ANTI-NEMPEL) ---
+  // --- PERCONST: HARD RESET MEMORY (ANTI-NEMPEL) ---
+  const hardResetGame = () => {
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = undefined;
+    }
+
+    obstaclesRef.current = [];
+    coinsRef.current = [];
+
+    velocityRef.current = 0;
+    birdPosRef.current = 300;
+
+    // PERCONST: JANGAN RESET SCORE REF DI SINI
+    setObstacles([]);
+    setCoins([]);
+
+    setBirdPos(300);
+    setIsGameOverAnim(false);
+  };
+
+  // --- PERCONST: GAME LOOP MANAGER (ANTI-STUCK) ---
+  // --- PERCONST: GAME LOOP & INVINCIBILITY MANAGER ---
+  // --- PERCONST: FIX LAYAR KOSONG & MOUNTING ---
   useEffect(() => {
     setMounted(true);
 
-    // 1. Ambil Nama yang Tersimpan
-    const savedName = localStorage.getItem("player_name");
-    if (savedName) setPlayerName(savedName);
-
-    // 2. LOGIKA ID UNIK (ANTI-REDUNDAN)
-    // Cek apakah HP ini sudah punya ID tetap
-    let id = localStorage.getItem("bird_player_id");
-    if (!id) {
-      // Jika belum ada, buat KTP Digital baru untuk HP ini
-      id = "PLAYER-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-      localStorage.setItem("bird_player_id", id);
-    }
-    setPlayerId(id); // Masukkan ke state biar bisa dipakai simpan skor
-
-    // 3. Logika Ukuran Layar
-    const updateSize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      screenSizeRef.current = { width: w, height: h };
-
-      // Responsif: Burung agak ke tengah kalau di Laptop, agak ke kiri kalau di HP
-      setBirdX(w > 768 ? w * 0.25 : w * 0.15);
+    // TEMBAK UKURAN LAYAR ASLI BIAR PIPA GAK MUNCUL DI KOORDINAT 0
+    screenSizeRef.current = {
+      width: window.innerWidth,
+      height: window.innerHeight,
     };
 
-    updateSize();
-    window.addEventListener("resize", updateSize);
+    const id =
+      localStorage.getItem("bird_player_id") ||
+      "PLAYER-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6);
 
-    // 4. Cleanup (Penting biar memori gak bocor)
-    return () => window.removeEventListener("resize", updateSize);
+    localStorage.setItem("bird_player_id", id);
+    setPlayerId(id);
+    setPlayerName(localStorage.getItem("player_name") || "");
   }, []);
-
   const animate = () => {
-    if (gameState !== "PLAYING") return;
+    // PROTEKSI: Jika state bukan playing atau array kosong, stop loop
+    if (gameState !== "PLAYING" || isGameOverAnim) {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      return;
+    }
 
     velocityRef.current += GRAVITY;
     birdPosRef.current += velocityRef.current;
     const h = screenSizeRef.current.height;
     const w = screenSizeRef.current.width;
 
-    if (birdPosRef.current >= h - 50) handleGameOver();
+    if (birdPosRef.current >= h - 50) {
+      birdPosRef.current = h - 50;
+      velocityRef.current = 0;
+      handleGameOver();
+    }
     if (birdPosRef.current <= 0) birdPosRef.current = 0;
 
     // 1. LOGIKA SPAWN PIPA (MUNCUL BERURUTAN)
@@ -195,22 +212,46 @@ const GameContainer = () => {
     }
 
     // 2. UPDATE POSISI & COLLISION PIPA
+    // 2. UPDATE POSISI & COLLISION PIPA
+    // --- PERCONST: UPDATE PIPA & CEK TABRAKAN (ANTI-NEMPEL & KEBAL) ---
     obstaclesRef.current = obstaclesRef.current.filter((obs) => {
       obs.left -= OBSTACLE_SPEED;
 
-      // Skor lewat pipa
+      // --- PERCONST: SYNC SKOR (VISUAL & DATABASE) ---
+      // --- PERCONST: FIX SKOR SINKRON (ANTI-NOL) ---
       if (!obs.passed && obs.left < birdX) {
         obs.passed = true;
-        scoreRef.current += 1;
-        setScore(scoreRef.current);
+
+        // 1. UPDATE STATE (UNTUK TAMPILAN)
+        // PERCONST: SAFE SCORE UPDATE (ANTI DOUBLE)
+        const addScore = (amount: number = 1) => {
+          scoreRef.current = scoreRef.current + amount;
+          setScore(scoreRef.current);
+        };
+
+        addScore(1);
+
+        console.log("🔥 SKOR BARU DI MEMORI:", scoreRef.current);
       }
 
-      // Tabrakan Pipa
       const bY = birdPosRef.current;
-      if (birdX + 30 > obs.left && birdX < obs.left + OBSTACLE_WIDTH) {
-        // Pakai obs.gap di sini:
-        if (bY < obs.height || bY + 30 > obs.height + obs.gap) {
-          handleGameOver();
+      const BIRD_W = 34;
+      const BIRD_H = 20; // GAGAK GEPENG
+      const PADDING_X = 4;
+      const PADDING_Y = 2;
+
+      // CEK TABRAKAN HANYA JIKA TIDAK SEDANG KEBAL
+      if (!isInvincible) {
+        if (
+          birdX + BIRD_W - PADDING_X > obs.left &&
+          birdX + PADDING_X < obs.left + OBSTACLE_WIDTH
+        ) {
+          if (
+            bY + PADDING_Y < obs.height ||
+            bY + BIRD_H - PADDING_Y > obs.height + obs.gap
+          ) {
+            handleGameOver();
+          }
         }
       }
       return obs.left > -OBSTACLE_WIDTH;
@@ -232,6 +273,7 @@ const GameContainer = () => {
         scoreRef.current += 5;
         setScore(scoreRef.current);
 
+        console.log("🪙 COIN SCORE:", scoreRef.current);
         // --- TAMBAHKAN LOGIKA EFEK PECAHAN DI SINI ---
         const particles = [...Array(8)].map((_, i) => ({
           id: Date.now() + i,
@@ -267,47 +309,82 @@ const GameContainer = () => {
     requestRef.current = requestAnimationFrame(animate);
   };
 
+  // --- PERCONST: LOGIKA MATI & KIRIM DATABASE ---
+  // --- PERCONST: LOGIKA MATI & KIRIM SKOR ---
+  // PERCONST: SAFE GAME OVER + FIREBASE SYNC FIX
   const handleGameOver = async () => {
-    // 1. Langsung kunci state agar tidak loop
-    setGameState("MENU");
+    // 🔒 LOCK BIAR TIDAK KEPAKAI 2X
+    if (gameOverLockRef.current) return;
+    gameOverLockRef.current = true;
 
-    // 2. Ambil data terbaru dari localStorage (Lebih aman daripada State saat transisi cepat)
-    const currentName = localStorage.getItem("player_name") || playerName;
-    const currentId = localStorage.getItem("bird_player_id") || playerId;
+    console.log("💀 GAME OVER TRIGGERED");
 
-    // Validasi: Jangan simpan kalau skor 0 atau nama masih kosong/default
-    if (
-      scoreRef.current <= 0 ||
-      !currentName ||
-      currentName === "Ketik Nama..."
-    )
-      return;
+    // STOP GAME LOOP
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = undefined;
+    }
+
+    setIsGameOverAnim(true);
+
+    const finalScore = scoreRef.current;
+
+    const currentName = (
+      playerName ||
+      localStorage.getItem("player_name") ||
+      ""
+    ).trim();
+
+    let currentId = localStorage.getItem("bird_player_id");
+
+    if (!currentId) {
+      currentId = "PLAYER-" + Date.now();
+      localStorage.setItem("bird_player_id", currentId);
+    }
+
+    console.log("📊 GAME OVER DATA:", {
+      name: currentName,
+      finalScore,
+      playerId: currentId,
+    });
 
     try {
+      if (!currentName) {
+        console.log("⚠️ Nama kosong, skip save");
+        gameOverLockRef.current = false;
+        return;
+      }
+
       const userScoreRef = ref(db, `leaderboard/${currentId}`);
       const snapshot = await get(userScoreRef);
-      const currentData = snapshot.val();
 
-      // 3. LOGIKA UPDATE:
-      // Tetap update jika Skor Baru > Skor Lama ATAU jika Nama berubah (biar di ranking nama terupdate)
-      if (
-        !currentData ||
-        scoreRef.current > currentData.score ||
-        currentName !== currentData.username
-      ) {
-        // Gunakan skor tertinggi antara yang baru atau yang sudah ada di database
-        const finalScore = Math.max(scoreRef.current, currentData?.score || 0);
+      const oldScore = snapshot.val()?.score || 0;
 
-        await databaseSet(userScoreRef, {
-          username: currentName,
-          score: finalScore,
-          timestamp: Date.now(),
-        });
-        console.log("✅ Data Terupdate di Firebase!");
-      }
-    } catch (error) {
-      console.error("❌ Gagal simpan ke Firebase:", error);
+      // 🔥 FIX UTAMA: AKUMULASI SCORE
+      const totalScore = oldScore + finalScore;
+
+      await databaseSet(userScoreRef, {
+        username: currentName,
+        score: totalScore,
+        lastRunScore: finalScore,
+        timestamp: Date.now(),
+      });
+
+      console.log("🔥 SCORE UPDATED SUCCESS:", {
+        oldScore,
+        finalScore,
+        totalScore,
+      });
+    } catch (err) {
+      console.error("❌ FIREBASE ERROR:", err);
     }
+
+    // RESET KE MENU
+    setTimeout(() => {
+      setGameState("MENU");
+      setIsGameOverAnim(false);
+      gameOverLockRef.current = false;
+    }, 300);
   };
 
   const fetchLeaderboard = () => {
@@ -326,26 +403,94 @@ const GameContainer = () => {
     );
   };
 
+  // --- PERBAIKAN 1: SETUP AWAL & MOUNTING ---
+  // --- PERCONST: SATU-SATUNYA GAME LOOP & INVINCIBILITY MANAGER ---
+  // --- PERCONST: SATU KESATUAN MANAGER GAME (ANTI-BENTROK & ANTI-NEMPEL) ---
+  // --- PERCONST: SATU KESATUAN MANAGER GAME (ANTI-BENTROK & ANTI-NEMPEL) ---
   useEffect(() => {
-    let id = localStorage.getItem("bird_player_id");
-    if (!id) {
-      id = "PLAYER-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-      localStorage.setItem("bird_player_id", id);
-    }
-    setPlayerId(id);
+    let invincibleTimer: NodeJS.Timeout;
 
     if (gameState === "PLAYING") {
-      birdPosRef.current = 300;
-      velocityRef.current = 0;
+      // 1. BERSIHKAN TOTAL (Biar gak nempel pipa lama)
+      hardResetGame();
+
+      // 2. MODE KEBAL 3 DETIK (Permintaan Abang)
+      setIsInvincible(true);
+      invincibleTimer = setTimeout(() => {
+        setIsInvincible(false);
+      }, 3000);
+
+      // 3. JALANKAN MESIN (Kasih jeda 50ms biar React gak kaget)
+      const startTimer = setTimeout(() => {
+        if (gameState === "PLAYING") {
+          requestRef.current = requestAnimationFrame(animate);
+          audioRef.current?.play().catch(() => {});
+        }
+      }, 50);
+
+      return () => {
+        clearTimeout(startTimer);
+        clearTimeout(invincibleTimer);
+        if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      };
+    } else {
+      // Matikan mesin kalau di menu/leaderboard
+      audioRef.current?.pause();
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+        requestRef.current = undefined;
+      }
+    }
+  }, [gameState]);
+
+  // --- PERBAIKAN 2: MONITORING LEADERBOARD (Realtime) ---
+  useEffect(() => {
+    const scoresRef = query(
+      ref(db, "leaderboard"),
+      orderByChild("score"),
+      limitToLast(10),
+    );
+    const unsubscribe = onValue(scoresRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const sorted = Object.values(data).sort(
+          (a: any, b: any) => b.score - a.score,
+        );
+        setGlobalScores(sorted);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // --- PERBAIKAN 3: GAME LOOP MANAGER (Anti-Stuck & Reset Pipa) ---
+  useEffect(() => {
+    if (gameState === "PLAYING") {
+      // RESET TOTAL FISIK & DATA (Agar tidak langsung nabrak pipa lama)
+      birdPosRef.current = birdPosRef.current;
+
+      setBirdPos(300);
+      velocityRef.current = velocityRef.current;
+      scoreRef.current = 0;
+      setScore(0);
+
+      // Bersihkan Pipa & Koin Sisa Ronde Sebelumnya
+      obstaclesRef.current = [];
+      coinsRef.current = [];
+      setObstacles([]);
+      setCoins([]);
+
+      // Pastikan hanya ada 1 loop yang jalan
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
       requestRef.current = requestAnimationFrame(animate);
-      requestRef.current = requestAnimationFrame(animate);
-      // NYALAKAN MUSIK DI SINI:
+
       audioRef.current?.play().catch(() => {});
     } else {
-      // MATIKAN MUSIK DI SINI:
+      // Hentikan suara dan loop saat di Menu atau Leaderboard
       audioRef.current?.pause();
       if (audioRef.current) audioRef.current.currentTime = 0;
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
     }
+
     return () => {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
@@ -498,12 +643,49 @@ const GameContainer = () => {
               top: birdPos,
               transform: `rotate(${velocityRef.current * 3}deg)`,
               zIndex: 100,
+              // Efek visual kebal: Transparan & Berpendar
+              opacity: isInvincible ? 0.5 : 1,
+              filter: isInvincible ? "drop-shadow(0 0 10px cyan)" : "none",
+              transition: "opacity 0.2s",
             }}
           >
             <Bird />
           </div>
         </>
       )}
+      {/* GAME OBJECTS (PIPES & COINS) DST... */}
+
+      {/* --- TARUH DI SINI: OVERLAY GAME OVER AESTHETIC --- */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: isGameOverAnim ? "rgba(255, 0, 0, 0.2)" : "transparent", // Kilat merah tipis
+          backdropFilter: isGameOverAnim ? "blur(8px)" : "none", // Efek blur estetik
+          opacity: isGameOverAnim ? 1 : 0,
+          transition: "all 0.4s ease-in-out",
+          zIndex: 150, // Di atas pipa, di bawah menu
+          pointerEvents: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {isGameOverAnim && (
+          <h1
+            style={{
+              color: "white",
+              fontSize: "4rem",
+              fontWeight: "900",
+              textShadow: "0 0 20px red",
+            }}
+          >
+            TERHEMPAS!
+          </h1>
+        )}
+      </div>
+
+      {/* MENU UTAMA DST... */}
 
       {/* MENU UTAMA */}
       {gameState === "MENU" && (
@@ -621,7 +803,15 @@ const GameContainer = () => {
                 </button>
 
                 <button
-                  onClick={() => setGameState("PLAYING")}
+                  onClick={() => {
+                    // 1. Bersihkan semua sampah pipa hantu ronde sebelumnya
+                    hardResetGame();
+
+                    // 2. Beri jeda 30ms agar React selesai menghapus pipa dari layar (DOM)
+                    setTimeout(() => {
+                      setGameState("PLAYING");
+                    }, 30);
+                  }}
                   style={{
                     width: "100%",
                     padding: "18px",
