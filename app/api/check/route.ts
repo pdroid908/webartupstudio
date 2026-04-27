@@ -93,6 +93,7 @@ export async function POST(req: Request) {
       // --- KOMUNIKASI & MEDSOS (Official Only) ---
       "whatsapp.com",
       "artup-studio.vercel.app",
+      "converter-artup.vercel.app",
       "facebook.com",
       "instagram.com",
       "x.com",
