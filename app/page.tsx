@@ -51,7 +51,7 @@ const WEB_GAMES: BaseItem[] = [
       "Uji ketangkasanmu dalam petualangan terbang yang adiktif! Kendalikan burung melewati celah pipa yang muncul secara acak dan tak terduga. Jangan biarkan konsentrasimu pecah, raih skor tertinggi, dan buktikan kemampuanmu dengan memuncaki Ranking Dunia melawan pemain lainnya!",
     tech: "Next.js & Firebase",
     iconFile: "bird2.png",
-    screenshots: ["bird1.png","bird2.png"],
+    screenshots: ["bird3.png","bird1.png","bird2.png"],
     isInternal: true, // TAMBAHKAN PENANDA INI
     route: "/BirdMystery",
   },
