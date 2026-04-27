@@ -42,7 +42,7 @@ const GameContainer = () => {
   // KONFIGURASI GAME
   const GRAVITY = 0.15;
   const JUMP_FORCE = -5.5;
-  const OBSTACLE_WIDTH = 120; // Lebih tipis agar muat banyak
+  const OBSTACLE_WIDTH = 80; // Lebih tipis agar muat banyak
   const OBSTACLE_GAP = 350; // Celah burung
   const OBSTACLE_SPEED = 3; // Kecepatan gerak
   const SPAWN_DISTANCE = 450; // Jarak antar pipa muncul
@@ -59,59 +59,95 @@ const GameContainer = () => {
   const getTheme = () => {
     const level = Math.floor(score / 100);
     const themes = [
-      {
-        bg: ["#0f0c29", "#302b63", "#24243e"],
-        pipe: "linear-gradient(#4facfe, #00f2fe)",
-        coin: "#ffd700",
-      },
-      {
-        bg: ["#134e5e", "#71b280", "#134e5e"],
-        pipe: "linear-gradient(#a8ff78, #78ffd6)",
-        coin: "#fff",
-      },
-      {
-        bg: ["#8e2de2", "#4a00e0", "#8e2de2"],
-        pipe: "linear-gradient(#f9d423, #ff4e50)",
-        coin: "#00fff2",
-      },
-    ];
+  // ... 3 tema awal milikmu ...
+  
+  // 4. RETRO VAPORWAVE (Pink & Cyan - Sangat Aesthetic)
+  {
+    bg: ["#ff71ce", "#01cdfe", "#05ffa1"],
+    pipe: "linear-gradient(#b967ff, #fffb96)",
+    coin: "#fff",
+  },
+  
+  // 5. MIDNIGHT CHERRY (Merah Gelap & Hitam - Mewah)
+  {
+    bg: ["#000000", "#434343", "#a71d31"],
+    pipe: "linear-gradient(#ff416c, #ff4b2b)",
+    coin: "#ffd700",
+  },
+
+  // 6. CYBERPUNK NEON (Kuning & Biru Elektrik)
+  {
+    bg: ["#000000", "#1a1a2e", "#16213e"],
+    pipe: "linear-gradient(#f9d423, #ff4e50)",
+    coin: "#00fff2",
+  },
+
+  // 7. SOFT PASTEL COTTON CANDY (Bikin Burung Ungu Terlihat Kontras)
+  {
+    bg: ["#ff9a9e", "#fecfef", "#a1c4fd"],
+    pipe: "linear-gradient(#cfd9df, #e2ebf0)",
+    coin: "#ff6b6b",
+  },
+
+  // 8. FOREST MIST (Hijau Lumut & Kabut)
+  {
+    bg: ["#000000", "#0b2027", "#40798c"],
+    pipe: "linear-gradient(#71b280, #134e5e)",
+    coin: "#f9d423",
+  },
+
+  // 9. SUNSET SILHOUETTE (Oranye & Ungu Muda)
+  {
+    bg: ["#f12711", "#f5af19", "#833ab4"],
+    pipe: "linear-gradient(#2c3e50, #000000)",
+    coin: "#ffffff",
+  },
+
+  // 10. DEEP OCEAN (Biru Laut Dalam)
+  {
+    bg: ["#021b79", "#0575e6", "#021b79"],
+    pipe: "linear-gradient(#78ffd6, #a8ff78)",
+    coin: "#ffd700",
+  }
+];
+    
     return themes[level % themes.length];
   };
   const theme = getTheme();
 
- useEffect(() => {
-   setMounted(true);
+  useEffect(() => {
+    setMounted(true);
 
-   // 1. Ambil Nama yang Tersimpan
-   const savedName = localStorage.getItem("player_name");
-   if (savedName) setPlayerName(savedName);
+    // 1. Ambil Nama yang Tersimpan
+    const savedName = localStorage.getItem("player_name");
+    if (savedName) setPlayerName(savedName);
 
-   // 2. LOGIKA ID UNIK (ANTI-REDUNDAN)
-   // Cek apakah HP ini sudah punya ID tetap
-   let id = localStorage.getItem("bird_player_id");
-   if (!id) {
-     // Jika belum ada, buat KTP Digital baru untuk HP ini
-     id = "PLAYER-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-     localStorage.setItem("bird_player_id", id);
-   }
-   setPlayerId(id); // Masukkan ke state biar bisa dipakai simpan skor
+    // 2. LOGIKA ID UNIK (ANTI-REDUNDAN)
+    // Cek apakah HP ini sudah punya ID tetap
+    let id = localStorage.getItem("bird_player_id");
+    if (!id) {
+      // Jika belum ada, buat KTP Digital baru untuk HP ini
+      id = "PLAYER-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+      localStorage.setItem("bird_player_id", id);
+    }
+    setPlayerId(id); // Masukkan ke state biar bisa dipakai simpan skor
 
-   // 3. Logika Ukuran Layar
-   const updateSize = () => {
-     const w = window.innerWidth;
-     const h = window.innerHeight;
-     screenSizeRef.current = { width: w, height: h };
+    // 3. Logika Ukuran Layar
+    const updateSize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      screenSizeRef.current = { width: w, height: h };
 
-     // Responsif: Burung agak ke tengah kalau di Laptop, agak ke kiri kalau di HP
-     setBirdX(w > 768 ? w * 0.25 : w * 0.15);
-   };
+      // Responsif: Burung agak ke tengah kalau di Laptop, agak ke kiri kalau di HP
+      setBirdX(w > 768 ? w * 0.25 : w * 0.15);
+    };
 
-   updateSize();
-   window.addEventListener("resize", updateSize);
+    updateSize();
+    window.addEventListener("resize", updateSize);
 
-   // 4. Cleanup (Penting biar memori gak bocor)
-   return () => window.removeEventListener("resize", updateSize);
- }, []);
+    // 4. Cleanup (Penting biar memori gak bocor)
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   const animate = () => {
     if (gameState !== "PLAYING") return;
@@ -231,32 +267,48 @@ const GameContainer = () => {
     requestRef.current = requestAnimationFrame(animate);
   };
 
- const handleGameOver = async () => {
-   // 1. Langsung kunci state agar tidak loop
-   setGameState("MENU");
+  const handleGameOver = async () => {
+    // 1. Langsung kunci state agar tidak loop
+    setGameState("MENU");
 
-   // 2. Validasi: Jangan simpan kalau skor 0 atau nama kosong
-   if (scoreRef.current <= 0 || !playerName) return;
+    // 2. Ambil data terbaru dari localStorage (Lebih aman daripada State saat transisi cepat)
+    const currentName = localStorage.getItem("player_name") || playerName;
+    const currentId = localStorage.getItem("bird_player_id") || playerId;
 
-   try {
-     // Gunakan ref yang benar ke folder playerId
-     const userScoreRef = ref(db, `leaderboard/${playerId}`);
-     const snapshot = await get(userScoreRef);
-     const currentData = snapshot.val();
+    // Validasi: Jangan simpan kalau skor 0 atau nama masih kosong/default
+    if (
+      scoreRef.current <= 0 ||
+      !currentName ||
+      currentName === "Ketik Nama..."
+    )
+      return;
 
-     // 3. Hanya update jika ini adalah High Score baru
-     if (!currentData || scoreRef.current > currentData.score) {
-       await databaseSet(userScoreRef, {
-         username: playerName,
-         score: scoreRef.current, // Gunakan scoreRef agar akurat saat mati
-         timestamp: Date.now(),
-       });
-       console.log("✅ High Score Disimpan!");
-     }
-   } catch (error) {
-     console.error("❌ Gagal simpan ke Firebase:", error);
-   }
- };
+    try {
+      const userScoreRef = ref(db, `leaderboard/${currentId}`);
+      const snapshot = await get(userScoreRef);
+      const currentData = snapshot.val();
+
+      // 3. LOGIKA UPDATE:
+      // Tetap update jika Skor Baru > Skor Lama ATAU jika Nama berubah (biar di ranking nama terupdate)
+      if (
+        !currentData ||
+        scoreRef.current > currentData.score ||
+        currentName !== currentData.username
+      ) {
+        // Gunakan skor tertinggi antara yang baru atau yang sudah ada di database
+        const finalScore = Math.max(scoreRef.current, currentData?.score || 0);
+
+        await databaseSet(userScoreRef, {
+          username: currentName,
+          score: finalScore,
+          timestamp: Date.now(),
+        });
+        console.log("✅ Data Terupdate di Firebase!");
+      }
+    } catch (error) {
+      console.error("❌ Gagal simpan ke Firebase:", error);
+    }
+  };
 
   const fetchLeaderboard = () => {
     setGameState("LEADERBOARD");
@@ -281,9 +333,7 @@ const GameContainer = () => {
       localStorage.setItem("bird_player_id", id);
     }
     setPlayerId(id);
-    
-    
-    
+
     if (gameState === "PLAYING") {
       birdPosRef.current = 300;
       velocityRef.current = 0;
@@ -504,11 +554,9 @@ const GameContainer = () => {
                 <input
                   type="text"
                   placeholder="Ketik Nama..."
-                  defaultValue={playerName}
-                  onBlur={(e) => {
-                    setPlayerName(e.target.value);
-                    localStorage.setItem("player_name", e.target.value);
-                  }}
+                  // Gunakan value agar sinkron
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
                   style={{
                     padding: "15px",
                     borderRadius: "15px",
@@ -521,7 +569,14 @@ const GameContainer = () => {
                   autoFocus
                 />
                 <button
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => {
+                    if (playerName.trim() !== "") {
+                      localStorage.setItem("player_name", playerName);
+                      setIsEditing(false);
+                    } else {
+                      alert("Nama tidak boleh kosong!");
+                    }
+                  }}
                   style={{
                     padding: "12px",
                     borderRadius: "15px",
@@ -607,25 +662,86 @@ const GameContainer = () => {
       {/* LEADERBOARD (Sama seperti sebelumnya) */}
       {/* LEADERBOARD */}
       {gameState === "LEADERBOARD" && (
-        <div style={{ position: "absolute", inset: 0, zIndex: 300, background: "#0f0c29", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "white", padding: "20px" }}>
-          <h2 style={{ fontSize: "2rem", color: "#4facfe", marginBottom: "20px", fontWeight: "900" }}>🏆 RANKING DUNIA</h2>
-          <div style={{ width: "100%", maxWidth: "350px", height: "50vh", background: "rgba(255,255,255,0.05)", padding: "15px", borderRadius: "24px", border: "1px solid rgba(79, 172, 254, 0.3)", overflowY: "auto" }}>
-            {globalScores.length > 0 ? globalScores.map((s, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "12px", borderBottom: "1px solid rgba(255,255,255,0.05)", background: i === 0 ? "rgba(79, 172, 254, 0.1)" : "none", borderRadius: "10px" }}>
-                <span style={{ fontWeight: i < 3 ? "bold" : "normal" }}>{i + 1}. {s.username}</span>
-                <span style={{ color: "#4facfe", fontWeight: "bold" }}>{s.score} PTS</span>
-              </div>
-            )) : <p style={{textAlign: 'center', opacity: 0.5}}>Memuat data...</p>}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 300,
+            background: "#0f0c29",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            padding: "20px",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "2rem",
+              color: "#4facfe",
+              marginBottom: "20px",
+              fontWeight: "900",
+            }}
+          >
+            🏆 RANKING DUNIA
+          </h2>
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "350px",
+              height: "50vh",
+              background: "rgba(255,255,255,0.05)",
+              padding: "15px",
+              borderRadius: "24px",
+              border: "1px solid rgba(79, 172, 254, 0.3)",
+              overflowY: "auto",
+            }}
+          >
+            {globalScores.length > 0 ? (
+              globalScores.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "12px",
+                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    background: i === 0 ? "rgba(79, 172, 254, 0.1)" : "none",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <span style={{ fontWeight: i < 3 ? "bold" : "normal" }}>
+                    {i + 1}. {s.username}
+                  </span>
+                  <span style={{ color: "#4facfe", fontWeight: "bold" }}>
+                    {s.score} PTS
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: "center", opacity: 0.5 }}>
+                Memuat data...
+              </p>
+            )}
           </div>
           <button
             onClick={() => setGameState("MENU")}
-            style={{ marginTop: "30px", padding: "12px 40px", borderRadius: "15px", background: "white", color: "#0f0c29", fontWeight: "bold", border: "none", cursor: "pointer" }}
+            style={{
+              marginTop: "30px",
+              padding: "12px 40px",
+              borderRadius: "15px",
+              background: "white",
+              color: "#0f0c29",
+              fontWeight: "bold",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
             KEMBALI KE MENU
           </button>
         </div>
       )}
-      
     </div>
   );
 };
