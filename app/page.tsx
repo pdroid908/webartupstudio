@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import GameContainer from "./src/components/Game/GameContainer";
+import { Analytics } from "@vercel/analytics/next";
 // --- INTERFACE UNTUK TYPE SAFETY ---
 interface BaseItem {
   id: string;
@@ -51,7 +52,7 @@ const WEB_GAMES: BaseItem[] = [
       "Uji ketangkasanmu dalam petualangan terbang yang adiktif! Kendalikan burung melewati celah pipa yang muncul secara acak dan tak terduga. Jangan biarkan konsentrasimu pecah, raih skor tertinggi, dan buktikan kemampuanmu dengan memuncaki Ranking Dunia melawan pemain lainnya!",
     tech: "Next.js & Firebase",
     iconFile: "bird2.png",
-    screenshots: ["bird3.png","bird1.png","bird2.png"],
+    screenshots: ["bird3.png", "bird1.png", "bird2.png"],
     isInternal: true, // TAMBAHKAN PENANDA INI
     route: "/BirdMystery",
   },
@@ -77,7 +78,6 @@ export default function Home() {
   const [showIframe, setShowIframe] = useState(false);
 
   useEffect(() => {
-    
     setLoading(false);
 
     const handleFocus = () => setLoading(false);
@@ -118,7 +118,7 @@ export default function Home() {
 
   const handleSecurityClick = () => {
     // Aktifkan loading HANYA sebelum pindah halaman
-    
+
     setTimeout(() => {
       window.location.href = "/Security";
     }, 400);
@@ -126,6 +126,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
+      <Analytics />
       {/* --- BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <img
