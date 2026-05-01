@@ -31,7 +31,7 @@ const GameContainer = () => {
   const [coins, setCoins] = useState<any[]>([]);
   const [coinEffects, setCoinEffects] = useState<any[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [birdX, setBirdX] = useState(50);
+  const [birdX, setBirdX] = useState(10);
   const [isEditing, setIsEditing] = useState(false);
 
   const birdPosRef = useRef<number>(300);
@@ -47,7 +47,7 @@ const GameContainer = () => {
   const JUMP_FORCE = -3.5;
   const OBSTACLE_WIDTH = 80; // Lebih tipis agar muat banyak
   const OBSTACLE_GAP = 350; // Celah burung
-  const OBSTACLE_SPEED = 6; // Kecepatan gerak
+  const OBSTACLE_SPEED = 4; // Kecepatan gerak
   const SPAWN_DISTANCE = 450; // Jarak antar pipa muncul
 
   const particles = useRef(
@@ -64,51 +64,86 @@ const GameContainer = () => {
     const themes = [
       // 1. FOREST MIST (Hijau Lumut & Kabut - Tenang & Alami)
       {
-        bg: ["#0b2027", "#1f4a4a", "#40798c"], // Hijau tua kebiruan, hijau lumut, biru kabut
-        pipe: "linear-gradient(#71b280, #134e5e)", // Hijau daun muda ke hijau tua kebiruan
-        coin: "#f9d423", // Kuning emas (seperti cahaya matahari menembus kabut)
+        bg: ["#0b2027", "#1f4a4a", "#40798c"],
+        pipe: "linear-gradient(#71b280, #134e5e)",
+        coin: "#f9d423",
       },
 
-      // 2. MIDNIGHT SKY (Biru Malam & Ungu Gelap - Misterius & Tenang)
+      // 2. CYBER NEON (Futuristik & High Contrast)
       {
-        bg: ["#000000", "#1a1a2e", "#16213e"], // Hitam, biru tua, biru keunguan
-        pipe: "linear-gradient(#3c1053, #ad5389)", // Ungu tua ke ungu kemerahan lembut
-        coin: "#ffffff", // Putih (seperti bintang)
+        bg: ["#0d0221", "#0f0844", "#000000"],
+        pipe: "linear-gradient(#00f2ff, #0061ff)",
+        coin: "#ff00ff",
       },
 
-      // 3. SOFT SUNSET (Oranye Lembut & Pink Pastel - Hangat & Damai)
+      // 3. MIDNIGHT SKY (Biru Malam & Ungu Gelap - Misterius)
       {
-        bg: ["#ff9a9e", "#fad0c4", "#ffdde1"], // Pink lembut, oranye peach, pink pudar
-        pipe: "linear-gradient(#ff758c, #ff7eb3)", // Pink cerah lembut ke pink medium
-        coin: "#ffe4b5", // Moccasin (kuning krem lembut)
+        bg: ["#000000", "#1a1a2e", "#16213e"],
+        pipe: "linear-gradient(#3c1053, #ad5389)",
+        coin: "#ffffff",
       },
 
-      // 4. TWILIGHT LAVENDER (Ungu Lembayung & Biru Senja - Tenang & Romantis)
+      // 4. VOLCANIC ASH (Agresif & Panas)
       {
-        bg: ["#a1c4fd", "#c2e9fb", "#d8bfd8"], // Biru muda, biru langit pudar, lavender muda
-        pipe: "linear-gradient(#6a11cb, #2575fc)", // Ungu tua ke biru cerah (lebih kontras sedikit)
-        coin: "#fafad2", // Kuning keemasan muda
+        bg: ["#1a1a1a", "#434343", "#000000"],
+        pipe: "linear-gradient(#ff416c, #ff4b2b)",
+        coin: "#ffd700",
       },
 
-      // 5. OCEAN BLISS (Biru Laut & Teal - Segar & Menenangkan)
+      // 5. SOFT SUNSET (Oranye Lembut & Pink Pastel)
       {
-        bg: ["#e0ffff", "#afeeee", "#40e0d0"], // Cyan muda, turquoise pucat, turquoise
-        pipe: "linear-gradient(#00ced1, #1e90ff)", // Dark turquoise ke biru laut
-        coin: "#ffffed", // Kuning gading (seperti pasir pantai)
+        bg: ["#ff9a9e", "#fad0c4", "#ffdde1"],
+        pipe: "linear-gradient(#ff758c, #ff7eb3)",
+        coin: "#ffe4b5",
       },
 
-      // 6. EARTHY STONE (Coklat Tanah & Abu-abu - Alami & Kokoh)
+      // 6. FROSTED NORTH (Dingin & Kristal)
       {
-        bg: ["#d3b8ae", "#bcaaa4", "#a1887f"], // Coklat muda, coklat keabu-abuan, coklat medium
-        pipe: "linear-gradient(#8d6e63, #5d4037)", // Coklat tanah ke coklat tua
-        coin: "#fff8dc", // Cornsilk (kuning pucat)
+        bg: ["#2980b9", "#6dd5fa", "#ffffff"],
+        pipe: "linear-gradient(#ffffff, #acb6e5)",
+        coin: "#00d2ff",
       },
 
-      // 7. DESERT SAND (Kuning Pasir & Peach - Hangat & Luas)
+      // 7. TWILIGHT LAVENDER (Ungu Lembayung & Biru Senja)
       {
-        bg: ["#ffeb3b", "#fff176", "#ffe082"], // Kuning cerah, kuning muda, kuning peach
-        pipe: "linear-gradient(#ffb74d, #ffa726)", // Oranye muda ke oranye
-        coin: "#ffffff", // Putih
+        bg: ["#a1c4fd", "#c2e9fb", "#d8bfd8"],
+        pipe: "linear-gradient(#6a11cb, #2575fc)",
+        coin: "#fafad2",
+      },
+
+      // 8. DEEP TOXIC (Misterius & Beracun)
+      {
+        bg: ["#000000", "#134e5e", "#71b280"],
+        pipe: "linear-gradient(#a8ff78, #78ffd6)",
+        coin: "#ffffff",
+      },
+
+      // 9. OCEAN BLISS (Biru Laut & Teal - Segar)
+      {
+        bg: ["#e0ffff", "#afeeee", "#40e0d0"],
+        pipe: "linear-gradient(#00ced1, #1e90ff)",
+        coin: "#ffffed",
+      },
+
+      // 10. GOLDEN NOIR (Mewah & Elegan)
+      {
+        bg: ["#000000", "#2c3e50", "#000000"],
+        pipe: "linear-gradient(#bf953f, #fcf6ba, #b38728)",
+        coin: "#ffffff",
+      },
+
+      // 11. EARTHY STONE (Coklat Tanah & Abu-abu)
+      {
+        bg: ["#d3b8ae", "#bcaaa4", "#a1887f"],
+        pipe: "linear-gradient(#8d6e63, #5d4037)",
+        coin: "#fff8dc",
+      },
+
+      // 12. RETRO VAPORWAVE (Gaya 80-an)
+      {
+        bg: ["#4a00e0", "#8e2de2", "#ff0099"],
+        pipe: "linear-gradient(#00d2ff, #3a7bd5)",
+        coin: "#ffff00",
       },
     ];
 
@@ -144,11 +179,19 @@ const GameContainer = () => {
   useEffect(() => {
     setMounted(true);
 
-    // TEMBAK UKURAN LAYAR ASLI BIAR PIPA GAK MUNCUL DI KOORDINAT 0
-    screenSizeRef.current = {
-      width: window.innerWidth,
-      height: window.innerHeight,
+    const handleResize = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      screenSizeRef.current = { width: w, height: h };
+      // Update birdX ke tengah setiap kali ukuran layar berubah
+      setBirdX(w / 2 - 17);
     };
+
+    // Jalankan saat pertama kali mount
+    handleResize();
+
+    // Tambahkan listener agar saat HP diputar (landscape/portrait) posisi tetap pas
+    window.addEventListener("resize", handleResize);
 
     const id =
       localStorage.getItem("bird_player_id") ||
@@ -157,6 +200,8 @@ const GameContainer = () => {
     localStorage.setItem("bird_player_id", id);
     setPlayerId(id);
     setPlayerName(localStorage.getItem("player_name") || "");
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
   const animate = () => {
     // PROTEKSI: Jika state bukan playing atau array kosong, stop loop
@@ -167,8 +212,8 @@ const GameContainer = () => {
 
     velocityRef.current += GRAVITY;
     birdPosRef.current += velocityRef.current;
-    const h = screenSizeRef.current.height;
     const w = screenSizeRef.current.width;
+    const h = screenSizeRef.current.height;
 
     if (birdPosRef.current >= h - 50) {
       birdPosRef.current = h - 50;
@@ -177,35 +222,33 @@ const GameContainer = () => {
     }
     if (birdPosRef.current <= 0) birdPosRef.current = 0;
 
-    // 1. LOGIKA SPAWN PIPA (MUNCUL BERURUTAN)
+    // LOGIKA SPAWN PIPA: Muncul tepat dari ujung kanan layar (w)
     if (
       obstaclesRef.current.length === 0 ||
       obstaclesRef.current[obstaclesRef.current.length - 1].left <
         w - SPAWN_DISTANCE
     ) {
-      // PILIH GAP SECARA ACAK DARI ARRAY
-      const gapOptions = [200, 300, 350, 500, 400, 450, 250, 600];
+      const gapOptions = [200, 250, 300, 350, 400];
       const randomGap =
         gapOptions[Math.floor(Math.random() * gapOptions.length)];
-
-      // Tentukan tinggi pipa atas (disesuaikan agar pipa bawah tidak off-screen)
       const newHeight = Math.floor(Math.random() * (h - randomGap - 200)) + 100;
+
       const obsId = Date.now();
 
       obstaclesRef.current.push({
         id: obsId,
-        left: w,
+        left: w, // <--- MULAI DARI POJOK KANAN LAYAR
         height: newHeight,
-        gap: randomGap, // Simpan gap unik untuk pipa ini
+        gap: randomGap,
         passed: false,
       });
 
-      // Spawn koin di antara pipa (50% peluang)
+      // Spawn koin disesuaikan dengan posisi w
       if (Math.random() > 0.5) {
         coinsRef.current.push({
           id: obsId + 1,
-          left: w + 200,
-          top: newHeight + OBSTACLE_GAP / 2 - 15,
+          left: w + SPAWN_DISTANCE / 2,
+          top: newHeight + randomGap / 2 - 15,
           collected: false,
         });
       }
@@ -307,7 +350,7 @@ const GameContainer = () => {
     setObstacles([...obstaclesRef.current]);
     setCoins([...coinsRef.current]);
     requestRef.current = requestAnimationFrame(animate);
-  };
+  };;
 
   // --- PERCONST: LOGIKA MATI & KIRIM DATABASE ---
   // --- PERCONST: LOGIKA MATI & KIRIM SKOR ---
