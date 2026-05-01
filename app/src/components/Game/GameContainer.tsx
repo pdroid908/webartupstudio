@@ -493,7 +493,7 @@ const GameContainer = () => {
     }
 
     return () => {
-      clearTimeout(invincibleTimer);
+      
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, [gameState]);
