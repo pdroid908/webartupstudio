@@ -133,7 +133,7 @@ const GameContainer = () => {
     // PERCONST: JANGAN RESET SCORE REF DI SINI
     setObstacles([]);
     setCoins([]);
-
+    setIsInvincible(false);
     setBirdPos(300);
     setIsGameOverAnim(false);
   };
@@ -467,6 +467,7 @@ const GameContainer = () => {
     if (gameState === "PLAYING") {
       // RESET TOTAL FISIK & DATA (Agar tidak langsung nabrak pipa lama)
       birdPosRef.current = birdPosRef.current;
+      hardResetGame();
 
       setBirdPos(300);
       velocityRef.current = velocityRef.current;
@@ -492,6 +493,7 @@ const GameContainer = () => {
     }
 
     return () => {
+      clearTimeout(invincibleTimer);
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, [gameState]);
