@@ -23,19 +23,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
       <head>
-        {/* TAMBAHKAN KODE INI DI SINI */}
-        <Script
-          id="google-adsense"
-          async
-          strategy="afterInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1112580585827937"
-          crossOrigin="anonymous"
-        />
-
+        <meta name="google-adsense-account" content="ca-pub-1112580585827937"></meta>
         {/* 2. ANTI-CLICKJACKING (Script Guard) */}
         <Script id="clickjack-protector" strategy="beforeInteractive">
           {`
