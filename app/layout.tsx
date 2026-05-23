@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import Script from "next/script";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,51 +16,58 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ARTUP STUDIO",
   description: "HIGH TECH SECURITY SYSTEMS",
-  // 1. ANTAL-CLICKJACKING (Frame Options) via Metadata
-  other: {
-    "X-Frame-Options": "DENY",
-    "Content-Security-Policy": "frame-ancestors 'none';",
-  },
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* 2. ANTI-CLICKJACKING (Script Guard) */}
+        {/* GOOGLE ADSENSE */}
+        <Script
+          id="google-adsense"
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1112580585827937"
+          crossOrigin="anonymous"
+        />
+
+        {/* BASIC SECURITY */}
+        <meta httpEquiv="X-Frame-Options" content="DENY" />
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="frame-ancestors 'none';"
+        />
+
+        {/* ANTI CLICKJACK */}
         <Script id="clickjack-protector" strategy="beforeInteractive">
           {`
-            if (self === top) {
-              var antiClickjack = document.getElementById("antiClickjack");
-              if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
-            } else {
+            if (self !== top) {
               top.location = self.location;
             }
           `}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col  overflow-x-hidden selection:bg-blue-500/30">
-        {/* 3. SECURITY MONITORING LAYER */}
+
+      <body className="min-h-full flex flex-col overflow-x-hidden selection:bg-blue-500/30">
+        {/* SECURITY MONITOR */}
         <Script id="security-layer" strategy="beforeInteractive">
           {`
-            // Monitor Error & Percobaan Injection
             window.onerror = function(message, source, lineno, colno, error) {
               console.warn("🛡️ Artup Security Alert:", message);
               return false;
             };
 
-            // Mencegah klik kanan di area sensitif 
-            document.addEventListener('contextmenu', event => {
-               if (window.location.pathname.includes('/cek')) {
-                  // event.preventDefault(); 
-               }
+            document.addEventListener('contextmenu', function(event) {
+              if (window.location.pathname.includes('/cek')) {
+                // event.preventDefault();
+              }
             });
           `}
         </Script>
