@@ -23,46 +23,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
-        <meta name="google-adsense-account" content="ca-pub-1112580585827937"></meta>
-        {/* 2. ANTI-CLICKJACKING (Script Guard) */}
-        <Script id="clickjack-protector" strategy="beforeInteractive">
-          {`
-            if (self === top) {
-              var antiClickjack = document.getElementById("antiClickjack");
-              if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
-            } else {
-              top.location = self.location;
-            }
-          `}
-        </Script>
+        {/* Meta Tag AdSense dihapus demi keamanan */}
       </head>
-      <body className="min-h-full flex flex-col  overflow-x-hidden selection:bg-blue-500/30">
-        {/* 3. SECURITY MONITORING LAYER */}
-        <Script id="security-layer" strategy="beforeInteractive">
+      <body className="min-h-full flex flex-col overflow-x-hidden selection:bg-blue-500/30">
+        
+        {/* Security Layer yang lebih bersih */}
+        <Script id="security-layer" strategy="afterInteractive">
           {`
-            // Monitor Error & Percobaan Injection
-            window.onerror = function(message, source, lineno, colno, error) {
-              console.warn("🛡️ Artup Security Alert:", message);
-              return false;
+            // Monitor Error
+            window.onerror = function(message) {
+              console.warn("🛡️ Artup Security Alert: ", message);
             };
-
-            // Mencegah klik kanan di area sensitif 
-            document.addEventListener('contextmenu', event => {
-               if (window.location.pathname.includes('/cek')) {
-                  // event.preventDefault(); 
-               }
-            });
+            
+            // Mencegah modifikasi tampilan (style) oleh skrip/ekstensi berbahaya
+            Object.freeze(document.body.style);
           `}
         </Script>
 

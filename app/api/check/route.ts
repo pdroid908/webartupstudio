@@ -92,8 +92,6 @@ export async function POST(req: Request) {
     const whitelist = [
       // --- KOMUNIKASI & MEDSOS (Official Only) ---
       "whatsapp.com",
-      "artup-studio.vercel.app",
-      "converter-artup.vercel.app",
       "facebook.com",
       "instagram.com",
       "x.com",
@@ -103,6 +101,21 @@ export async function POST(req: Request) {
       "linkedin.com",
       "discord.com",
       "tiktok.com",
+      "stackblitz.com",   // Editor kode online
+      "codesandbox.io",   // Editor kode online
+      "w3schools.com",    // Edukasi teknis
+      "stackoverflow.com",// Edukasi teknis
+      "elevenia.co.id",
+      "jd.id",
+      "bhinneka.com",
+      "zalora.co.id",
+      "sociolla.com",
+      "halodoc.com",      // Layanan kesehatan resmi
+      "alodokter.com",
+      "kemdikbud.go.id",
+      "prakerja.go.id",
+      "layanan.go.id",
+      "sso.go.id",
 
       // --- INFRASTRUKTUR & SEARCH ENGINE ---
       "google.com",
@@ -116,6 +129,7 @@ export async function POST(req: Request) {
       "android.com",
       "cloudflare.com",
       "github.com", // Penting untuk developer
+      
 
       // --- PEMERINTAH, PENDIDIKAN & MILITER (Induk TLD) ---
       "go.id",
