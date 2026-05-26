@@ -450,7 +450,7 @@ export async function POST(req: Request) {
 
     if (!isWhitelisted) {
       trustScore -= 10;
-      artupHeuristic.push("Domain belum masuk daftar terpercaya");
+      artupHeuristic.push("Domain belum terverifikasi, jangan masukan PIN, OTP, password");
     }
 
     if (hasRedirectParam) {
@@ -480,7 +480,7 @@ export async function POST(req: Request) {
     if (googleStatus === "BAHAYA" || trustScore < 50) {
       finalStatus = "BAHAYA";
 
-      userMessage = "Terdapat indikasi phishing, malware, atau reputasi buruk.";
+      userMessage = "Terdapat indikasi phishing, malware, reputasi buruk.";
     } else if (trustScore < 90) {
       finalStatus = "HATI-HATI";
 

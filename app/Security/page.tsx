@@ -46,7 +46,6 @@ export default function SecurityPage() {
   const handleCekKeamanan = async () => {
     if (!urlInput) return;
 
-
     // --- 2. LOGIKA SCAn (Tetap Jalan) ---
     setLoading(true);
     setResult(null);
@@ -170,7 +169,6 @@ export default function SecurityPage() {
           >
             {loading ? statusText : "LINK / WEBSITE SCANNER"}
           </button>
-
         </div>
 
         {result && !result.error && (
@@ -179,17 +177,19 @@ export default function SecurityPage() {
               className={`p-6 md:p-10 rounded-[2.5rem] border-2 md:border-4 transition-all duration-700 shadow-2xl ${
                 finalStatus === "BAHAYA"
                   ? "bg-red-950/80 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.2)]"
-                  : finalStatus === "ADA CELAH"
+                  : finalStatus === "Hati-hati"
                     ? "bg-orange-950/80 border-orange-600 shadow-[0_0_40px_rgba(249,115,22,0.15)]"
                     : "bg-zinc-900/90 border-green-600 shadow-[0_0_40_rgba(34,197,94,0.15)]"
               }`}
             >
               <h2 className="text-2xl md:text-4xl font-black italic mb-6 md:mb-10 leading-tight uppercase tracking-tighter text-center">
                 {finalStatus === "BAHAYA"
-                  ? "🚨 POSITIF PHISHING / MANIPULASI!"
-                  : finalStatus === "ADA CELAH"
-                    ? "⚠️ WASPADA: SITUS PUBLIK/UNVERIFIED"
-                    : "✅ LINK AMAN"}
+                  ? "🚨 WEBSITE BERBAHAYA"
+                  : finalStatus === "HATI-HATI"
+                    ? "⚠️ PERLU KEWASPADAAN"
+                    : finalStatus === "AMAN"
+                      ? "✅ WEBSITE AMAN"
+                      : "🛡️ AMAN TERVERIFIKASI"}
               </h2>
 
               <div className="bg-black/60 backdrop-blur-md p-5 md:p-7 rounded-3xl space-y-5 border border-white/5">
@@ -229,31 +229,61 @@ export default function SecurityPage() {
                   </span>
                 </div>
 
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1">
+                <div className="flex flex-col gap-2">
                   <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
                     ARTUP LOGIC:
                   </span>
-                  <span
-                    className={`font-black tracking-widest text-xs md:text-sm ${result.artupHeuristic === "BAHAYA" ? "text-red-500" : result.artupHeuristic === "ADA CELAH" ? "text-orange-500" : "text-green-500"}`}
-                  >
-                    {result.artupHeuristic === "BAHAYA"
-                      ? "🚨 MANIPULATION DETECTED"
-                      : result.artupHeuristic === "ADA CELAH"
-                        ? "⚠️ WEB PUBLIK JANGAN MASUKAN DATA SENSITIF,  "
-                        : "🛡️ VERIFIKASI AMAN"}
+
+                  {result.heuristicFlags?.length > 0 ? (
+                    result.heuristicFlags.map((flag: string, index: number) => (
+                      <span
+                        key={index}
+                        className="text-orange-400 text-xs font-bold"
+                      >
+                        ⚠️ {flag}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-green-500 text-xs font-bold">
+                      🛡️ Tidak ada indikator manipulasi
+                    </span>
+                  )}
+                </div>
+
+                <div className="border-b border-white/5 pb-4">
+                  <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
+                    TRUST SCORE
                   </span>
+
+                  <div className="mt-2">
+                    <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        style={{
+                          width: `${result.trustScore}%`,
+                        }}
+                        className={`h-full ${
+                          result.trustScore < 50
+                            ? "bg-red-500"
+                            : result.trustScore < 90
+                              ? "bg-orange-500"
+                              : "bg-green-500"
+                        }`}
+                      />
+                    </div>
+
+                    <p className="mt-2 font-black">{result.trustScore}/100</p>
+                  </div>
                 </div>
               </div>
 
               <div className="mt-8 text-center px-2">
                 <p className="font-black text-[10px] md:text-xs uppercase tracking-widest leading-relaxed opacity-90 text-zinc-200">
-                  {finalStatus === "BAHAYA"
-                    ? "Sistem mendeteksi pola PENCURIAN DATA . Jangan masukkan data apa pun!"
-                    : finalStatus === "ADA CELAH"
-                      ? isPublicHosting
-                        ? "PERINGATAN: Jangan masukan data penting keuangan dan data diri sensitif atau kode rahasia, Kecuali percaya pada situs itu"
-                        : "WASPADA: Jangan masukkan informasi keuangan atau kode rahasia, KECUALI PERCAYA PADA SITUS ITU."
-                      : "Terverifikasi , Link AMAN."}
+                  <p className="font-black text-[10px] md:text-xs uppercase tracking-widest leading-relaxed opacity-90 text-zinc-200">
+                    {result.userMessage}
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    Scan selesai dalam {result.scanTime} ms
+                  </p>
                 </p>
               </div>
             </div>
