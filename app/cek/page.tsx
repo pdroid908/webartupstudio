@@ -267,7 +267,7 @@ export default function ArtupUltimateV4() {
             {step === 1 ? "Login" : "Selamat Datang"}
           </h1>
           <p className="text-center text-[16px] text-[#202124] mb-8">
-            {step === 1 ? "Gunakan Akun Google Anda" : email}
+            {step === 1 ? "edukasi " : email}
           </p>
 
           <form

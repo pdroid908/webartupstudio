@@ -211,7 +211,7 @@ export default function Home() {
                 <div className="hover:bg-blue-600 flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 z-10">
                   <span className="text-blue-500">🖥️</span>
                   <span className="font-black text-[10px] uppercase tracking-[0.1em] text-blue-200/70">
-                    Auto Farming
+                    Education what web get you
                   </span>
                 </div>
                 <div className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10 group-hover:bg-cyan-500/30 blur-2xl z-0" />
