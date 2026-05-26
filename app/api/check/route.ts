@@ -460,7 +460,7 @@ export async function POST(req: Request) {
 
     if (isManipulated) {
       trustScore -= 30;
-      artupHeuristic.push("Kemungkinan meniru brand terkenal");
+      artupHeuristic.push("meniru brand terkenal");
     }
 
     const hasSensitiveWord = sensitiveKeywords.some(

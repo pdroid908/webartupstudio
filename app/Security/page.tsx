@@ -281,9 +281,7 @@ export default function SecurityPage() {
                   <p className="font-black text-[10px] md:text-xs uppercase tracking-widest leading-relaxed opacity-90 text-zinc-200">
                     {result.userMessage}
                   </p>
-                  <p className="text-xs text-zinc-500">
-                    Scan selesai dalam {result.scanTime} ms
-                  </p>
+                  
                 </p>
               </div>
             </div>
