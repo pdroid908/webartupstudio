@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import GameContainer from "./src/components/Game/GameContainer";
-import { Analytics } from "@vercel/analytics/next";
+
 // --- INTERFACE UNTUK TYPE SAFETY ---
 interface BaseItem {
   id: string;
@@ -126,7 +126,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
-      <Analytics />
+      
       {/* --- BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <img

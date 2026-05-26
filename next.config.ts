@@ -7,14 +7,17 @@ const nextConfig = {
           {
             key: "Content-Security-Policy",
             value:
+              "base-uri 'self'; " +
+             " form-action 'self';"+
+             "frame-ancestors 'none'; "+
               "default-src 'self'; " +
-              "script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com https://pagead2.googlesyndication.com https://adservice.google.com; " +
+              "script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com ; " +
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
               "img-src 'self' data: https://i.ytimg.com https://s.ytimg.com https://*.googlesyndication.com https://*.google.com; " +
               "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; " +
               "child-src 'self' https://www.youtube.com; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
-              "connect-src 'self' https://safebrowsing.googleapis.com https://www.virustotal.com https://*.google.com https://*.googlesyndication.com; " +
+              "connect-src 'self' https://safebrowsing.googleapis.com https://www.virustotal.com; " +
               "upgrade-insecure-requests;",
           },
           {
@@ -23,11 +26,11 @@ const nextConfig = {
           },
           {
             key: "X-Frame-Options",
-            value: "SAMEORIGIN",
+            value: "DENY",
           },
           {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
           },
           {
             key: "Referrer-Policy",

@@ -17,10 +17,7 @@ export const metadata: Metadata = {
   title: "ARTUP STUDIO",
   description: "HIGH TECH SECURITY SYSTEMS",
   // 1. ANTAL-CLICKJACKING (Frame Options) via Metadata
-  other: {
-    "X-Frame-Options": "DENY",
-    "Content-Security-Policy": "frame-ancestors 'none';",
-  },
+  
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -39,8 +36,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               console.warn("🛡️ Artup Security Alert: ", message);
             };
             
-            // Mencegah modifikasi tampilan (style) oleh skrip/ekstensi berbahaya
-            Object.freeze(document.body.style);
           `}
         </Script>
 
