@@ -6,9 +6,9 @@ export default function PrivacyPage() {
       
       {/* Tombol Back */}
       <div className="max-w-4xl mx-auto mb-10">
-        <a href="/" className="text-blue-500 hover:text-blue-400 transition-all font-bold flex items-center gap-2">
+        <link href="/" className="text-blue-500 hover:text-blue-400 transition-all font-bold flex items-center gap-2">
           <span>←</span> Back to Artup Studio
-        </a>
+        </link>
       </div>
 
       {/* Konten Privacy Policy */}
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
         <p className="mb-4">Only aggregated, anonymized data is periodically transmitted to external services to aid the Service Provider in improving the Application and their service. Below are the links to the Privacy Policy of the third-party service providers used by the Application:</p>
         <ul className="list-disc list-inside space-y-2 ml-4 mb-6">
           <li><a href="https://www.google.com/policies/privacy/" className="text-blue-500 underline">Google Play Services</a></li>
-          <li><a href="https://support.google.com/admob/answer/6128543?hl=id" className="text-blue-500 underline">AdMob</a></li>
+         
         </ul>
 
         <h2 className="text-xl font-bold text-blue-400 mt-10 mb-4 uppercase tracking-wider">Contact Us</h2>
