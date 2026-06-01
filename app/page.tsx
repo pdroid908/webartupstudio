@@ -119,6 +119,7 @@ export default function Home() {
             <a
               href="https://wa.me/6281328343908"
               target="_blank"
+              rel="noopener noreferrer"
               className="w-full px-4 py-3 rounded-xl font-bold text-[10px] transition-all bg-green-600/10 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white flex items-center justify-center gap-2 mb-6"
             >
               wa: jasa buat web / app / games murah dan aman
@@ -131,6 +132,7 @@ export default function Home() {
               </p>
               <a
                 href="mailto:p1998nr@gmail.com"
+                rel="noopener noreferrer"
                 className="text-[10px] md:text-xs font-bold text-slate-300 bg-slate-900/50 p-3 rounded-xl border border-slate-800 hover:border-blue-500 transition-all flex items-center gap-2"
               >
                 <span>✉️</span> p1998nr@gmail.com
@@ -148,6 +150,7 @@ export default function Home() {
             <a
               href="https://paypal.me/put98"
               target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 group"
             >
               <span className="text-sm">❤️</span>
