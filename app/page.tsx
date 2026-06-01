@@ -3,10 +3,20 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-
+import { useRouter } from "next/navigation";
 export default function Home() {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
+  const handleNavigation = (e: React.MouseEvent, path: string) => {
+    e.preventDefault(); // Mencegah navigasi langsung
+    setLoading(true); // Aktifkan loading
+
+    // Tunggu 800ms agar animasi loading terasa, baru pindah
+    setTimeout(() => {
+      router.push(path);
+    }, 500);
+  };
   useEffect(() => {
     setLoading(false);
 
@@ -62,13 +72,10 @@ export default function Home() {
             {/* NAVIGASI */}
             <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide mb-6 w-full">
               {/* --- TOMBOL LINK SCANNER --- */}
-              <Link
+              <a // Ubah Link menjadi <a> agar lebih mudah dikontrol
                 href="/Security"
-                onClick={() => {
-                  setLoading(true);
-                  setTimeout(() => setLoading(false), 1000);
-                }}
-                className="flex-shrink-0 group relative h-12 w-[160px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
+                onClick={(e) => handleNavigation(e, "/Security")}
+                className="flex-shrink-0 group relative h-12 w-[160px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 cursor-pointer"
               >
                 <div className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#78350f_0%,#f59e0b_50%,#78350f_100%)] group-hover:animate-[spin_2s_linear_infinite] group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#ef4444_0%,#f97316_50%,#ef4444_100%)]" />
                 <div className="flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 transition-all duration-500 z-10 group-hover:bg-red-950/20 group-hover:backdrop-blur-sm">
@@ -80,7 +87,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-500 bg-orange-500/10 group-hover:bg-red-500/30 blur-2xl z-0" />
-              </Link>
+              </a>
             </nav>
 
             {/* KONTAK ME wa */}
