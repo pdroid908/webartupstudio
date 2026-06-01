@@ -1,8 +1,8 @@
 name: DevSecOps Optimized Pipeline
 
 on:
-  pull_request: {branches: [master]}
-  push: {branches: [master]}
+  pull_request: {branches: [main]}
+  push: {branches: [main]}
 
 jobs:
   # 1. GABUNGAN SCAN: Menjalankan semua cek secara bersamaan dalam satu job
