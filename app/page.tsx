@@ -2,7 +2,6 @@
 //c
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import GameContainer from "./src/components/Game/GameContainer";
 
 // --- INTERFACE UNTUK TYPE SAFETY ---
 interface BaseItem {
