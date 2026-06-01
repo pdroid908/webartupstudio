@@ -2,13 +2,10 @@
 //c
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from 'next/image';
-
-
+import Image from "next/image";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
- 
 
   useEffect(() => {
     setLoading(false);
@@ -23,48 +20,22 @@ export default function Home() {
     };
   }, []);
 
-  
-
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
-      
       {/* --- BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <Image
-        src="/bgrun.png"
-        alt="Background"
-        fill
-        priority
-        className="object-cover object-center opacity-100 transition-opacity duration-1000"
-      />
+          src="/bgrun.png"
+          alt="Background"
+          fill
+          priority
+          className="object-cover object-center opacity-100 transition-opacity duration-1000"
+        />
 
         {/* Overlay agar teks tetap terbaca */}
         <div className="absolute inset-0 bg-gradient-to-a from-slate-950/70 via-slate-950/20 to-slate-950"></div>
       </div>
 
-
-      {/* --- SEO CONTENT (Tengah Layar) --- */}
-<div className="absolute inset-0 flex items-center justify-center z-10 px-6">
-  <div className="max-w-2xl text-center space-y-6">
-    <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 uppercase tracking-tighter drop-shadow-2xl">
-      High-Tech Development & Security
-    </h1>
-    <p className="text-slate-400 text-sm md:text-base leading-relaxed max-w-lg mx-auto">
-      Di <strong>Artup STUDIO</strong>, kami memprioritaskan keamanan siber dalam setiap baris kode. 
-      Membangun aplikasi, website, dan game berperforma tinggi yang aman, stabil, dan dirancang khusus untuk memenuhi kebutuhan bisnis digital Anda di era modern.
-    </p>
-    <div className="flex gap-4 justify-center">
-      <div className="bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-full text-[10px] text-blue-500 font-mono tracking-widest uppercase">
-        Secure by Design
-      </div>
-      <div className="bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-full text-[10px] text-blue-500 font-mono tracking-widest uppercase">
-        Performance Optimized
-      </div>
-    </div>
-  </div>
-</div>
-
-      {/* --- AUDIO TOGGLE --- */}
       {/* --- SIDEBAR --- */}
       <aside className="pt-10 w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col md:overflow-y-auto scrollbar-hide">
         {/* CSS inline untuk memastikan scrollbar tidak muncul tapi tetap bisa di-scroll */}
@@ -90,8 +61,6 @@ export default function Home() {
 
             {/* NAVIGASI */}
             <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide mb-6 w-full">
-
-
               {/* --- TOMBOL LINK SCANNER --- */}
               <Link
                 href="/Security"
@@ -114,8 +83,7 @@ export default function Home() {
               </Link>
             </nav>
 
-
-{/* KONTAK ME wa */}
+            {/* KONTAK ME wa */}
             <a
               href="https://wa.me/6281328343908"
               target="_blank"
