@@ -11,11 +11,8 @@ const nextConfig = {
              " form-action 'self';"+
              "frame-ancestors 'none'; "+
               "default-src 'self'; " +
-              "script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com ; " +
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-              "img-src 'self' data: https://i.ytimg.com https://s.ytimg.com https://*.googlesyndication.com https://*.google.com; " +
-              "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; " +
-              "child-src 'self' https://www.youtube.com; " +
+              "img-src 'self' data: https://*.googlesyndication.com https://*.google.com; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
               "connect-src 'self' https://safebrowsing.googleapis.com https://www.virustotal.com; " +
               "upgrade-insecure-requests;",

@@ -1,0 +1,27 @@
+name: DevSecOps Optimized Pipeline
+
+on:
+  pull_request: {branches: [master]}
+  push: {branches: [master]}
+
+jobs:
+  # 1. GABUNGAN SCAN: Menjalankan semua cek secara bersamaan dalam satu job
+  quality-and-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm' # Otomatis caching node_modules
+      - run: npm ci --ignore-scripts
+      
+      - name: Lint & Audit
+        run: |
+          npm run lint
+          npm audit --audit-level=high
+      
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7

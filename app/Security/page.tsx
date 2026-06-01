@@ -1,45 +1,52 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { SecurityResult } from "@/types";
 
+// 1. Tambahkan fungsi ini di atas komponen SecurityPage
+const GOOGLE_STATUS_MAP: Record<string, { color: string; label: string }> = {
+  BAHAYA: { color: "text-red-500", label: "⚠️ BLACKLISTED" },
+  "ADA CELAH": { color: "text-orange-500", label: "❓ BELUM TERVERIFIKASI" },
+  DEFAULT: { color: "text-green-500", label: "✔️ VERIFIED" },
+};
+
+const VIRUS_STATUS_MAP: Record<string, { color: string; label: string }> = {
+  BAHAYA: { color: "text-red-500", label: "⚠️ DETECTED" }, // Label dinamis nanti kita handle
+  "TIDAK ADA DATA": { color: "text-orange-500", label: "NO RECORD" },
+  DEFAULT: { color: "text-green-500", label: "✔️ NO VIRUS" },
+};
 export default function SecurityPage() {
   const [urlInput, setUrlInput] = useState("");
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<SecurityResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const getGoogle = result
+    ? GOOGLE_STATUS_MAP[result.googleStatus] || GOOGLE_STATUS_MAP.DEFAULT
+    : GOOGLE_STATUS_MAP.DEFAULT;
 
-  const [statusText, setStatusText] = useState("SCAN LINK SEKARANG");
-
-  const [manualVideo, setManualVideo] = useState("tzYhNOu7Bdg"); // Video default saat pertama buka
-  // 1. Simpan ID video tadi di variable atau state
-  const videoId = "tzYhNOu7Bdg";
-
-  const handleManualVideo = (id: string) => {
-    setManualVideo(id);
-    // Scroll otomatis ke video agar terlihat di HP
-    const element = document.getElementById("video-section");
-    element?.scrollIntoView({ behavior: "smooth" });
+  const getVirus = result
+    ? VIRUS_STATUS_MAP[result.virusTotal] || VIRUS_STATUS_MAP.DEFAULT
+    : VIRUS_STATUS_MAP.DEFAULT;
+  const getTrustColor = (score: number) => {
+    if (score < 50) return "bg-red-500";
+    if (score < 90) return "bg-orange-500";
+    return "bg-green-500";
   };
-
+  const messages = [
+    "INITIALIZING ARTUP NEURAL CORE...",
+    "DECRYPTING PACKET OBFUSCATION...",
+    "SCANNING DATABASE REPUTATION...",
+    "EXTRACTING HEURISTIC PATTERNS...",
+    "CALCULATING RISK PROBABILITY...",
+    "FINALIZING SECURITY INTEGRITY...",
+  ];
+  const [statusIndex, setStatusIndex] = useState(0);
+  const statusText = loading ? messages[statusIndex] : "SCAN LINK SEKARANG";
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (loading) {
-      const messages = [
-        "INITIALIZING ARTUP NEURAL CORE...",
-        "DECRYPTING PACKET OBFUSCATION...",
-        "SCANNING DATABASE REPUTATION...",
-        "EXTRACTING HEURISTIC PATTERNS...",
-        "CALCULATING RISK PROBABILITY...",
-        "FINALIZING SECURITY INTEGRITY...",
-      ];
-      let i = 0;
-      setStatusText(messages[0]);
-      interval = setInterval(() => {
-        i = (i + 1) % messages.length;
-        setStatusText(messages[i]);
-      }, 2000);
-    } else {
-      setStatusText("SCAN LINK SEKARANG");
-    }
+    if (!loading) return;
+
+    const interval = setInterval(() => {
+      setStatusIndex((prev) => (prev + 1) % messages.length);
+    }, 3000);
+
     return () => clearInterval(interval);
   }, [loading]);
 
@@ -57,88 +64,43 @@ export default function SecurityPage() {
         body: JSON.stringify({ url: urlInput }),
       });
 
-      const data = await response.json();
+      const data: SecurityResult = await response.json();
       setResult(data);
-    } catch (error) {
-      setResult({ error: "Gagal menyambung ke Artup Infrastructure" });
     } finally {
       setLoading(false);
-      setStatusText("SCAN LINK SEKARANG");
     }
   };
-
-  const finalStatus = result?.finalStatus;
-  const isPublicHosting = result?.details?.isPublicHosting; // Ambil data dari backend
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-10 font-sans selection:bg-red-600/40 relative overflow-x-hidden">
       {/* --- SIDEBAR/DOCK MEDSOS (Responsive) --- */}
+
       <aside className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-auto md:top-1/2 md:right-4 md:left-auto z-50 flex flex-row md:flex-col gap-3 bg-zinc-900/80 md:bg-transparent p-3 md:p-0 rounded-full md:rounded-none border border-zinc-800 md:border-none backdrop-blur-md md:backdrop-blur-none shadow-2xl md:shadow-none">
         <a
-          href="https://www.facebook.com/profile.php?id=61580560360762&locale=id_ID"
+          href="https://humanizer-638.pages.dev/"
           target="_blank"
           rel="noopener noreferrer" // Tambahkan ini agar aman
-          className="p-3 bg-blue-600 rounded-full hover:scale-110 transition-all text-xs font-black"
+          className="p-3 bg-blue-700 rounded-full hover:scale-110 transition-all text-xs font-black"
         >
-          FACEEBOOK
+          Humanizer AI
         </a>
         <a
-          href="https://www.tiktok.com/@artupstudio"
+          href="https://converter-artup.pages.dev/"
           target="_blank"
           rel="noopener noreferrer" // Tambahkan ini agar aman
-          className="p-3 bg-pink-600 rounded-full hover:scale-110 transition-all text-xs font-black"
+          className="p-3 bg-pink-700 rounded-full hover:scale-110 transition-all text-xs font-black"
         >
-          TikTok
+          foto converter
         </a>
         <a
-          href="https://www.youtube.com/@Artup-STUDIO"
+          href="https://www.tiktok.com/@artupstd?lang=id-ID"
           target="_blank"
           rel="noopener noreferrer" // Tambahkan ini agar aman
           className=" p-3 bg-red-600 rounded-full hover:scale-110 transition-all text-xs font-black"
         >
-          YouTube
+          My TikTok
         </a>
       </aside>
-
-      <Link
-        onClick={() => setLoading(false)}
-        href="/"
-        /* Ganti mb-18 (tidak ada) menjadi mb-12 untuk HP.
-     Ganti md:mb-12 menjadi md:mb-20 untuk Laptop agar lebih lega.
-     Tambahkan block atau flex agar margin bekerja maksimal.
-  */
-        className="relative mb-12 md:mb-20 inline-flex items-center justify-center p-[3px] rounded-full overflow-hidden transition-all duration-300 text-[10px] font-black uppercase tracking-[0.2em] group shadow-lg shadow-black active:scale-90"
-      >
-        {/* 1. LAYER ANIMASI WARNA BERPUTAR (DIAM GERAK-GERAK) */}
-        <div
-          className="absolute inset-[-1000%] animate-[spin_5s_linear_infinite] 
-    bg-[conic-gradient(from_90deg_at_50%_50%,#334155_0%,#ef4444_20%,#3b82f6_50%,#ef4444_80%,#334155_100%)]
-    /* Saat Hover: Warna Berubah jadi Merah Terang */
-    group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#ef4444_0%,#f97316_50%,#ef4444_100%)]"
-        />
-
-        {/* 2. LAYER BACKROUND HITAM (Agar Teks Terbaca & Hover Effect) */}
-        <div
-          className="flex h-full w-full items-center gap-3 rounded-full bg-zinc-900 px-3 py-2.5 transition-all duration-300 z-10 
-    group-hover:bg-red-600/10 group-hover:backdrop-blur-sm"
-        >
-          {/* Icon Panah */}
-          <span className="relative z-20 text-red-500 group-hover:text-white transition-colors text-base">
-            ←
-          </span>
-
-          {/* Teks */}
-          <span className="relative z-20 text-zinc-100 group-hover:text-white transition-colors">
-            Kembali
-          </span>
-        </div>
-
-        {/* 3. LAYER GLOW (Cahaya di Belakang) */}
-        <div
-          className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-300 
-    bg-blue-600/10 group-hover:bg-red-600/20 blur-xl z-0"
-        />
-      </Link>
 
       <div className="max-w-2xl mx-auto">
         <header className="text-center mb-8 md:mb-12">
@@ -150,7 +112,7 @@ export default function SecurityPage() {
           </p>
         </header>
 
-        <div className="bg-zinc-900/40 p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-zinc-800/50 shadow-2xl mb-8 backdrop-blur-xl">
+        <div className="bg-zinc-900/40 p-5 md:p-8 rounded-4xl md:rounded-[2.5rem] border border-zinc-800/50 shadow-2xl mb-8 backdrop-blur-xl">
           <input
             type="text"
             value={urlInput}
@@ -171,123 +133,123 @@ export default function SecurityPage() {
           </button>
         </div>
 
-        {result && !result.error && (
-          <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-            <div
-              className={`p-6 md:p-10 rounded-[2.5rem] border-2 md:border-4 transition-all duration-700 shadow-2xl ${
-                finalStatus === "BAHAYA"
-                  ? "bg-red-950/80 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.2)]"
-                  : finalStatus === "Hati-hati"
-                    ? "bg-orange-950/80 border-orange-600 shadow-[0_0_40px_rgba(249,115,22,0.15)]"
-                    : "bg-zinc-900/90 border-green-600 shadow-[0_0_40_rgba(34,197,94,0.15)]"
-              }`}
-            >
-              <h2 className="text-2xl md:text-4xl font-black italic mb-6 md:mb-10 leading-tight uppercase tracking-tighter text-center">
-                {finalStatus === "BAHAYA"
-                  ? "🚨 WEBSITE BERBAHAYA"
-                  : finalStatus === "HATI-HATI"
-                    ? "⚠️ PERLU KEWASPADAAN"
-                    : finalStatus === "AMAN"
-                      ? "✅ WEBSITE AMAN"
-                      : "🛡️ AMAN TERVERIFIKASI"}
-              </h2>
+        {result &&
+          !result.error &&
+          (() => {
+            // 1. Ambil status yang pasti ada
+            const status = result.finalStatus || "AMAN";
 
-              <div className="bg-black/60 backdrop-blur-md p-5 md:p-7 rounded-3xl space-y-5 border border-white/5">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
-                  <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                    GLOBAL ENGINE:
-                  </span>
-                  <span
-                    className={`font-black tracking-widest text-xs md:text-sm ${
-                      result.googleStatus === "BAHAYA"
-                        ? "text-red-500"
-                        : result.googleStatus === "ADA CELAH"
-                          ? "text-orange-500"
-                          : "text-green-500"
-                    }`}
-                  >
-                    {result.googleStatus === "BAHAYA"
-                      ? "⚠️ BLACKLISTED"
-                      : result.googleStatus === "ADA CELAH"
-                        ? "❓ BELUM TERVERIFIKASI"
-                        : "✔️  VERIFIED"}
-                  </span>
-                </div>
+            const getContainerStyles = (s: string) => {
+              switch (s) {
+                case "BAHAYA":
+                  return "bg-red-950/80 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.2)]";
+                case "HATI-HATI":
+                  return "bg-orange-950/80 border-orange-600 shadow-[0_0_40px_rgba(249,115,22,0.15)]";
+                default:
+                  return "bg-zinc-900/90 border-green-600 shadow-[0_0_40px_rgba(34,197,94,0.15)]";
+              }
+            };
 
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
-                  <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                    VIRUS ENGINE:
-                  </span>
-                  <span
-                    className={`font-black tracking-widest text-xs md:text-sm ${result.virusTotal === "BAHAYA" ? "text-red-500" : result.virusTotal === "TIDAK ADA DATA" ? "text-orange-500" : "text-green-500"}`}
-                  >
-                    {result.virusTotal === "BAHAYA"
-                      ? `⚠️ DETECTED (${result.vtDetails?.malicious || 0} Engines)`
-                      : result.virusTotal === "TIDAK ADA DATA"
-                        ? "NO RECORD"
-                        : "✔️ NO VIRUS"}
-                  </span>
-                </div>
+            const getHeaderText = (s: string) => {
+              switch (s) {
+                case "BAHAYA":
+                  return "🚨 WEBSITE BERBAHAYA";
+                case "HATI-HATI":
+                  return "⚠️ PERLU KEWASPADAAN";
+                case "AMAN":
+                  return "✅ WEBSITE AMAN";
+                default:
+                  return "🛡️ AMAN TERVERIFIKASI";
+              }
+            };
 
-                <div className="flex flex-col gap-2">
-                  <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                    ARTUP LOGIC:
-                  </span>
+            return (
+              <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+                <div
+                  className={`p-6 md:p-10 rounded-[2.5rem] border-2 md:border-4 transition-all duration-700 shadow-2xl ${getContainerStyles(status)}`}
+                >
+                  <h2 className="text-2xl md:text-4xl font-black italic mb-6 md:mb-10 leading-tight uppercase tracking-tighter text-center">
+                    {getHeaderText(status)}
+                  </h2>
 
-                  {result.heuristicFlags?.length > 0 ? (
-                    result.heuristicFlags.map((flag: string, index: number) => (
-                      <span
-                        key={index}
-                        className="text-orange-400 text-xs font-bold"
-                      >
-                        ⚠️ {flag}
+                  <div className="bg-black/60 backdrop-blur-md p-5 md:p-7 rounded-3xl space-y-5 border border-white/5">
+                    {/* GLOBAL ENGINE */}
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
+                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
+                        GLOBAL ENGINE:
                       </span>
-                    ))
-                  ) : (
-                    <span className="text-green-500 text-xs font-bold">
-                      🛡️ Tidak ada indikator manipulasi
-                    </span>
-                  )}
-                </div>
-
-                <div className="border-b border-white/5 pb-4">
-                  <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                    TRUST SCORE
-                  </span>
-
-                  <div className="mt-2">
-                    <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
-                      <div
-                        style={{
-                          width: `${result.trustScore}%`,
-                        }}
-                        className={`h-full ${
-                          result.trustScore < 50
-                            ? "bg-red-500"
-                            : result.trustScore < 90
-                              ? "bg-orange-500"
-                              : "bg-green-500"
-                        }`}
-                      />
+                      <span
+                        className={`font-black tracking-widest text-xs md:text-sm ${getGoogle.color}`}
+                      >
+                        {getGoogle.label}
+                      </span>
                     </div>
 
-                    <p className="mt-2 font-black">{result.trustScore}/100</p>
+                    {/* VIRUS ENGINE */}
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
+                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
+                        VIRUS ENGINE:
+                      </span>
+                      <span
+                        className={`font-black tracking-widest text-xs md:text-sm ${getVirus.color}`}
+                      >
+                        {result.virusTotal === "BAHAYA"
+                          ? `⚠️ DETECTED (${result.vtDetails?.malicious || 0} Engines)`
+                          : getVirus.label}
+                      </span>
+                    </div>
+                    {/* ARTUP LOGIC */}
+                    <div className="flex flex-col gap-2">
+                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
+                        ARTUP LOGIC:
+                      </span>
+                      {result.heuristicFlags?.length > 0 ? (
+                        result.heuristicFlags.map(
+                          (flag: string, index: number) => (
+                            <span
+                              key={flag} // Menggunakan string flag itu sendiri sebagai key yang unik
+                              className="text-orange-400 text-xs font-bold"
+                            >
+                              ⚠️ {flag}
+                            </span>
+                          ),
+                        )
+                      ) : (
+                        <span className="text-green-500 text-xs font-bold">
+                          🛡️ Tidak ada indikator manipulasi
+                        </span>
+                      )}
+                    </div>
+
+                    {/* TRUST SCORE */}
+                    <div className="border-b border-white/5 pb-4">
+                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
+                        TRUST SCORE
+                      </span>
+                      <div className="mt-2">
+                        <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
+                          <div
+                            style={{ width: `${result.trustScore}%` }}
+                            className={`h-full ${getTrustColor(result.trustScore)}`}
+                          />
+                        </div>
+                        <p className="mt-2 font-black">
+                          {result.trustScore}/100
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* MESSAGE */}
+                    <div className="mt-8 text-center px-2">
+                      <p className="font-black text-[10px] md:text-xs uppercase tracking-widest leading-relaxed opacity-90 text-zinc-200">
+                        {result.userMessage}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-8 text-center px-2">
-                <p className="font-black text-[10px] md:text-xs uppercase tracking-widest leading-relaxed opacity-90 text-zinc-200">
-                  <p className="font-black text-[10px] md:text-xs uppercase tracking-widest leading-relaxed opacity-90 text-zinc-200">
-                    {result.userMessage}
-                  </p>
-                  
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
+            );
+          })()}
         {result?.error && (
           <div className="p-5 bg-red-600/10 border border-red-600/50 rounded-2xl text-center text-red-500 text-xs font-bold uppercase tracking-widest animate-bounce">
             {result.error}
@@ -295,74 +257,12 @@ export default function SecurityPage() {
         )}
       </div>
 
-      <div className="max-w-2xl mx-auto mb-10 pt-4">
-        {/* --- TOMBOL EDUKASI (Trigger Ganti Video) --- */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <button
-            onClick={() => setManualVideo("eIa6zppZ03A")} // ID Video Phishing
-            className={`py-3 px-2 rounded-xl border transition-all active:scale-95 text-[9px] font-black uppercase tracking-tighter ${
-              manualVideo === "eIa6zppZ03A"
-                ? "bg-red-600 border-red-400 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]"
-                : "bg-red-950/30 border-red-900/50 text-red-500 hover:bg-red-900/40"
-            }`}
-          >
-            🚨 JIKA PHISING?
-          </button>
-          <button
-            onClick={() => setManualVideo("tzYhNOu7Bdg")} // ID Video Celah/Default
-            className={`py-3 px-2 rounded-xl border transition-all active:scale-95 text-[9px] font-black uppercase tracking-tighter ${
-              manualVideo === "tzYhNOu7Bdgy"
-                ? "bg-orange-600 border-orange-400 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]"
-                : "bg-orange-950/30 border-orange-900/50 text-orange-500 hover:bg-orange-900/40"
-            }`}
-          >
-            ⚠️ JIKA ADA CELAH?
-          </button>
-        </div>
-
-        {/* --- SINGLE VIDEO PLAYER SECTION --- */}
-        <div className="mb-10 group">
-          <div className="bg-zinc-900/40 p-3 rounded-[2rem] border border-zinc-800 backdrop-blur-sm shadow-2xl relative overflow-hidden">
-            {/* Dekorasi Cahaya di Belakang Video */}
-            <div
-              className={`absolute inset-0 opacity-10 blur-[80px] transition-colors duration-700 ${
-                manualVideo === "eIa6zppZ03A" ? "bg-red-600" : "bg-orange-600"
-              }`}
-            />
-
-            <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-inner border border-white/5 relative z-10 bg-black">
-              <iframe
-                key={manualVideo} // Key ini penting agar Iframe refresh & autoplay jalan saat ID berubah
-                src={`https://www.youtube-nocookie.com/embed/${manualVideo}?autoplay=0&mute=1&rel=0&modestbranding=1`}
-                title="Artup Security Education"
-                className="w-full h-full"
-                allow="accelerometer;  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-
-            <div className="mt-3 flex justify-between items-center px-2 relative z-10">
-              <p className="text-[8px] font-bold text-zinc-500 uppercase tracking-[0.2em]">
-                Mode:{" "}
-                {manualVideo === "eIa6zppZ03A"
-                  ? "PERGI SAJA"
-                  : "WASPADA PUBLIK"}
-              </p>
-              <div className="flex gap-1">
-                <div
-                  className={`w-1.5 h-1.5 rounded-full animate-pulse ${manualVideo === "eIa6zppZ03A4" ? "bg-red-500" : "bg-orange-500"}`}
-                />
-                <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <footer className="mt-20 text-center pb-10">
-        <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.5em]">
-          ARTUP STUDIO Security Division &copy; 2026
-        </p>
+        <div>
+          <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.5em]">
+            ARTUP STUDIO Security Division &copy; 2026
+          </p>
+        </div>
       </footer>
     </div>
   );
