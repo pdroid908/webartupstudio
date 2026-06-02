@@ -5,6 +5,7 @@ const whitelist = [
   // --- KOMUNIKASI & MEDSOS (Official Only) ---
   "whatsapp.com",
   "facebook.com",
+  "Tiket.com",
   "instagram.com",
   "x.com",
   "twitter.com",
@@ -424,6 +425,25 @@ const virusTotal =
     const hasSensitiveWord = sensitiveKeywords.some((w) => decodedUrl.includes(w));
 
     const { score, flags } = calculateTrustScore(googleStatus, vtStats, isWhitelisted, hasRedirect, isManipulated, hasSensitiveWord);
+    function generateUserMessage(
+  finalStatus: string, 
+  flags: string[], 
+  googleStatus: string, 
+  maliciousCount: number
+): string {
+  if (finalStatus === "BAHAYA") {
+    if (googleStatus === "BAHAYA") return "SITUS INI TELAH DIBLOKIR OLEH GOOGLE. JANGAN DIAKSES!";
+    if (maliciousCount > 0) return `TERDETEKSI ${maliciousCount} ANCAMAN VIRUS OLEH ENGINE KEAMANAN. SANGAT BERBAHAYA!`;
+    return "SITUS INI MENUNJUKKAN AKTIVITAS MENCURIGAKAN DAN TIDAK AMAN UNTUK DATA PRIBADI.";
+  }
+  
+  if (finalStatus === "HATI-HATI") {
+    const reason = flags.length > 0 ? flags[0] : "indikator mencurigakan";
+    return `SITUS TERDETEKSI: ${reason.toUpperCase()}. HARAP WASPADA SAAT MEMASUKKAN DATA!`;
+  }
+
+  return "SITUS INI TIDAK MENUNJUKKAN ANCAMAN SIGNIFIKAN. TETAP WASPADA.";
+}
 
     // Penentuan Status Akhir
     let finalStatus = "AMAN";
@@ -431,11 +451,13 @@ if (score < 50) {
   finalStatus = "BAHAYA";
 } else if (score < 90) {
   finalStatus = "HATI-HATI";
-}
+}const userMessage = generateUserMessage(finalStatus, flags, googleStatus, maliciousCount);
     return NextResponse.json({
   trustScore: score,
   googleStatus,
   virusTotal,
+  userMessage,
+  
   vtDetails: {
     malicious: maliciousCount,
   },

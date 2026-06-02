@@ -6,6 +6,6 @@ export interface SecurityResult {
   vtDetails?: { malicious: number };
   heuristicFlags: string[];
   trustScore: number;
-  userMessage: string;
+  userMessage: "string";
   error?: string;
 }
