@@ -127,32 +127,36 @@ export default function SecurityPage() {
   className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
 />
 
-
 <div className="mb-6">
-  {/* Status Bar Container */}
-  <div className="w-full bg-zinc-800 rounded-full h-2 mb-2 overflow-hidden">
-    <div 
-      className={`h-full transition-all duration-1000 ${
-        turnstileToken ? "bg-green-500 w-full" : "bg-red-600 w-1/2 animate-pulse"
-      }`}
-    />
-  </div>
-  
-  {/* Pesan Dinamis */}
-  <p className="text-[10px] md:text-[20px] text-center font-bold uppercase tracking-widest text-zinc-500 mb-4">
-    {turnstileToken 
-      ? "✅ Ternyata Kamu Masih Punya Hati" 
-      : "🛡️ Sedang memahami mu: APAKAH KAMUPUNYA HATI?"
-    }
-  </p>
+  {/* Kondisi Jika BELUM terverifikasi (Tampilkan Bar + Teks + Widget) */}
+  {!turnstileToken && (
+    <>
+      <div className="w-full bg-zinc-800 rounded-full h-2 mb-2 overflow-hidden">
+        <div className="h-full bg-red-600 w-1/2 animate-pulse transition-all duration-1000" />
+      </div>
+      
+      <p className="text-[10px] md:text-[20px] text-center font-bold uppercase tracking-widest text-zinc-500 mb-4">
+        🛡️ Sedang memahami mu APAKAH KAMU PUNYA HATI?
+      </p>
 
-  {/* Widget Turnstile - Bisa kita bungkus agar rapi */}
-  <div className={`flex justify-center transition-opacity duration-500 ${turnstileToken ? "hidden" : "opacity-100"}`}>
-    <Turnstile 
-      siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
-      onSuccess={(token) => setTurnstileToken(token)} 
-    />
-  </div>
+      <div className="flex justify-center transition-opacity duration-500">
+        <Turnstile 
+          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
+          onSuccess={(token) => setTurnstileToken(token)} 
+        />
+      </div>
+    </>
+  )}
+
+  {/* Kondisi Jika SUDAH terverifikasi (Tampilkan Pesan Sukses saja) */}
+  {turnstileToken && (
+    <div className="text-center animate-in fade-in zoom-in duration-500">
+      <div className="w-full bg-green-500 rounded-full h-2 mb-2" />
+      <p className="text-[10px] md:text-[20px] font-bold uppercase tracking-widest text-green-500 mb-4">
+        ✅ Ternyata Kamu Masih Punya Hati
+      </p>
+    </div>
+  )}
 </div>
 
 <button
