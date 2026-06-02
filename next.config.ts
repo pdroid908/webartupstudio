@@ -42,9 +42,5 @@ const nextConfig = {
     ];
   },
 };
-<<<<<<< HEAD
-export default nextConfig
-=======
 
-export default nextConfig;
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
+export default nextConfig

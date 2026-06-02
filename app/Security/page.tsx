@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
-import { SecurityResult } from "../types";
+import { SecurityResult } from "@/types";
 // 1. Tambahkan fungsi ini di atas komponen SecurityPage
 const GOOGLE_STATUS_MAP: Record<string, { color: string; label: string }> = {
   BAHAYA: { color: "text-red-500", label: "⚠️ BLACKLISTED" },
@@ -9,24 +8,12 @@ const GOOGLE_STATUS_MAP: Record<string, { color: string; label: string }> = {
   DEFAULT: { color: "text-green-500", label: "✔️ VERIFIED" },
 };
 
-=======
-import { SecurityResult } from "@/types";
-import { Turnstile } from "@marsidev/react-turnstile";
-
-const GOOGLE_STATUS_MAP: Record<string, { color: string; label: string }> = {
-  BAHAYA: { color: "text-red-500", label: "⚠️ BLACKLISTED" },
-  "ADA CELAH": { color: "text-orange-500", label: "❓ BELUM TERVERIFIKASI" },
-  DEFAULT: { color: "text-green-500", label: "✔️ VERIFIED" },
-};
-
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
 const VIRUS_STATUS_MAP: Record<string, { color: string; label: string }> = {
   BAHAYA: { color: "text-red-500", label: "⚠️ DETECTED" }, // Label dinamis nanti kita handle
   "TIDAK ADA DATA": { color: "text-orange-500", label: "NO RECORD" },
   DEFAULT: { color: "text-green-500", label: "✔️ NO VIRUS" },
 };
 export default function SecurityPage() {
-  
   const [urlInput, setUrlInput] = useState("");
   const [result, setResult] = useState<SecurityResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,7 +30,6 @@ export default function SecurityPage() {
     return "bg-green-500";
   };
   const messages = [
-<<<<<<< HEAD
     "INITIALIZING ARTUP NEURAL CORE...",
     "DECRYPTING PACKET OBFUSCATION...",
     "SCANNING DATABASE REPUTATION...",
@@ -53,19 +39,6 @@ export default function SecurityPage() {
   ];
   const [statusIndex, setStatusIndex] = useState(0);
   const statusText = loading ? messages[statusIndex] : "SCAN LINK SEKARANG";
-=======
-  "DISMANTLING SECURITY LAYERS...",
-  "UNPACKING CORE DATA...",
-  "INSPECTING REPUTATION...",
-  "DECONSTRUCTING PATTERNS...",
-  "COMPUTING RISK METRICS...",
-  "FINALIZING SYSTEM CHECK...",
-];
-
-  const [statusIndex, setStatusIndex] = useState(0);
-  const statusText = loading ? messages[statusIndex] : "SCAN LINK SEKARANG";
-  const [turnstileToken, setTurnstileToken] = useState("");
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
   useEffect(() => {
     if (!loading) return;
 
@@ -74,19 +47,12 @@ export default function SecurityPage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [loading]);
+  }, [loading, messages.length]);
 
-  
-
- const handleCekKeamanan = async () => {
+  const handleCekKeamanan = async () => {
     if (!urlInput) return;
-    
-    // Validasi tambahan: Cek apakah token sudah ada
-    if (!turnstileToken) {
-        alert("Mohon selesaikan verifikasi keamanan terlebih dahulu.");
-        return;
-    }
 
+    // --- 2. LOGIKA SCAn (Tetap Jalan) ---
     setLoading(true);
     setResult(null);
 
@@ -94,21 +60,11 @@ export default function SecurityPage() {
       const response = await fetch("/api/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // 2. Masukkan token ke sini
-        body: JSON.stringify({ 
-            url: urlInput,
-            token: turnstileToken // Kirim token ke backend
-        }),
+        body: JSON.stringify({ url: urlInput }),
       });
-      
 
       const data: SecurityResult = await response.json();
       setResult(data);
-<<<<<<< HEAD
-=======
-    } catch (error) {
-        console.error("Gagal melakukan scan:", error);
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
     } finally {
       setLoading(false);
     }
@@ -116,7 +72,6 @@ export default function SecurityPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-10 font-sans selection:bg-red-600/40 relative overflow-x-hidden">
-<<<<<<< HEAD
       {/* --- SIDEBAR/DOCK MEDSOS (Responsive) --- */}
 
       <aside className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-auto md:top-1/2 md:right-4 md:left-auto z-50 flex flex-row md:flex-col gap-3 bg-zinc-900/80 md:bg-transparent p-3 md:p-0 rounded-full md:rounded-none border border-zinc-800 md:border-none backdrop-blur-md md:backdrop-blur-none shadow-2xl md:shadow-none">
@@ -137,10 +92,6 @@ export default function SecurityPage() {
           foto converter
         </a>
         <a
-=======
-      
-      <aside className="fixed bottom-6 right-6 z-50 flex flex-col gap-3"> <a
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
           href="https://www.tiktok.com/@artupstd?lang=id-ID"
           target="_blank"
           rel="noopener noreferrer" // Tambahkan ini agar aman
@@ -160,7 +111,6 @@ export default function SecurityPage() {
           </p>
         </header>
 
-<<<<<<< HEAD
         <div className="bg-zinc-900/40 p-5 md:p-8 rounded-4xl md:rounded-[2.5rem] border border-zinc-800/50 shadow-2xl mb-8 backdrop-blur-xl">
           <input
             type="text"
@@ -178,7 +128,7 @@ export default function SecurityPage() {
                 : "bg-red-700 hover:bg-red-600 shadow-[0_10px_40px_rgba(185,28,28,0.2)] text-white"
             }`}
           >
-            {loading ? statusText : "LINK / WEBSITE SCANNER"}
+            {loading ? statusText : "SCAN NOW"}
           </button>
         </div>
 
@@ -221,102 +171,6 @@ export default function SecurityPage() {
                     {getHeaderText(status)}
                   </h2>
 
-=======
-        <div className="flex justify-center items-center gap-2 mb-6 text-emerald-500/80">
-          <div className="flex gap-2 bg-emerald-950/30 px-4 py-1 rounded-full border border-emerald-900/50">
-            <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-              <span className="text-sm">🛡️</span> 95% DETECTION RATE
-            </span>
-            <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border-l border-emerald-900/50 pl-2">
-              <span className="text-sm">⚡</span> Real-time Scan
-            </span>
-          </div>
-        </div>
-
-        <div className="bg-zinc-900/40 p-5 md:p-8 rounded-4xl md:rounded-[2.5rem] border border-zinc-800/50 shadow-2xl mb-8 backdrop-blur-xl">
-          <input
-  type="text"
-  value={urlInput}
-  onChange={(e) => setUrlInput(e.target.value)}
-  placeholder="Tempel link web, e-commerce, atau link mencurigakan..."
-  className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
-/>
-
-<div className="mb-6">
-  {!turnstileToken && (
-    <div className="animate-in fade-in duration-500">
-      <div className="w-full bg-zinc-800 rounded-full h-2 mb-2 overflow-hidden">
-        <div className="h-full bg-red-600 w-1/2 animate-pulse transition-all duration-1000" />
-      </div>
-      
-      <p className="text-[10px] md:text-[20px] text-center font-bold uppercase tracking-widest text-zinc-500 mb-4">
-        🛡️ Please Wait..
-      </p>
-
-      <div className="flex justify-center transition-opacity duration-500">
-        <Turnstile 
-          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
-          onSuccess={(token) => setTurnstileToken(token)} 
-        />
-      </div>
-    </div>
-  )}
-</div>
-
-<button
-  onClick={handleCekKeamanan}
-  // Tombol akan disable jika loading ATAU token belum ada (biar user wajib verifikasi)
-  disabled={loading || !turnstileToken} 
-  className={`w-full py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl tracking-tight transition-all active:scale-95 ${
-    (loading || !turnstileToken)
-      ? "bg-zinc-800 text-zinc-600 cursor-not-allowed" // Warna lebih redup saat disabled
-      : "bg-red-700 hover:bg-red-600 shadow-[0_10px_40px_rgba(185,28,28,0.2)] text-white"
-  }`}
->
-  {loading ? statusText : "LINK / WEBSITE SCANNER"}
-</button>
-        </div>
-
-        {result &&
-          !result.error &&
-          (() => {
-            // 1. Ambil status yang pasti ada
-            const status = result.finalStatus || "AMAN";
-
-            const getContainerStyles = (s: string) => {
-              switch (s) {
-                case "BAHAYA":
-                  return "bg-red-950/80 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.2)]";
-                case "HATI-HATI":
-                  return "bg-orange-950/80 border-orange-600 shadow-[0_0_40px_rgba(249,115,22,0.15)]";
-                default:
-                  return "bg-zinc-900/90 border-green-600 shadow-[0_0_40px_rgba(34,197,94,0.15)]";
-              }
-            };
-
-            const getHeaderText = (s: string) => {
-              switch (s) {
-                case "BAHAYA":
-                  return "🚨 WEBSITE BERBAHAYA";
-                case "HATI-HATI":
-                  return "⚠️ PERLU KEWASPADAAN";
-                case "AMAN":
-                  return "✅ WEBSITE AMAN";
-                default:
-                  return "🛡️ AMAN TERVERIFIKASI";
-              }
-            };
-
-            return (
-              <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                <div
-                  className={`p-6 md:p-10 rounded-[2.5rem] border-2 md:border-4 transition-all duration-700 shadow-2xl ${getContainerStyles(status)}`}
-                >
-                  <h2 className="text-2xl md:text-4xl font-black italic mb-6 md:mb-10 leading-tight uppercase tracking-tighter text-center">
-                    {getHeaderText(status)}
-                  </h2>
-
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
                   <div className="bg-black/60 backdrop-blur-md p-5 md:p-7 rounded-3xl space-y-5 border border-white/5">
                     {/* GLOBAL ENGINE */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
@@ -350,7 +204,7 @@ export default function SecurityPage() {
                       </span>
                       {result.heuristicFlags?.length > 0 ? (
                         result.heuristicFlags.map(
-                          (flag: string, index: number) => (
+                          (flag: string) => (
                             <span
                               key={flag} // Menggunakan string flag itu sendiri sebagai key yang unik
                               className="text-orange-400 text-xs font-bold"
@@ -402,43 +256,11 @@ export default function SecurityPage() {
         )}
       </div>
 
-<<<<<<< HEAD
       <footer className="mt-20 text-center pb-10">
         <div>
-          <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.5em]">
+          <p className="text-[12px] md:text-[20px] text-zinc-800 font-black uppercase tracking-[0.5em]">
             ARTUP STUDIO Security Division &copy; 2026
           </p>
-=======
-      <section className="mt-20 max-w-xl mx-auto px-6 text-center">
-        <h2 className="text-zinc-00 font-black text-[10px] md:text-[20px] uppercase tracking-[0.3em] mb-4">
-          Mengapa Menggunakan Artup Link Scanner?
-        </h2>
-        <p className="text-zinc-500 text-[13px] leading-relaxed">
-          <strong>Artup Security</strong> menyediakan layanan{" "}
-          <em>Link Scanner</em> dan <em>Website Security Checker</em> untuk
-          membantu Anda mendeteksi potensi ancaman siber. Dengan teknologi{" "}
-          <strong>Multi-Engine Verification</strong>, kami memindai setiap
-          tautan untuk mencari indikator <strong>phishing</strong>,{" "}
-          <strong>malware</strong>, dan penipuan <em>e-commerce</em> secara
-          real-time.
-        </p>
-      </section>
-
-      <footer  className="mt-20 text-center pb-12 border-t border-zinc-900 pt-8">
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-[10px] md:text-[20px] text-zinc-500 font-black uppercase tracking-[0.4em]">
-            ARTUP STUDIO SECURITY DIVISION &copy; 2026
-          </p>
-          <div className="flex gap-4 ">
-            <span className="text-[9px] text-zinc-800 font-bold uppercase tracking-widest">
-              System Operational
-            </span>
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-          </div>
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
         </div>
       </footer>
     </div>

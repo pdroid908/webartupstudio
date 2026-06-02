@@ -42,12 +42,6 @@ const whitelist = [
   "microsoft.com",
   "android.com",
   "cloudflare.com",
-<<<<<<< HEAD
-=======
-  "amazon.com",
-  "amazon.co.id",
-  "media-amazon.com",
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
 
   "github.com", // Penting untuk developer
 
@@ -112,6 +106,7 @@ const whitelist = [
   // --- HIBURAN & STREAMING RESMI ---
   "netflix.com",
   "googleusercontent.com",
+  "amazon.com",
   "youtube.com",
   "youtu.be",
   "disneyplus.com",
@@ -141,19 +136,12 @@ const sensitiveKeywords = [
   "akun",
   "banking",
   "hadiah",
+  "bonus",
   "win",
   "suprise",
   "reward",
-<<<<<<< HEAD
-=======
-  "claim",
   "klaim",
-  "update",
-  "undian",
-  "win",
-  "verification",
-  "menang"
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
+  "claim"
 ];
 
 function validateInput(url: string) {
@@ -211,12 +199,9 @@ const getVirusTotalData = async (targetUrl: string) => {
       };
 
       try {
-<<<<<<< HEAD
         // ====================================================
         // CEK HASIL YANG SUDAH ADA DULU
         // ====================================================
-=======
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
 
         const urlId = Buffer.from(cleanUrl)
           .toString("base64")
@@ -247,12 +232,9 @@ const getVirusTotalData = async (targetUrl: string) => {
           }
         }
 
-<<<<<<< HEAD
         // ====================================================
         // BELUM ADA DATA → KIRIM SCAN BARU
         // ====================================================
-=======
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
 
         console.log("[VT] Mengirim scan baru...");
 
@@ -289,7 +271,7 @@ const getVirusTotalData = async (targetUrl: string) => {
 
         let completed = false;
 
-        for (let attempt = 1; attempt <= 2; attempt++) {
+        for (let attempt = 1; attempt <= 4; attempt++) {
           const analysisRes = await fetch(
             `https://www.virustotal.com/api/v3/analyses/${analysisId}`,
             { headers },
@@ -310,7 +292,7 @@ const getVirusTotalData = async (targetUrl: string) => {
             break;
           }
 
-          await new Promise((resolve) => setTimeout(resolve, 7000));
+          await new Promise((resolve) => setTimeout(resolve, 5000));
         }
 
         if (!completed) {
@@ -395,38 +377,12 @@ const fetchGoogleWithTimeout = async (targetUrl: string) => {
     };
 
 export async function POST(req: Request) {
-<<<<<<< HEAD
   try {
     const { url: inputUrl } = await req.json();
     if (!inputUrl) return NextResponse.json({ error: "URL is required" }, { status: 400 });
 
     let url = inputUrl.trim();
 
-=======
-  const body = await req.json();
-  
-  const { url: rawUrl, token } = body;
-  const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        secret: process.env.TURNSTILE_SECRET_KEY,
-        response: token,
-      }),
-    });
-  const verifyData = await verifyRes.json();
-
-  if (!verifyData.success) {
-    return NextResponse.json({ error: "Verifikasi gagal." }, { status: 401 });
-  }
-
-  
-  try {
-
-    if (!rawUrl) return NextResponse.json({ error: "URL is required" }, { status: 400 });
-    let url = rawUrl.trim();
-    
->>>>>>> 7a0249b1bcbe42265f03cc2d0b6b6e283552b63f
     // Decoding Base64 (disederhanakan)
     const base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
     if (base64Regex.test(url) && url.length > 20) {
@@ -451,6 +407,14 @@ export async function POST(req: Request) {
     // Analisis Hasil
     const googleStatus = googleData?.matches?.length > 0 ? "BAHAYA" : "AMAN";
     const vtStats = vtData?.data?.attributes?.last_analysis_stats;
+    const maliciousCount = vtStats?.malicious || 0;
+
+const virusTotal =
+  maliciousCount > 0
+    ? "BAHAYA"
+    : vtStats
+      ? "AMAN"
+      : "TIDAK ADA DATA";
     
     const isWhitelisted = whitelist.some((w) => hostname === w || hostname.endsWith("." + w));
     const hasRedirect = Array.from(urlObj.searchParams.values()).some((v) => v.includes("http"));
@@ -469,13 +433,19 @@ if (score < 50) {
   finalStatus = "HATI-HATI";
 }
     return NextResponse.json({
-      trustScore: score,
-      googleStatus,
-      finalStatus,
-      heuristicFlags: flags,
-      details: { domain: hostname, isWhitelisted }
-    });
-
+  trustScore: score,
+  googleStatus,
+  virusTotal,
+  vtDetails: {
+    malicious: maliciousCount,
+  },
+  finalStatus,
+  heuristicFlags: flags,
+  details: {
+    domain: hostname,
+    isWhitelisted,
+  },
+});
   } catch (error) {
     console.error("[CRITICAL ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
