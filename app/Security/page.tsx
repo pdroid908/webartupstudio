@@ -73,12 +73,8 @@ export default function SecurityPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-10 font-sans selection:bg-red-600/40 relative overflow-x-hidden">
-      {/* --- SIDEBAR/DOCK MEDSOS (Responsive) --- */}
-
-      <aside className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-auto md:top-1/2 md:right-4 md:left-auto z-50 flex flex-row md:flex-col gap-3 bg-zinc-900/80 md:bg-transparent p-3 md:p-0 rounded-full md:rounded-none border border-zinc-800 md:border-none backdrop-blur-md md:backdrop-blur-none shadow-2xl md:shadow-none">
-        
-        
-        <a
+      
+      <aside className="fixed bottom-6 right-6 z-50 flex flex-col gap-3"> <a
           href="https://www.tiktok.com/@artupstd?lang=id-ID"
           target="_blank"
           rel="noopener noreferrer" // Tambahkan ini agar aman
@@ -98,12 +94,23 @@ export default function SecurityPage() {
           </p>
         </header>
 
+        <div className="flex justify-center items-center gap-2 mb-6 text-emerald-500/80">
+          <div className="flex gap-2 bg-emerald-950/30 px-4 py-1 rounded-full border border-emerald-900/50">
+            <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+              <span className="text-sm">🛡️</span> 95% DETECTION RATE
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border-l border-emerald-900/50 pl-2">
+              <span className="text-sm">⚡</span> Real-time Scan
+            </span>
+          </div>
+        </div>
+
         <div className="bg-zinc-900/40 p-5 md:p-8 rounded-4xl md:rounded-[2.5rem] border border-zinc-800/50 shadow-2xl mb-8 backdrop-blur-xl">
           <input
             type="text"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Tempel link bank, e-commerce, atau link mencurigakan..."
+            placeholder="Tempel link web, e-commerce, atau link mencurigakan..."
             className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
           />
           <button
@@ -243,11 +250,35 @@ export default function SecurityPage() {
         )}
       </div>
 
-      <footer className="mt-20 text-center pb-10">
-        <div>
-          <p className="text-[9px] text-zinc-800 font-black uppercase tracking-[0.5em]">
-            ARTUP STUDIO Security Division &copy; 2026
+      <section className="mt-20 max-w-xl mx-auto px-6 text-center">
+        <h2 className="text-zinc-00 font-black text-[10px] md:text-[20px] uppercase tracking-[0.3em] mb-4">
+          Mengapa Menggunakan Artup Link Scanner?
+        </h2>
+        <p className="text-zinc-500 text-[13px] leading-relaxed">
+          <strong>Artup Security</strong> menyediakan layanan{" "}
+          <em>Link Scanner</em> dan <em>Website Security Checker</em> untuk
+          membantu Anda mendeteksi potensi ancaman siber. Dengan teknologi{" "}
+          <strong>Multi-Engine Verification</strong>, kami memindai setiap
+          tautan untuk mencari indikator <strong>phishing</strong>,{" "}
+          <strong>malware</strong>, dan penipuan <em>e-commerce</em> secara
+          real-time.
+        </p>
+      </section>
+
+      <footer  className="mt-20 text-center pb-12 border-t border-zinc-900 pt-8">
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-[10px] md:text-[20px] text-zinc-500 font-black uppercase tracking-[0.4em]">
+            ARTUP STUDIO SECURITY DIVISION &copy; 2026
           </p>
+          <div className="flex gap-4 ">
+            <span className="text-[9px] text-zinc-800 font-bold uppercase tracking-widest">
+              System Operational
+            </span>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+          </div>
         </div>
       </footer>
     </div>

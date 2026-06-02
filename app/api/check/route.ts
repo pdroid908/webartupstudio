@@ -42,6 +42,9 @@ const whitelist = [
   "microsoft.com",
   "android.com",
   "cloudflare.com",
+  "amazon.com",
+  "amazon.co.id",
+  "media-amazon.com",
 
   "github.com", // Penting untuk developer
 
@@ -138,6 +141,13 @@ const sensitiveKeywords = [
   "win",
   "suprise",
   "reward",
+  "claim",
+  "klaim",
+  "update",
+  "undian",
+  "win",
+  "verification",
+  "menang"
 ];
 
 function validateInput(url: string) {

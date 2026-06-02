@@ -15,7 +15,7 @@ export default function Home() {
     // Tunggu 800ms agar animasi loading terasa, baru pindah
     setTimeout(() => {
       router.push(path);
-    }, 500);
+    }, 300);
   };
   useEffect(() => {
     setLoading(false);
@@ -68,27 +68,6 @@ export default function Home() {
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 ml-0.5 mb-6">
               HIGH-TECH
             </p>
-
-            {/* NAVIGASI */}
-            <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide mb-6 w-full">
-              {/* --- TOMBOL LINK SCANNER --- */}
-              <a // Ubah Link menjadi <a> agar lebih mudah dikontrol
-                href="/Security"
-                onClick={(e) => handleNavigation(e, "/Security")}
-                className="flex-shrink-0 group relative h-12 w-[160px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95 cursor-pointer"
-              >
-                <div className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#78350f_0%,#f59e0b_50%,#78350f_100%)] group-hover:animate-[spin_2s_linear_infinite] group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#ef4444_0%,#f97316_50%,#ef4444_100%)]" />
-                <div className="flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 transition-all duration-500 z-10 group-hover:bg-red-950/20 group-hover:backdrop-blur-sm">
-                  <span className="text-orange-500 group-hover:text-red-500 animate-pulse group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] transition-all duration-300">
-                    🛡️
-                  </span>
-                  <span className="font-black text-[10px] md:text-xs uppercase tracking-[0.2em] text-orange-200/70 group-hover:text-white transition-all duration-300">
-                    LINK SCANNER
-                  </span>
-                </div>
-                <div className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-500 bg-orange-500/10 group-hover:bg-red-500/30 blur-2xl z-0" />
-              </a>
-            </nav>
 
             {/* KONTAK ME wa */}
             <a
@@ -155,6 +134,40 @@ export default function Home() {
           </div>
         </div>
       </aside>
+
+     {/* --- AREA TENGAH --- */}
+<div className="flex flex-col items-center justify-center min-h-screen md:ml-64 p-4 md:p-32">
+  
+  {/* TOMBOL LINK SCANNER */}
+  <a 
+    href="/Security"
+    title="Layanan Link Scanner untuk deteksi malware"
+    onClick={(e) => handleNavigation(e, "/Security")}
+    className="mb-4 group relative w-full max-w-[140px] md:max-w-[360px] h-14 md:h-16 flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(251,146,60,0.5)] active:scale-95"
+  >
+    <div className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#78350f_0%,#f59e0b_50%,#78350f_100%)]" />
+    <div className="flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-6 z-10">
+      <span className="text-lg text-orange-500 animate-pulse">🛡️</span>
+      <span className="font-black text-xs md:text-sm uppercase tracking-[0.2em] text-orange-200">LINK SCANNER</span>
+    </div>
+  </a>
+
+
+  {/* KOTAK SEO LEBIH LEBAR */}
+  <div className="mt-10 w-full max-w-[600px] p-8 rounded-3xl bg-slate-950/40 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 hover:bg-slate-900/50">
+    <h3 className="text-blue-400 font-black text-sm md:text-lg mb-4 uppercase tracking-[0.3em] text-center">
+      Artup High-Tech Security
+    </h3>
+    <p className="text-slate-300 text-xs md:text-sm leading-relaxed text-center font-medium">
+      Selamat datang di <span className="text-blue-500 font-bold">Artup Studio</span>. 
+      Kami menyediakan layanan <span className="text-orange-400">Link Scanner</span> profesional untuk melindungi aktivitas digital Anda dari ancaman phising, malware, dan tautan berbahaya lainnya secara real-time. 
+      <br/><br/>
+      Keamanan data adalah prioritas utama kami. Gunakan fitur pemindaian cepat kami untuk memastikan setiap tautan yang Anda buka benar-benar aman dan terpercaya bagi Anda maupun perangkat Anda.
+    </p>
+  </div>
+</div>
+
+      
 
       {/* Overlay Loading */}
       <div
