@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 const whitelist = [
   // --- KOMUNIKASI & MEDSOS (Official Only) ---
@@ -28,6 +28,8 @@ const whitelist = [
   "prakerja.go.id",
   "layanan.go.id",
   "sso.go.id",
+  "chatgpt.com",
+  "gemini.google.com",
 
   // --- INFRASTRUKTUR & SEARCH ENGINE ---
   "google.com",
@@ -40,6 +42,7 @@ const whitelist = [
   "microsoft.com",
   "android.com",
   "cloudflare.com",
+
   "github.com", // Penting untuk developer
 
   // --- PEMERINTAH, PENDIDIKAN & MILITER (Induk TLD) ---
@@ -131,228 +134,191 @@ const sensitiveKeywords = [
   "verifikasi",
   "akun",
   "banking",
+  "hadiah",
+  "win",
+  "suprise",
+  "reward",
 ];
 
-export async function POST(req: Request) {
-  const startTime = Date.now();
-  try {
-    const { url: inputUrl } = await req.json();
-    if (!inputUrl)
-      return NextResponse.json({ error: "URL is required" }, { status: 400 });
+function validateInput(url: string) {
+  if (url.length > 700 || /[<>"'@\s]/.test(url)) return false;
+  return true;
+}
+interface VTStats {
+  malicious: number;
+  // Tambahkan properti lain yang ada di vtStats jika perlu
+}
+function calculateTrustScore(
+  googleStatus: string,
+  vtStats: VTStats,
+  isWhitelisted: boolean,
+  hasRedirect: boolean,
+  isManipulated: boolean,
+  hasSensitiveWord: boolean
+) {
+  let score = 100;
+  const flags: string[] = [];
 
-    // 1. Normalisasi & Decoder
-    let url = inputUrl.trim();
-
-    const base64Regex =
-      /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
-    if (base64Regex.test(url) && url.length > 20) {
-      try {
-        const decoded = atob(url);
-        if (decoded.startsWith("http")) url = decoded;
-      } catch (e) {
-        /* ignore */
-      }
-    }
-
-    // --- PROTEKSI PINTU DEPAN ---
-    if (url.length > 700 || /[<>"'@\s]/.test(url)) {
-      return NextResponse.json(
-        { error: "Invalid URL format", finalStatus: "BAHAYA" },
-        { status: 400 },
-      );
-    }
-
-    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-
-    if (
-      url.includes("<") ||
-      url.includes(">") ||
-      url.includes('"') ||
-      url.includes(" ")
-    ) {
-      return NextResponse.json(
-        {
-          error: "Nice Try Diddy >_<",
-          finalStatus: "BAHAYA",
-        },
-        { status: 400 },
-      );
-    }
-
-    const urlObj = new URL(url);
-    const domain = urlObj.hostname.replace(/^www\./, "");
-
-    if (domain === "webartupstudio.pages.dev") {
-      return NextResponse.json(
-        { error: "Self-scan detected", finalStatus: "AMAN" },
-        { status: 400 },
-      );
-    }
-
-    // 3. AMBIL DOMAIN
-
-    const parts = domain.split(".");
-    const rootDomain =
-      domain.endsWith(".co.id") || domain.endsWith(".net.id")
-        ? parts.slice(-3).join(".")
-        : parts.slice(-2).join(".");
-
-    // 1. BONGKAR KODE RAHASIA (Contoh: %6c%6f -> lo)
-    const decodedUrl = decodeURIComponent(url).toLowerCase();
-    const hostname = urlObj.hostname.replace("www.", "");
-    const cleanUrlText = decodedUrl
-      .replace(/[^a-z0-9]/g, "")
-      .replace(/[\u200B-\u200D\uFEFF]/g, "");
-
-    // 2. CEK DOMAIN KETAT (Gunakan endsWith agar tidak tertipu bca.co.id.palsu.com)
-    const isWhitelisted = whitelist.some(
-      (w) => hostname === w || hostname.endsWith("." + w),
-    );
-
-    // 3. DETEKSI REDIRECT (Cek semua parameter, jika ada 'http' di dalamnya = Redirect)
-    const hasRedirectParam = Array.from(urlObj.searchParams.values()).some(
-      (val) => val.includes("http://") || val.includes("https://"),
-    );
-
-    // 4. DETEKSI MANIPULASI (Jika ada nama bank di domain asing)
-    const isManipulated =
-      !isWhitelisted &&
-      whitelist.some((w) => hostname.includes(w.split(".")[0]));
-
-    console.log(`\n--- START SCAN: ${url} ---`);
-
-    // 2. FUNGSI VIRUSTOTAL (DIPERBAIKI)
-    const getVirusTotalData = async (targetUrl: string) => {
-  const cleanUrl = targetUrl.trim();
-
-  const headers = {
-    "x-apikey": process.env.VIRUSTOTAL_API_KEY as string,
-  };
-
-  try {
-    // ====================================================
-    // CEK HASIL YANG SUDAH ADA DULU
-    // ====================================================
-
-    const urlId = Buffer.from(cleanUrl)
-      .toString("base64")
-      .replace(/=/g, "")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
-
-    const existingRes = await fetch(
-      `https://www.virustotal.com/api/v3/urls/${urlId}`,
-      { headers }
-    );
-
-    if (existingRes.ok) {
-      const existingData = await existingRes.json();
-
-      if (existingData?.data?.attributes?.last_analysis_stats) {
-        console.log("[VT] Menggunakan hasil yang sudah tersedia");
-        return existingData;
-      }
-    }
-
-    // ====================================================
-    // BELUM ADA DATA → KIRIM SCAN BARU
-    // ====================================================
-
-    console.log("[VT] Mengirim scan baru...");
-
-    const scanRes = await fetch(
-      "https://www.virustotal.com/api/v3/urls",
-      {
-        method: "POST",
-        headers: {
-          ...headers,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          url: cleanUrl,
-        }),
-      }
-    );
-
-    if (!scanRes.ok) {
-      console.error("[VT] Gagal submit scan");
-      return null;
-    }
-
-    const scanData = await scanRes.json();
-
-    const analysisId = scanData?.data?.id;
-
-    if (!analysisId) {
-      console.error("[VT] Analysis ID tidak ditemukan");
-      return null;
-    }
-
-    console.log(`[VT] Analysis ID: ${analysisId}`);
-
-    // ====================================================
-    // TUNGGU SAMPAI COMPLETED
-    // ====================================================
-
-    let completed = false;
-
-    for (let attempt = 1; attempt <= 20; attempt++) {
-      const analysisRes = await fetch(
-        `https://www.virustotal.com/api/v3/analyses/${analysisId}`,
-        { headers }
-      );
-
-      if (!analysisRes.ok) {
-        break;
-      }
-
-      const analysisData = await analysisRes.json();
-
-      const status =
-        analysisData?.data?.attributes?.status;
-
-      console.log(
-        `[VT] Polling ${attempt}/20 | Status: ${status}`
-      );
-
-      if (status === "completed") {
-        completed = true;
-        break;
-      }
-
-      await new Promise((resolve) =>
-        setTimeout(resolve, 3000)
-      );
-    }
-
-    if (!completed) {
-      console.warn(
-        "[VT] Analysis belum selesai, mengambil hasil sementara"
-      );
-    }
-
-    // ====================================================
-    // AMBIL HASIL FINAL
-    // ====================================================
-
-    const finalRes = await fetch(
-      `https://www.virustotal.com/api/v3/urls/${urlId}`,
-      { headers }
-    );
-
-    if (!finalRes.ok) {
-      return null;
-    }
-
-    return await finalRes.json();
-  } catch (error) {
-    console.error("[VT ERROR]", error);
-    return null;
+  if (googleStatus === "BAHAYA") score -= 50;
+  
+  if (vtStats) {
+    if (vtStats.malicious >= 3) score -= 50;
+    else if (vtStats.malicious === 2) score -= 20;
+    else if (vtStats.malicious === 1) score -= 10;
   }
-};
+
+  if (!isWhitelisted) {
+    score -= 10;
+    flags.push("Domain belum terverifikasi");
+  }
+  if (hasRedirect) {
+    score -= 10;
+    flags.push("Mengandung parameter redirect");
+  }
+  if (isManipulated) {
+    score -= 30;
+    flags.push("Meniru brand terkenal");
+  }
+  if (hasSensitiveWord && !isWhitelisted) {
+    score -= 15;
+    flags.push("Mengandung kata pancingan");
+  }
+
+  return { score: Math.max(0, score), flags };
+}
+
+const getVirusTotalData = async (targetUrl: string) => {
+      const cleanUrl = targetUrl.trim();
+
+      const headers = {
+        "x-apikey": process.env.VIRUSTOTAL_API_KEY as string,
+      };
+
+      try {
+        // ====================================================
+        // CEK HASIL YANG SUDAH ADA DULU
+        // ====================================================
+
+        const urlId = Buffer.from(cleanUrl)
+          .toString("base64")
+          .replace(/[=+/]/g, (match) => {
+            switch (match) {
+              case "=":
+                return "";
+              case "+":
+                return "-";
+              case "/":
+                return "_";
+              default:
+                return match;
+            }
+          });
+
+        const existingRes = await fetch(
+          `https://www.virustotal.com/api/v3/urls/${urlId}`,
+          { headers },
+        );
+
+        if (existingRes.ok) {
+          const existingData = await existingRes.json();
+
+          if (existingData?.data?.attributes?.last_analysis_stats) {
+            console.log("[VT] Menggunakan hasil yang sudah tersedia");
+            return existingData;
+          }
+        }
+
+        // ====================================================
+        // BELUM ADA DATA → KIRIM SCAN BARU
+        // ====================================================
+
+        console.log("[VT] Mengirim scan baru...");
+
+        const scanRes = await fetch("https://www.virustotal.com/api/v3/urls", {
+          method: "POST",
+          headers: {
+            ...headers,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            url: cleanUrl,
+          }),
+        });
+
+        if (!scanRes.ok) {
+          console.error("[VT] Gagal submit scan");
+          return null;
+        }
+
+        const scanData = await scanRes.json();
+
+        const analysisId = scanData?.data?.id;
+
+        if (!analysisId) {
+          console.error("[VT] Analysis ID tidak ditemukan");
+          return null;
+        }
+
+        console.log(`[VT] Analysis ID: ${analysisId}`);
+
+        // ====================================================
+        // TUNGGU SAMPAI COMPLETED
+        // ====================================================
+
+        let completed = false;
+
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          const analysisRes = await fetch(
+            `https://www.virustotal.com/api/v3/analyses/${analysisId}`,
+            { headers },
+          );
+
+          if (!analysisRes.ok) {
+            break;
+          }
+
+          const analysisData = await analysisRes.json();
+
+          const status = analysisData?.data?.attributes?.status;
+
+          console.log(`[VT] Polling ${attempt}/20 | Status: ${status}`);
+
+          if (status === "completed") {
+            completed = true;
+            break;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 7000));
+        }
+
+        if (!completed) {
+          console.warn(
+            "[VT] Analysis belum selesai, mengambil hasil sementara",
+          );
+        }
+
+        // ====================================================
+        // AMBIL HASIL FINAL
+        // ====================================================
+
+        const finalRes = await fetch(
+          `https://www.virustotal.com/api/v3/urls/${urlId}`,
+          { headers },
+        );
+
+        if (!finalRes.ok) {
+          return null;
+        }
+
+        return await finalRes.json();
+      } catch (error) {
+        console.error("[VT ERROR]", error);
+        return null;
+      }
+    };
 
     // 3. FUNGSI GOOGLE DENGAN DEBUG LENGKAP
-    const fetchGoogleWithTimeout = async (targetUrl: string) => {
+const fetchGoogleWithTimeout = async (targetUrl: string) => {
       console.log(`[GOOGLE] Memulai pengecekan Safe Browsing...`);
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), 7000); // 7 detik biar lebih lega
@@ -393,130 +359,77 @@ export async function POST(req: Request) {
           );
         }
         return data;
-      } catch (err: any) {
-        if (err.name === "AbortError") {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === "AbortError") {
           console.error("[GOOGLE] TIMEOUT: Koneksi ke Google terlalu lama.");
         } else {
-          console.error("[GOOGLE] ERROR:", err.message);
+          console.error(
+            "[GOOGLE] ERROR:",
+            err instanceof Error ? err.message : "Unknown error",
+          );
         }
         return { matches: [] };
       }
     };
 
-    // EKSEKUSI PARALEL
+export async function POST(req: Request) {
+  try {
+    const { url: inputUrl } = await req.json();
+    if (!inputUrl) return NextResponse.json({ error: "URL is required" }, { status: 400 });
+
+    let url = inputUrl.trim();
+
+    // Decoding Base64 (disederhanakan)
+    const base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
+    if (base64Regex.test(url) && url.length > 20) {
+      try {
+        const decoded = atob(url);
+        if (decoded.startsWith("http")) url = decoded;
+      } catch { /* Error diabaikan */ }
+    }
+
+    if (!validateInput(url)) return NextResponse.json({ error: "Invalid URL", finalStatus: "BAHAYA" }, { status: 400 });
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.replace("www.", "");
+    
+    // Scan Paralel
     const [googleData, vtData] = await Promise.all([
       fetchGoogleWithTimeout(url),
       getVirusTotalData(url),
     ]);
 
-    // --- 4. ANALISIS GOOGLE (SINKRONISASI 3 STATUS) ---
-    let googleStatus = "AMAN";
-    if (googleData?.matches?.length > 0) {
-      googleStatus = "BAHAYA";
-    }
-
-    // --- 5. ANALISIS VIRUSTOTAL ---
+    // Analisis Hasil
+    const googleStatus = googleData?.matches?.length > 0 ? "BAHAYA" : "AMAN";
     const vtStats = vtData?.data?.attributes?.last_analysis_stats;
-    let vtStatus = "AMAN";
+    
+    const isWhitelisted = whitelist.some((w) => hostname === w || hostname.endsWith("." + w));
+    const hasRedirect = Array.from(urlObj.searchParams.values()).some((v) => v.includes("http"));
+    const isManipulated = !isWhitelisted && whitelist.some((w) => hostname.includes(w.split(".")[0]));
+    
+    const decodedUrl = decodeURIComponent(url).toLowerCase();
+    const hasSensitiveWord = sensitiveKeywords.some((w) => decodedUrl.includes(w));
 
-    if (!vtStats) {
-      vtStatus = "TIDAK ADA DATA";
-    } else if (vtStats.malicious >= 3) {
-      vtStatus = "BAHAYA";
-    } else if (vtStats.malicious === 2) {
-      vtStatus = "MENCURIGAKAN";
-    } else if (vtStats.malicious === 1) {
-      vtStatus = "PERLU PERHATIAN";
-    }
+    const { score, flags } = calculateTrustScore(googleStatus, vtStats, isWhitelisted, hasRedirect, isManipulated, hasSensitiveWord);
 
-    let trustScore = 100;
-
-    if (googleStatus === "BAHAYA") {
-      trustScore -= 50;
-    }
-
-    if (vtStats) {
-      if (vtStats.malicious >= 3) {
-        trustScore -= 50;
-      } else if (vtStats.malicious === 2) {
-        trustScore -= 20;
-      } else if (vtStats.malicious === 1) {
-        trustScore -= 10;
-      }
-    }
-
-    // --- 6. ARTUP HEURISTIC (URUTAN PRIORITAS BARU) ---
-    let artupHeuristic = [];
-
-    if (!isWhitelisted) {
-      trustScore -= 10;
-      artupHeuristic.push("Domain belum terverifikasi, jangan masukan PIN, OTP, password");
-    }
-
-    if (hasRedirectParam) {
-      trustScore -= 10;
-      artupHeuristic.push("Mengandung parameter redirect");
-    }
-
-    if (isManipulated) {
-      trustScore -= 30;
-      artupHeuristic.push("meniru brand terkenal");
-    }
-
-    const hasSensitiveWord = sensitiveKeywords.some(
-      (word) => cleanUrlText.includes(word) || decodedUrl.includes(word),
-    );
-
-    if (hasSensitiveWord && !isWhitelisted) {
-      trustScore -= 15;
-      artupHeuristic.push("Mengandung kata pancingan");
-    }
-
-    trustScore = Math.max(0, trustScore);
-
-    let finalStatus = "";
-    let userMessage = "";
-
-    if (googleStatus === "BAHAYA" || trustScore < 50) {
-      finalStatus = "BAHAYA";
-
-      userMessage = "Terdapat indikasi phishing, malware, reputasi buruk.";
-    } else if (trustScore < 90) {
-      finalStatus = "HATI-HATI";
-
-      userMessage =
-        "Tidak ditemukan malware, namun jangan memasukkan password, OTP, PIN, atau data sensitif sebelum memastikan identitas situs.";
-    } else if (trustScore < 100) {
-      finalStatus = "AMAN";
-
-      userMessage = "Website terlihat aman, tetap gunakan kewaspadaan standar.";
-    } else {
-      finalStatus = "AMAN TERVERIFIKASI";
-
-      userMessage = "Tidak ditemukan indikasi malware atau phishing.";
-    }
-
+    // Penentuan Status Akhir
+    let finalStatus = "AMAN";
+if (score < 50) {
+  finalStatus = "BAHAYA";
+} else if (score < 90) {
+  finalStatus = "HATI-HATI";
+}
     return NextResponse.json({
-      trustScore,
+      trustScore: score,
       googleStatus,
-      virusTotal: vtStatus,
-      vtDetails: vtStats,
       finalStatus,
-      userMessage,
-
-      details: {
-        domain,
-        rootDomain,
-        isWhitelisted,
-      },
-
-      heuristicFlags: artupHeuristic,
+      heuristicFlags: flags,
+      details: { domain: hostname, isWhitelisted }
     });
-  } catch (error: any) {
-    console.error("CRITICAL ERROR:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error", msg: error.message },
-      { status: 500 },
-    );
+
+  } catch (error) {
+    console.error("[CRITICAL ERROR]", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

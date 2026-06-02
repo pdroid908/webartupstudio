@@ -2,7 +2,6 @@
 //c
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import GameContainer from "./src/components/Game/GameContainer";
 
 // --- INTERFACE UNTUK TYPE SAFETY ---
 interface BaseItem {
@@ -45,17 +44,7 @@ const MY_GAMES: BaseItem[] = [
 ];
 
 const WEB_GAMES: BaseItem[] = [
-  {
-    id: "bird-mystery",
-    title: "Bird Mystery",
-    descFull:
-      "Uji ketangkasanmu dalam petualangan terbang yang adiktif! Kendalikan burung melewati celah pipa yang muncul secara acak dan tak terduga. Jangan biarkan konsentrasimu pecah, raih skor tertinggi, dan buktikan kemampuanmu dengan memuncaki Ranking Dunia melawan pemain lainnya!",
-    tech: "Next.js & Firebase",
-    iconFile: "bird2.png",
-    screenshots: ["bird3.png", "bird1.png", "bird2.png"],
-    isInternal: true, // TAMBAHKAN PENANDA INI
-    route: "/BirdMystery",
-  },
+  
   {
     id: "block-fight-web",
     title: "Cozy Block Fight",
@@ -78,8 +67,7 @@ export default function Home() {
   const [showIframe, setShowIframe] = useState(false);
 
   useEffect(() => {
-    setLoading(false);
-
+  
     const handleFocus = () => setLoading(false);
     window.addEventListener("pageshow", handleFocus);
     window.addEventListener("focus", handleFocus);
@@ -116,13 +104,7 @@ export default function Home() {
     }, 200);
   };
 
-  const handleSecurityClick = () => {
-    // Aktifkan loading HANYA sebelum pindah halaman
 
-    setTimeout(() => {
-      window.location.href = "/Security";
-    }, 400);
-  };
 
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">

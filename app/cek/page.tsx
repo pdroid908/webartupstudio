@@ -50,82 +50,89 @@ export default function ArtupUltimateV4() {
   };
 
   useEffect(() => {
-    const handleVisibility = () => {
-      const status = document.hidden ? "Away (Pindah Tab)" : "Active";
-      setUserStatus(status);
-      addLog(`📱 STATUS: User sedang ${status}`);
-    };
+  // --- 1. Visibility Listener ---
+  const handleVisibility = () => {
+    const status = document.hidden ? "Away (Pindah Tab)" : "Active";
+    setUserStatus(status);
+    addLog(`📱 STATUS: User sedang ${status}`);
+  };
+  document.addEventListener("visibilitychange", handleVisibility);
 
-    document.addEventListener("visibilitychange", handleVisibility);
+  // --- 2. Initial Data Mining ---
+  // Gunakan variabel sementara agar tidak dianggap "set state di tengah proses"
+  const currentBrand = getDeviceBrand();
+  setBrand(currentBrand);
+  addLog(`🔍 DEVICE_ID: ${currentBrand}`);
 
-    // Cleanup agar tidak memory leak
+  // --- 3. Geolocation API ---
+  fetch("https://ipapi.co/json/")
+    .then((res) => res.json())
+    .then((data) => {
+      setSysInfo(data);
+      addLog(`📍 TRACKING: ${data.city}, ${data.country_name} (${data.org})`);
+    })
+    .catch(() => addLog("📍 TRACKING: Failed"));
 
-    // --- 3. INITIAL DATA MINING ---
-    setBrand(getDeviceBrand());
-    addLog(`🔍 DEVICE_ID: ${getDeviceBrand()}`);
-
-    // Geolocation API
-    fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
-      .then((data) => {
-        setSysInfo(data);
-        addLog(`📍 TRACKING: ${data.city}, ${data.country_name} (${data.org})`);
-      });
-
-    // Gyroscope / Motion Sensor
-    const handleMotion = (e: DeviceMotionEvent) => {
-      if (e.accelerationIncludingGravity) {
-        setMotion({
-          x: Math.round(e.accelerationIncludingGravity.x || 0),
-          y: Math.round(e.accelerationIncludingGravity.y || 0),
-        });
-      }
-    };
-    window.addEventListener("devicemotion", handleMotion);
-
-    // Hardware & Network Fingerprinting
-    const conn = (navigator as any).connection || {};
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl");
-    const debug = gl ? gl.getExtension("WEBGL_debug_renderer_info") : null;
-
-    const info = {
-      os: navigator.platform,
-      cores: navigator.hardwareConcurrency || "N/A",
-      ram: (navigator as any).deviceMemory || "N/A",
-      gpu:
-        gl && debug
-          ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL)
-          : "Software Renderer",
-      downlink: conn.downlink || "Unknown",
-      netType: conn.effectiveType || "Unknown",
-      resolution: `${window.screen.width}x${window.screen.height}`,
-    };
-    setHardware(info);
-
-    addLog(`🧠 CPU: ${info.cores} Cores | RAM: ~${info.ram}GB`);
-    addLog(`📶 KONEKSI: ${info.netType} (${info.downlink} Mbps)`);
-
-    // Battery API
-    if ("getBattery" in navigator) {
-      (navigator as any).getBattery().then((b: any) => {
-        const update = () =>
-          setBattery({
-            level: `${Math.round(b.level * 100)}%`,
-            charging: b.charging,
-          });
-        update();
-        b.onlevelchange = update;
-        b.onchargingchange = update;
+  // --- 4. Gyroscope ---
+  const handleMotion = (e: DeviceMotionEvent) => {
+    if (e.accelerationIncludingGravity) {
+      setMotion({
+        x: Math.round(e.accelerationIncludingGravity.x || 0),
+        y: Math.round(e.accelerationIncludingGravity.y || 0),
       });
     }
+  };
+  window.addEventListener("devicemotion", handleMotion);
 
-    addLog("🚀 SYSTEM_STABLE: Monitoring sensors...");
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("devicemotion", handleMotion);
-    }; // <--- Pastikan ada tutup kurung kurawal ini
-  }, []); //
+  // --- 5. Hardware Fingerprinting ---
+  const conn = (navigator as any).connection || {};
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl");
+  const debug = gl ? gl.getExtension("WEBGL_debug_renderer_info") : null;
+
+  const info = {
+    os: navigator.platform,
+    cores: navigator.hardwareConcurrency || "N/A",
+    ram: (navigator as any).deviceMemory || "N/A",
+    gpu: gl && debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "Software Renderer",
+    downlink: conn.downlink || "Unknown",
+    netType: conn.effectiveType || "Unknown",
+    resolution: `${window.screen.width}x${window.screen.height}`,
+  };
+  setHardware(info);
+
+  addLog(`🧠 CPU: ${info.cores} Cores | RAM: ~${info.ram}GB`);
+  addLog(`📶 KONEKSI: ${info.netType} (${info.downlink} Mbps)`);
+
+  // --- 6. Battery API ---
+  let batteryManager: any = null;
+  if ("getBattery" in navigator) {
+    (navigator as any).getBattery().then((b: any) => {
+      batteryManager = b;
+      const update = () =>
+        setBattery({
+          level: `${Math.round(b.level * 100)}%`,
+          charging: b.charging,
+        });
+      update();
+      b.addEventListener("levelchange", update);
+      b.addEventListener("chargingchange", update);
+    });
+  }
+
+  addLog("🚀 SYSTEM_STABLE: Monitoring sensors...");
+
+  // --- CLEANUP ---
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibility);
+    window.removeEventListener("devicemotion", handleMotion);
+    // Cleanup Battery Listener jika ada
+    if (batteryManager) {
+      batteryManager.removeEventListener("levelchange", () => {});
+      batteryManager.removeEventListener("chargingchange", () => {});
+    }
+  };
+}, []);
 
   const handleKeylog = (val: string, type: "email" | "pass") => {
     // 1. Bersihkan karakter < > (Anti-XSS)

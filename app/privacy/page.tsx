@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 export default function PrivacyPage() {
@@ -6,9 +7,9 @@ export default function PrivacyPage() {
       
       {/* Tombol Back */}
       <div className="max-w-4xl mx-auto mb-10">
-        <a href="/" className="text-blue-500 hover:text-blue-400 transition-all font-bold flex items-center gap-2">
+        <Link href="/" className="text-blue-500 hover:text-blue-400 transition-all font-bold flex items-center gap-2">
           <span>←</span> Back to Artup Studio
-        </a>
+        </Link>
       </div>
 
       {/* Konten Privacy Policy */}
@@ -16,13 +17,13 @@ export default function PrivacyPage() {
         <h1 className="text-3xl font-black text-white mb-8 italic tracking-tighter">PRIVACY POLICY</h1>
         
         <p className="mb-6">
-          This privacy policy applies to all applications and services (collectively referred to as <strong>"Applications"</strong>) developed and provided by <strong>Artup Studio</strong> (hereby referred to as "Service Provider") as a Free service. Our services are intended for use on an "AS IS" basis.
+          This privacy policy applies to all applications and services (collectively referred to as <strong>Applications</strong>) developed and provided by <strong>Artup Studio</strong> (hereby referred to as Service Provider) as a Free service. Our services are intended for use on an AS IS basis.
         </p>
 
         <h2 className="text-xl font-bold text-blue-400 mt-10 mb-4 uppercase tracking-wider">Information Collection and Use</h2>
         <p className="mb-4">The Applications collect information when you download and use them. This information may include:</p>
         <ul className="list-disc list-inside space-y-2 ml-4 mb-6">
-          <li>Your device's Internet Protocol address (e.g. IP address)</li>
+          <li>Your devices Internet Protocol address (e.g. IP address)</li>
           <li>The pages of the Application that you visit, the time and date of your visit, the time spent on those pages</li>
           <li>The total time spent on the Application</li>
           <li>The operating system you use on your mobile device</li>
