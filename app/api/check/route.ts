@@ -384,26 +384,28 @@ const fetchGoogleWithTimeout = async (targetUrl: string) => {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { url, token } = body;
+  
+  const { url: rawUrl, token } = body;
   const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      secret: process.env.TURNSTILE_SECRET_KEY, // Ini akan terbaca di sisi server
-      response: token,
-    }),
-  });
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: token,
+      }),
+    });
   const verifyData = await verifyRes.json();
 
   if (!verifyData.success) {
-    return Response.json({ error: "Verifikasi keamanan gagal, bot terdeteksi." }, { status: 401 });
+    return NextResponse.json({ error: "Verifikasi gagal." }, { status: 401 });
   }
+
+  
   try {
-    const { url: inputUrl } = await req.json();
-    if (!inputUrl) return NextResponse.json({ error: "URL is required" }, { status: 400 });
 
-    let url = inputUrl.trim();
-
+    if (!rawUrl) return NextResponse.json({ error: "URL is required" }, { status: 400 });
+    let url = rawUrl.trim();
+    
     // Decoding Base64 (disederhanakan)
     const base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
     if (base64Regex.test(url) && url.length > 20) {
