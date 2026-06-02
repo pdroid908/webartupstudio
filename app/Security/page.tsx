@@ -128,31 +128,29 @@ export default function SecurityPage() {
 />
 
 <div className="mb-6">
-  {/* Kondisi Jika BELUM terverifikasi (Tampilkan Bar + Teks + Widget) */}
+  {/* Kondisi Jika BELUM terverifikasi */}
   {!turnstileToken && (
-    <>
+    <div className="animate-in fade-in duration-500">
       <div className="w-full bg-zinc-800 rounded-full h-2 mb-2 overflow-hidden">
         <div className="h-full bg-red-600 w-1/2 animate-pulse transition-all duration-1000" />
       </div>
-      
       <p className="text-[10px] md:text-[20px] text-center font-bold uppercase tracking-widest text-zinc-500 mb-4">
         🛡️ Sedang memahami mu APAKAH KAMU PUNYA HATI?
       </p>
-
-      <div className="flex justify-center transition-opacity duration-500">
+      <div className="flex justify-center">
         <Turnstile 
           siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
           onSuccess={(token) => setTurnstileToken(token)} 
         />
       </div>
-    </>
+    </div>
   )}
 
-  {/* Kondisi Jika SUDAH terverifikasi (Tampilkan Pesan Sukses saja) */}
+  {/* Kondisi Jika SUDAH terverifikasi (Hanya muncul saat token ada) */}
   {turnstileToken && (
-    <div className="text-center animate-in fade-in zoom-in duration-500">
+    <div className="text-center animate-in fade-in zoom-in duration-500 mb-6">
       <div className="w-full bg-green-500 rounded-full h-2 mb-2" />
-      <p className="text-[10px] md:text-[20px] font-bold uppercase tracking-widest text-green-500 mb-4">
+      <p className="text-[10px] md:text-[20px] font-bold uppercase tracking-widest text-green-500">
         ✅ Ternyata Kamu Masih Punya Hati
       </p>
     </div>
