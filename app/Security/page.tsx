@@ -127,12 +127,32 @@ export default function SecurityPage() {
   className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
 />
 
-{/* --- TAMBAHAN TURNSTILE --- */}
-<div className="mb-4 flex justify-center">
-  <Turnstile 
-    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
-    onSuccess={(token) => setTurnstileToken(token)} 
-  />
+
+<div className="mb-6">
+  {/* Status Bar Container */}
+  <div className="w-full bg-zinc-800 rounded-full h-2 mb-2 overflow-hidden">
+    <div 
+      className={`h-full transition-all duration-1000 ${
+        turnstileToken ? "bg-green-500 w-full" : "bg-red-600 w-1/2 animate-pulse"
+      }`}
+    />
+  </div>
+  
+  {/* Pesan Dinamis */}
+  <p className="text-[10px] md:text-[20px] text-center font-bold uppercase tracking-widest text-zinc-500 mb-4">
+    {turnstileToken 
+      ? "✅ Ternyata Kamu Masih Punya Hati" 
+      : "🛡️ Sedang memahami mu: APAKAH KAMUPUNYA HATI?"
+    }
+  </p>
+
+  {/* Widget Turnstile - Bisa kita bungkus agar rapi */}
+  <div className={`flex justify-center transition-opacity duration-500 ${turnstileToken ? "hidden" : "opacity-100"}`}>
+    <Turnstile 
+      siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
+      onSuccess={(token) => setTurnstileToken(token)} 
+    />
+  </div>
 </div>
 
 <button
