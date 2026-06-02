@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: Lint & Audit
         run: |
           npm run lint
@@ -28,6 +28,9 @@ jobs:
   deploy:
     needs: quality-and-security
     runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+      contents: read
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
@@ -40,8 +43,8 @@ jobs:
         with:
           path: .vercel
           key: ${{ runner.os }}-vercel-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci
-      - run: npx @cloudflare/next-on-pages@1
+      - run: npm ci --ignore-scripts
+      - run: npx @cloudflare/next-on-pages@1 --ignore-scripts
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
