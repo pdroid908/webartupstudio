@@ -5,7 +5,7 @@ on:
   push: {branches: [main]}
 
 jobs:
-  # 1. GABUNGAN SCAN: Menjalankan semua cek secara bersamaan dalam satu job
+  # Job 1: Scan
   quality-and-security:
     runs-on: ubuntu-latest
     steps:
@@ -15,49 +15,38 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm' # Otomatis caching node_modules
-      - run: npm ci --ignore-scripts
-      
+          cache: 'npm'
+      - run: npm ci
       - name: Lint & Audit
         run: |
           npm run lint
           npm audit --audit-level=high
-      
       - name: Gitleaks
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
 
-
-deploy:
+  # Job 2: Deploy (Harus ada di bawah 'jobs:')
+  deploy:
     needs: quality-and-security
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm' # Ini mempercepat 'npm ci' secara signifikan
-
-      # Cache folder .vercel agar proses build next-on-pages tidak selalu mulai dari nol
+          cache: 'npm'
       - name: Cache build output
         uses: actions/cache@v4
         with:
           path: .vercel
           key: ${{ runner.os }}-vercel-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vercel-
-
-      - run: npm ci --ignore-scripts
-      
-      # Build menggunakan command Cloudflare
-      - run: npx @cloudflare/next-on-pages@1 --ignore-scripts
-
+      - run: npm ci
+      - run: npx @cloudflare/next-on-pages@1
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: 'artup' 
+          projectName: 'artup'
           directory: '.vercel/output/static'
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
