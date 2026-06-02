@@ -12,13 +12,13 @@ const nextConfig = {
               "form-action 'self'; " +
               "frame-ancestors 'none'; " +
               "default-src 'self'; " +
-              `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""}; ` +
+              `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""} https://static.cloudflareinsights.com https://challenges.cloudflare.com; ` +
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
               "img-src 'self' data: https://*.googlesyndication.com https://*.google.com; " +
-              "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; " +
+              "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://challenges.cloudflare.com; " +
               "child-src 'self'; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
-              "connect-src 'self' https://safebrowsing.googleapis.com https://www.virustotal.com; " +
+              "connect-src 'self' https://safebrowsing.googleapis.com https://www.virustotal.com https://challenges.cloudflare.com; " +
               "upgrade-insecure-requests;",
           },
           {

@@ -18,7 +18,7 @@ export default function Home() {
     }, 300);
   };
   useEffect(() => {
-    setLoading(false);
+    
 
     const handleFocus = () => setLoading(false);
     window.addEventListener("pageshow", handleFocus);
