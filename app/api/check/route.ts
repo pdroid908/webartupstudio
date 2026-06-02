@@ -205,9 +205,6 @@ const getVirusTotalData = async (targetUrl: string) => {
       };
 
       try {
-        // ====================================================
-        // CEK HASIL YANG SUDAH ADA DULU
-        // ====================================================
 
         const urlId = Buffer.from(cleanUrl)
           .toString("base64")
@@ -238,9 +235,6 @@ const getVirusTotalData = async (targetUrl: string) => {
           }
         }
 
-        // ====================================================
-        // BELUM ADA DATA → KIRIM SCAN BARU
-        // ====================================================
 
         console.log("[VT] Mengirim scan baru...");
 

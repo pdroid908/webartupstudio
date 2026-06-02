@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { SecurityResult } from "@/types";
 import { Turnstile } from "@marsidev/react-turnstile";
-// 1. Tambahkan fungsi ini di atas komponen SecurityPage
+
 const GOOGLE_STATUS_MAP: Record<string, { color: string; label: string }> = {
   BAHAYA: { color: "text-red-500", label: "⚠️ BLACKLISTED" },
   "ADA CELAH": { color: "text-orange-500", label: "❓ BELUM TERVERIFIKASI" },
@@ -15,7 +15,7 @@ const VIRUS_STATUS_MAP: Record<string, { color: string; label: string }> = {
   DEFAULT: { color: "text-green-500", label: "✔️ NO VIRUS" },
 };
 export default function SecurityPage() {
-  const [token, setToken] = useState<string>("");
+  
   const [urlInput, setUrlInput] = useState("");
   const [result, setResult] = useState<SecurityResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,13 +32,14 @@ export default function SecurityPage() {
     return "bg-green-500";
   };
   const messages = [
-    "INITIALIZING ARTUP NEURAL CORE...",
-    "DECRYPTING PACKET OBFUSCATION...",
-    "SCANNING DATABASE REPUTATION...",
-    "EXTRACTING HEURISTIC PATTERNS...",
-    "CALCULATING RISK PROBABILITY...",
-    "FINALIZING SECURITY INTEGRITY...",
-  ];
+  "DISMANTLING SECURITY LAYERS...",
+  "UNPACKING CORE DATA...",
+  "INSPECTING REPUTATION...",
+  "DECONSTRUCTING PATTERNS...",
+  "COMPUTING RISK METRICS...",
+  "FINALIZING SYSTEM CHECK...",
+];
+
   const [statusIndex, setStatusIndex] = useState(0);
   const statusText = loading ? messages[statusIndex] : "SCAN LINK SEKARANG";
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -51,6 +52,8 @@ export default function SecurityPage() {
 
     return () => clearInterval(interval);
   }, [loading]);
+
+  
 
  const handleCekKeamanan = async () => {
     if (!urlInput) return;
@@ -74,6 +77,7 @@ export default function SecurityPage() {
             token: turnstileToken // Kirim token ke backend
         }),
       });
+      
 
       const data: SecurityResult = await response.json();
       setResult(data);
@@ -128,15 +132,14 @@ export default function SecurityPage() {
 />
 
 <div className="mb-6">
-  {/* Kondisi Jika BELUM terverifikasi (Tampilkan Bar + Teks + Widget) */}
   {!turnstileToken && (
-    <>
+    <div className="animate-in fade-in duration-500">
       <div className="w-full bg-zinc-800 rounded-full h-2 mb-2 overflow-hidden">
         <div className="h-full bg-red-600 w-1/2 animate-pulse transition-all duration-1000" />
       </div>
       
       <p className="text-[10px] md:text-[20px] text-center font-bold uppercase tracking-widest text-zinc-500 mb-4">
-        🛡️ Sedang memahami mu APAKAH KAMU PUNYA HATI?
+        🛡️ Please Wait..
       </p>
 
       <div className="flex justify-center transition-opacity duration-500">
@@ -145,16 +148,6 @@ export default function SecurityPage() {
           onSuccess={(token) => setTurnstileToken(token)} 
         />
       </div>
-    </>
-  )}
-
-  {/* Kondisi Jika SUDAH terverifikasi (Tampilkan Pesan Sukses saja) */}
-  {turnstileToken && (
-    <div className="text-center animate-in fade-in zoom-in duration-500">
-      <div className="w-full bg-green-500 rounded-full h-2 mb-2" />
-      <p className="text-[10px] md:text-[20px] font-bold uppercase tracking-widest text-green-500 mb-4">
-        ✅ Ternyata Kamu Masih Punya Hati
-      </p>
     </div>
   )}
 </div>
