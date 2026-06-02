@@ -44,7 +44,7 @@ jobs:
           path: .vercel
           key: ${{ runner.os }}-vercel-${{ hashFiles('**/package-lock.json') }}
       - run: npm ci --ignore-scripts
-      - run: npx @cloudflare/next-on-pages@1 --ignore-scripts
+      - run: npx @cloudflare/next-on-pages@1
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
