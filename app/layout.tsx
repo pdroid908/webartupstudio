@@ -13,12 +13,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "ARTUP STUDIO",
-  description: "HIGH TECH SECURITY SYSTEMS",
-  // 1. ANTAL-CLICKJACKING (Frame Options) via Metadata
-  
-};
+export const metadata = {
+  title: 'Artup Security | Link Scanner & Website Security Checker',
+  description: 'Deteksi link berbahaya, phishing, dan malware secara gratis dengan Artup Security. Cek keamanan website Anda sebelum mengklik.',
+  keywords: 'link scanner, deteksi phishing, keamanan website, cek link aman, anti malware, artup studio',
+}
 
 export default function RootLayout({ children }: { readonly children: React.ReactNode }) {
   return (
