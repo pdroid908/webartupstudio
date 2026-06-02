@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { SecurityResult } from "@/types";
-
+import { Turnstile } from "@marsidev/react-turnstile";
 // 1. Tambahkan fungsi ini di atas komponen SecurityPage
 const GOOGLE_STATUS_MAP: Record<string, { color: string; label: string }> = {
   BAHAYA: { color: "text-red-500", label: "⚠️ BLACKLISTED" },
@@ -15,6 +15,7 @@ const VIRUS_STATUS_MAP: Record<string, { color: string; label: string }> = {
   DEFAULT: { color: "text-green-500", label: "✔️ NO VIRUS" },
 };
 export default function SecurityPage() {
+  const [token, setToken] = useState<string>("");
   const [urlInput, setUrlInput] = useState("");
   const [result, setResult] = useState<SecurityResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,6 +41,7 @@ export default function SecurityPage() {
   ];
   const [statusIndex, setStatusIndex] = useState(0);
   const statusText = loading ? messages[statusIndex] : "SCAN LINK SEKARANG";
+  const [turnstileToken, setTurnstileToken] = useState("");
   useEffect(() => {
     if (!loading) return;
 
@@ -50,10 +52,15 @@ export default function SecurityPage() {
     return () => clearInterval(interval);
   }, [loading]);
 
-  const handleCekKeamanan = async () => {
+ const handleCekKeamanan = async () => {
     if (!urlInput) return;
+    
+    // Validasi tambahan: Cek apakah token sudah ada
+    if (!turnstileToken) {
+        alert("Mohon selesaikan verifikasi keamanan terlebih dahulu.");
+        return;
+    }
 
-    // --- 2. LOGIKA SCAn (Tetap Jalan) ---
     setLoading(true);
     setResult(null);
 
@@ -61,11 +68,17 @@ export default function SecurityPage() {
       const response = await fetch("/api/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: urlInput }),
+        // 2. Masukkan token ke sini
+        body: JSON.stringify({ 
+            url: urlInput,
+            token: turnstileToken // Kirim token ke backend
+        }),
       });
 
       const data: SecurityResult = await response.json();
       setResult(data);
+    } catch (error) {
+        console.error("Gagal melakukan scan:", error);
     } finally {
       setLoading(false);
     }
@@ -107,23 +120,33 @@ export default function SecurityPage() {
 
         <div className="bg-zinc-900/40 p-5 md:p-8 rounded-4xl md:rounded-[2.5rem] border border-zinc-800/50 shadow-2xl mb-8 backdrop-blur-xl">
           <input
-            type="text"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Tempel link web, e-commerce, atau link mencurigakan..."
-            className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
-          />
-          <button
-            onClick={handleCekKeamanan}
-            disabled={loading}
-            className={`w-full py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl tracking-tight transition-all active:scale-95 ${
-              loading
-                ? "bg-zinc-800 text-red-500 cursor-not-allowed animate-pulse"
-                : "bg-red-700 hover:bg-red-600 shadow-[0_10px_40px_rgba(185,28,28,0.2)] text-white"
-            }`}
-          >
-            {loading ? statusText : "LINK / WEBSITE SCANNER"}
-          </button>
+  type="text"
+  value={urlInput}
+  onChange={(e) => setUrlInput(e.target.value)}
+  placeholder="Tempel link web, e-commerce, atau link mencurigakan..."
+  className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
+/>
+
+{/* --- TAMBAHAN TURNSTILE --- */}
+<div className="mb-4 flex justify-center">
+  <Turnstile 
+    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!} 
+    onSuccess={(token) => setTurnstileToken(token)} 
+  />
+</div>
+
+<button
+  onClick={handleCekKeamanan}
+  // Tombol akan disable jika loading ATAU token belum ada (biar user wajib verifikasi)
+  disabled={loading || !turnstileToken} 
+  className={`w-full py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl tracking-tight transition-all active:scale-95 ${
+    (loading || !turnstileToken)
+      ? "bg-zinc-800 text-zinc-600 cursor-not-allowed" // Warna lebih redup saat disabled
+      : "bg-red-700 hover:bg-red-600 shadow-[0_10px_40px_rgba(185,28,28,0.2)] text-white"
+  }`}
+>
+  {loading ? statusText : "LINK / WEBSITE SCANNER"}
+</button>
         </div>
 
         {result &&

@@ -383,6 +383,21 @@ const fetchGoogleWithTimeout = async (targetUrl: string) => {
     };
 
 export async function POST(req: Request) {
+  const body = await req.json();
+  const { url, token } = body;
+  const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      secret: process.env.TURNSTILE_SECRET_KEY, // Ini akan terbaca di sisi server
+      response: token,
+    }),
+  });
+  const verifyData = await verifyRes.json();
+
+  if (!verifyData.success) {
+    return Response.json({ error: "Verifikasi keamanan gagal, bot terdeteksi." }, { status: 401 });
+  }
   try {
     const { url: inputUrl } = await req.json();
     if (!inputUrl) return NextResponse.json({ error: "URL is required" }, { status: 400 });
