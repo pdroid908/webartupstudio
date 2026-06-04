@@ -14,7 +14,7 @@ const nextConfig = {
               "default-src 'self'; " +
               `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""} https://static.cloudflareinsights.com https://challenges.cloudflare.com; ` +
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-              "img-src 'self' data: https://*.googlesyndication.com https://*.google.com; " +
+              "img-src 'self' data: blob: https://*.googlesyndication.com https://*.google.com;" +
               "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://challenges.cloudflare.com; " +
               "child-src 'self'; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
