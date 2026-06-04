@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-
+export const runtime = "edge";
 export default function ImageConverter() {
   const [file, setFile] = useState<File | null>(null);
   const [format, setFormat] = useState("jpeg");

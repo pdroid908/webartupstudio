@@ -228,7 +228,7 @@ export default function Home() {
       <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-20 md:pt-56 min-h-screen">
         <header className="mb-10">
           <h1 className="text-2xl md:text-3xl font-black tracking-tight uppercase italic text-zinc-100">
-            {activeTab === "web" ? "Free tools" : "My Games"}
+            {activeTab === "web" ? "Free tools" : "Perbaikan"}
           </h1>
           <div
             className={`h-1.5 w-12 mt-2 rounded-full ${activeTab === "web" ? "bg-purple-600" : "bg-blue-600"}`}
