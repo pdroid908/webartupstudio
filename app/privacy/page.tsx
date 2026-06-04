@@ -5,10 +5,10 @@ export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-300 font-sans p-8 md:p-20">
       
-      {/* Tombol Back */}
+      {/* Tombol Bacsfasfk */}
       <div className="max-w-4xl mx-auto mb-10">
         <Link href="/" className="text-blue-500 hover:text-blue-400 transition-all font-bold flex items-center gap-2">
-          <span>←</span> Back to Artup Studio
+          <span>← </span> Back to Artup Studio
         </Link>
       </div>
 
