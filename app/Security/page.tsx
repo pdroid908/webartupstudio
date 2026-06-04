@@ -30,7 +30,7 @@ export default function SecurityPage() {
     return "bg-green-500";
   };
   const messages = [
-    "INITIALIZING ARTUP NEURAL CORE...",
+    "Please Wait...",
     "DECRYPTING PACKET OBFUSCATION...",
     "SCANNING DATABASE REPUTATION...",
     "EXTRACTING HEURISTIC PATTERNS...",
@@ -76,22 +76,6 @@ export default function SecurityPage() {
 
       <aside className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-auto md:top-1/2 md:right-4 md:left-auto z-50 flex flex-row md:flex-col gap-3 bg-zinc-900/80 md:bg-transparent p-3 md:p-0 rounded-full md:rounded-none border border-zinc-800 md:border-none backdrop-blur-md md:backdrop-blur-none shadow-2xl md:shadow-none">
         <a
-          href="https://humanizer-638.pages.dev/"
-          target="_blank"
-          rel="noopener noreferrer" // Tambahkan ini agar aman
-          className="p-3 bg-blue-700 rounded-full hover:scale-110 transition-all text-xs font-black"
-        >
-          Humanizer AI
-        </a>
-        <a
-          href="https://converter-artup.pages.dev/"
-          target="_blank"
-          rel="noopener noreferrer" // Tambahkan ini agar aman
-          className="p-3 bg-pink-700 rounded-full hover:scale-110 transition-all text-xs font-black"
-        >
-          foto converter
-        </a>
-        <a
           href="https://www.tiktok.com/@artupstd?lang=id-ID"
           target="_blank"
           rel="noopener noreferrer" // Tambahkan ini agar aman
@@ -106,8 +90,11 @@ export default function SecurityPage() {
           <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-blue-600 mb-3 drop-shadow-[0_0_15px_rgba(37,99,235,0.3)] uppercase">
             🛡️ ARTUP SECURITY
           </h1>
-          <p className="text-zinc-500 text-[10px] md:text-[10px] font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] px-4">
-            Multi-Engine Real-time Verification System
+          <p className="flex flex-wrap items-center gap-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 md:tracking-[0.4em]">
+            <span>Multi-Engine Real-time Verification System</span>
+            <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-green-500 shadow-sm border border-green-500/20">
+              95% Accuracy
+            </span>
           </p>
         </header>
 
@@ -116,7 +103,7 @@ export default function SecurityPage() {
             type="text"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Tempel link bank, e-commerce, atau link mencurigakan..."
+            placeholder="Tempel link / url untuk di check"
             className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
           />
           <button
@@ -203,16 +190,14 @@ export default function SecurityPage() {
                         ARTUP LOGIC:
                       </span>
                       {result.heuristicFlags?.length > 0 ? (
-                        result.heuristicFlags.map(
-                          (flag: string) => (
-                            <span
-                              key={flag} // Menggunakan string flag itu sendiri sebagai key yang unik
-                              className="text-orange-400 text-xs font-bold"
-                            >
-                              ⚠️ {flag}
-                            </span>
-                          ),
-                        )
+                        result.heuristicFlags.map((flag: string) => (
+                          <span
+                            key={flag} // Menggunakan string flag itu sendiri sebagai key yang unik
+                            className="text-orange-400 text-xs font-bold"
+                          >
+                            ⚠️ {flag}
+                          </span>
+                        ))
                       ) : (
                         <span className="text-green-500 text-xs font-bold">
                           🛡️ Tidak ada indikator manipulasi
@@ -258,7 +243,7 @@ export default function SecurityPage() {
 
       <footer className="mt-20 text-center pb-10">
         <div>
-          <p className="text-[12px] md:text-[20px] text-zinc-800 font-black uppercase tracking-[0.5em]">
+          <p className="text-[12px] md:text-[20px] text-zinc-500 font-black uppercase tracking-[0.5em]">
             ARTUP STUDIO Security Division &copy; 2026
           </p>
         </div>

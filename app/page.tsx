@@ -177,25 +177,6 @@ export default function Home() {
                 </div>
               </button>
 
-              {/* --- TOMBOL AUTO FARMING --- */}
-              <Link
-                href="/cek"
-                onClick={() => {
-                  setLoading(true);
-                  setTimeout(() => setLoading(false), 1000);
-                }}
-                className="flex-shrink-0 group relative h-12 w-[160px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
-              >
-                <div className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#0f172a_0%,#3b82f6_50%,#0f172a_100%)] group-hover:animate-[spin_2s_linear_infinite] group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#06b6d4_0%,#3b82f6_50%,#06b6d4_100%)]" />
-                <div className="hover:bg-blue-600 flex h-full w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-5 z-10">
-                  <span className="text-blue-500">🖥️</span>
-                  <span className="font-black text-[10px] uppercase tracking-[0.1em] text-blue-200/70">
-                    Education what web get you
-                  </span>
-                </div>
-                <div className="absolute inset-0 opacity-10 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10 group-hover:bg-cyan-500/30 blur-2xl z-0" />
-              </Link>
-
               {/* --- TOMBOL LINK SCANNER --- */}
               <Link
                 href="/Security"
