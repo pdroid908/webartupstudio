@@ -1,70 +1,72 @@
+
 import { NextResponse } from "next/server";
-import sharp from "sharp";
 
 export async function POST(req: Request) {
   try {
+    // Ambil form data dari frontend
     const formData = await req.formData();
-    const file = formData.get("file") as File | null;
-    
-    // 1. Validasi keberadaan file
-    if (!file) {
-      return NextResponse.json({ error: "File tidak ditemukan" }, { status: 400 });
-    }
 
-    const format = (formData.get("format") as string) || "jpeg";
-    const quality = parseInt(formData.get("quality") as string) || 80;
+    // URL backend Railway kamu
+    const BACKEND_URL =
+      "https://NAMA-BACKEND-KAMU.up.railway.app/convert";
 
-    // 2. Validasi Tipe File (MIME Type)
-    // Jangan percaya extension, periksa MIME type langsung
-    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowedMimeTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Tipe file tidak diizinkan" }, { status: 400 });
-    }
-
-    // 3. Validasi Ukuran File (Hard limit 20MB)
-    const MAX_SIZE = 20 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: "File terlalu besar" }, { status: 413 });
-    }
-
-    const arrayBuffer = await file.arrayBuffer();
-    
-    // 4. SHARP SECURITY: Batasi dimensi untuk mencegah Memory Bomb
-    // Gambar yang sangat besar bisa membuat server crash karena kehabisan RAM
-    let pipeline = sharp(Buffer.from(arrayBuffer), {
-      limitInputPixels: 100000000, // Maks 100MP, cegah serangan file piksel raksasa
-      failOn: 'error' // Jangan proses jika file korup
+    // Kirim ke backend converter
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      body: formData,
     });
 
-    // 5. Normalisasi Metadata (Hapus EXIF agar aman & privasi terjaga)
-    pipeline = pipeline.rotate().withMetadata();
+    // Kalau backend error
+    if (!response.ok) {
+      const errorData = await response.json();
 
-    const allowedFormats = ["jpeg", "png", "webp"];
-    if (!allowedFormats.includes(format)) {
-      return NextResponse.json({ error: "Format tidak didukung" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            errorData.error ||
+            "Gagal convert gambar",
+        },
+        {
+          status: response.status,
+        }
+      );
     }
 
-    // Pemrosesan Gambar
-    if (format === "jpeg") pipeline = pipeline.jpeg({ quality, mozjpeg: true });
-    else if (format === "webp") pipeline = pipeline.webp({ quality });
-    else if (format === "png") {
-      pipeline = pipeline.png({
-        palette: true,
-        quality: 70, // Gunakan dynamic quality dari user
-        compressionLevel: 9,
-      });
-    }
+    // Ambil hasil gambar
+    const arrayBuffer =
+      await response.arrayBuffer();
 
-    const outputBuffer = await pipeline.toBuffer();
-    
-    return new NextResponse(new Uint8Array(outputBuffer), {
-      headers: { 
-        "Content-Type": `image/${format}`,
-        "Cache-Control": "no-store" // Jangan simpan di cache browser
-      },
-    });
+    // Ambil content type
+    const contentType =
+      response.headers.get(
+        "content-type"
+      ) || "image/jpeg";
+
+    // Balikin ke frontend
+    return new NextResponse(
+      new Uint8Array(arrayBuffer),
+      {
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+
   } catch (error) {
-    console.error("Conversion error:", error);
-    return NextResponse.json({ error: "Gagal memproses gambar" }, { status: 500 });
+    console.error(
+      "Proxy convert error:",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        error:
+          "Server gagal memproses request",
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }
