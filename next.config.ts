@@ -1,6 +1,6 @@
 const isDev = process.env.NODE_ENV !== 'production';
 const nextConfig = {
-  output: 'standalone',
+  output: "standalone",
   async headers() {
     return [
       {
