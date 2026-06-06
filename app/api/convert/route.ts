@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     // URL backend Railway kamu
     const BACKEND_URL =
-      "backendconverter-production.up.railway.app";
+      "https://backendconverter-production.up.railway.app/convert";
 
     // Kirim ke backend converter
     const response = await fetch(BACKEND_URL, {
