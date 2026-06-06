@@ -2,7 +2,7 @@
 //c
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-
+import Image from 'next/image';
 // --- INTERFACE UNTUK TYPE SAFETY ---
 interface BaseItem {
   id: string;
@@ -21,7 +21,7 @@ interface BaseItem {
 const MY_GAMES: BaseItem[] = [
   {
     id: "pixel-universe",
-    title: "Pixel Universe",
+    title: "Analisis Big Data",
    tech: "Android",
     link: "https://drive.google.com/file/d/1297vtnwaJKCdRf2u6ftLAb-Tjy2CtoqY/view?usp=sharing",
    
@@ -30,7 +30,7 @@ const MY_GAMES: BaseItem[] = [
   },
   {
     id: "block-fight",
-    title: "Cozy Block Fight",
+    title: "Automation Chats",
     tech: "Android",
     link: "https://drive.google.com/file/d/16gjJGQsM72Roj19gAV1Gmw5kJ-B_Vt_o/view?usp=sharing",
     
@@ -94,15 +94,17 @@ export default function Home() {
       
       {/* --- BACKGROUND --- */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <img
-          src="bgrun.png"
-          alt="Background"
-          className="w-full h-full object-cover object-center opacity-100 transition-opacity duration-1000"
-        />
+  <Image
+    src="/bgrun.png" // Tambahkan tanda slash di depan jika file di folder 'public'
+    alt="Background"
+    fill // Menggantikan w-full h-full
+    className="object-cover object-center opacity-100 transition-opacity duration-1000"
+    priority // Karena ini background di awal, tambahkan priority agar cepat muncul
+  />
 
-        {/* Overlay agar teks tetap terbaca */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-950"></div>
-      </div>
+  {/* Overlay agar teks tetap terbaca */}
+  <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-950"></div>
+</div>
 
       {/* --- AUDIO TOGGLE --- */}
       {/* --- SIDEBAR --- */}
@@ -156,7 +158,7 @@ export default function Home() {
                 <div
                   className={`flex h-full w-full items-center justify-center gap-3 rounded-2xl px-5 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-300 z-10 ${activeTab === "games" ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-2 border-blue-400" : "bg-slate-950 text-slate-400 hover:text-white hover:bg-blue-600 "}`}
                 >
-                  <span className="text-sm">🎮</span> App Games
+                  <span className="text-sm">Premium Tools</span> 
                 </div>
               </button>
 
@@ -228,7 +230,7 @@ export default function Home() {
       <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-20 md:pt-56 min-h-screen">
         <header className="mb-10">
           <h1 className="text-2xl md:text-3xl font-black tracking-tight uppercase italic text-zinc-100">
-            {activeTab === "web" ? "Free tools" : "Perbaikan"}
+            {activeTab === "web" ? "Free tools" : "masih Perbaikan"}
           </h1>
           <div
             className={`h-1.5 w-12 mt-2 rounded-full ${activeTab === "web" ? "bg-purple-600" : "bg-blue-600"}`}

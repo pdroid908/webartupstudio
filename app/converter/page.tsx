@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import Image from 'next/image';
 export default function ImageConverter() {
   const [file, setFile] = useState<File | null>(null);
   const [format, setFormat] = useState("jpeg");
@@ -38,8 +39,11 @@ export default function ImageConverter() {
     const handler = setTimeout(() => {
       renderPreview(sliderValue, format, file);
     }, 500);
-    return () => clearTimeout(handler);
-  }, [sliderValue, format, file, renderPreview]);
+    return () => {
+    clearTimeout(handler);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+  };
+  }, [sliderValue, format, file, renderPreview, previewUrl]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -119,17 +123,25 @@ export default function ImageConverter() {
 
         {/* Preview Area */}
         <div className="relative flex items-center justify-center p-4 border border-white/10 rounded-2xl bg-black/20 min-h-[200px]">
-          {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-10 rounded-2xl">
-              <div className="h-6 w-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
-          {previewUrl ? (
-            <img src={previewUrl} className="max-w-full max-h-[250px] object-contain rounded-lg shadow-2xl" alt="preview" />
-          ) : (
-            <span className="text-zinc-500 italic text-sm">Preview akan muncul di sini</span>
-          )}
-        </div>
+  {isLoading && (
+    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-10 rounded-2xl">
+      <div className="h-6 w-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  )}
+  
+  {previewUrl ? (
+    <Image 
+      src={previewUrl} 
+      alt="preview" 
+      width={400} 
+      height={250} 
+      className="max-w-full max-h-[250px] object-contain rounded-lg shadow-2xl" 
+      unoptimized // PENTING: Wajib ditambahkan untuk blob URL
+    />
+  ) : (
+    <span className="text-zinc-500 italic text-sm">Preview akan muncul di sini</span>
+  )}
+</div>
 
         {/* Download Button - Lebih berani */}
         <button 
