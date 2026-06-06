@@ -165,13 +165,6 @@ export default function Home() {
 
             </nav>
 
-            <a
-              href="https://wa.me/6281328343908"
-              target="_blank"
-              className="w-full px-4 py-3 rounded-xl font-bold text-[10px] transition-all bg-green-600/10 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white flex items-center justify-center gap-2 mb-6"
-            >
-              wa: jasa buat web / app / games murah dan aman
-            </a>
 
             {/* KONTAK ME */}
             <div className="flex flex-col gap-2 mb-10">

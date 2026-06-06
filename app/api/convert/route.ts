@@ -1,72 +1,36 @@
-
 import { NextResponse } from "next/server";
 export const runtime = 'edge';
+
 export async function POST(req: Request) {
   try {
-    // Ambil form data dari frontend
     const formData = await req.formData();
+    // Cek apakah request ini untuk 'estimasi' atau 'convert'
+    const isEstimate = req.url.includes("?type=estimate");
+    
+    // Sesuaikan URL backend
+    const endpoint = isEstimate ? "/estimate" : "/convert";
+    const BACKEND_URL = `https://backendconverter-production.up.railway.app${endpoint}`;
 
-    // URL backend Railway kamu
-    const BACKEND_URL =
-      "https://backendconverter-production.up.railway.app/convert";
-
-    // Kirim ke backend converter
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       body: formData,
     });
 
-    // Kalau backend error
-    if (!response.ok) {
-      const errorData = await response.json();
+    if (!response.ok) return NextResponse.json({ error: "Backend error" }, { status: 500 });
 
-      return NextResponse.json(
-        {
-          error:
-            errorData.error ||
-            "Gagal convert gambar",
-        },
-        {
-          status: response.status,
-        }
-      );
-    }
+    // Jika estimasi, kembalikan JSON
+    if (isEstimate) {
+      const data = await response.json();
+      return NextResponse.json(data);
+    } 
+    
+    // Jika convert, kembalikan File Gambar
+    const arrayBuffer = await response.arrayBuffer();
+    return new NextResponse(new Uint8Array(arrayBuffer), {
+      headers: { "Content-Type": response.headers.get("content-type") || "image/jpeg" }
+    });
 
-    // Ambil hasil gambar
-    const arrayBuffer =
-      await response.arrayBuffer();
-
-    // Ambil content type
-    const contentType =
-      response.headers.get(
-        "content-type"
-      ) || "image/jpeg";
-
-    // Balikin ke frontend
-    return new NextResponse(
-      new Uint8Array(arrayBuffer),
-      {
-        headers: {
-          "Content-Type": contentType,
-          "Cache-Control": "no-store",
-        },
-      }
-    );
-
-  } catch (error) {
-    console.error(
-      "Proxy convert error:",
-      error
-    );
-
-    return NextResponse.json(
-      {
-        error:
-          "Server gagal memproses request",
-      },
-      {
-        status: 500,
-      }
-    );
+  } catch {
+    return NextResponse.json({ error: "Proxy error" }, { status: 500 });
   }
 }
