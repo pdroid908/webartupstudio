@@ -39,11 +39,8 @@ export default function ImageConverter() {
     const handler = setTimeout(() => {
       renderPreview(sliderValue, format, file);
     }, 500);
-    return () => {
-    clearTimeout(handler);
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-  };
-  }, [sliderValue, format, file, renderPreview, previewUrl]);
+    return () => clearTimeout(handler);
+  }, [sliderValue, format, file, renderPreview]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
