@@ -1,253 +1,170 @@
-"use client";
-import { useState, useEffect } from "react";
-import { SecurityResult } from "@/types";
-// 1. Tambahkan fungsi ini di atas komponen SecurityPage
-const GOOGLE_STATUS_MAP: Record<string, { color: string; label: string }> = {
-  BAHAYA: { color: "text-red-500", label: "⚠️ BLACKLISTED" },
-  "ADA CELAH": { color: "text-orange-500", label: "❓ BELUM TERVERIFIKASI" },
-  DEFAULT: { color: "text-green-500", label: "✔️ VERIFIED" },
+import type { Metadata } from "next";
+import Scanner from "./Scanner";
+
+export const metadata: Metadata = {
+  title: "Website Security Scanner Online Gratis | artup Studio",
+
+  description:
+    "Scanner keamanan website online gratis untuk mendeteksi phishing, malware, scam, dan website berbahaya secara cepat menggunakan multi-engine security verification.",
+
+  keywords: [
+    "website security scanner",
+    "scan link phishing",
+    "cek website aman",
+    "url scanner",
+    "phishing checker",
+    "website malware scanner",
+    "scan url online",
+    "website checker",
+    "security scanner online",
+    "link safety checker",
+    "website trust checker",
+    "cek link scam",
+  ],
+
+  authors: [{ name: "artup Studio" }],
+
+  creator: "artup Studio",
+
+  publisher: "artup Studio",
+
+  metadataBase: new URL("https://webartupstudio.pages.dev"),
+
+  alternates: {
+    canonical: "https://webartupstudio.pages.dev/Security",
+  },
+
+  openGraph: {
+    title: "Website Security Scanner Online",
+
+    description:
+      "Cek keamanan website dan URL secara online untuk mendeteksi phishing, malware, scam, dan ancaman keamanan lainnya.",
+
+    url: "https://webartupstudio.pages.dev/Security",
+
+    siteName: "artup Studio",
+
+    locale: "id_ID",
+
+    type: "website",
+
+    images: [
+      {
+        url: "/og-security.png",
+        width: 1200,
+        height: 630,
+        alt: "Website Security Scanner",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+
+    title: "Website Security Scanner Online",
+
+    description:
+      "Scanner keamanan URL online cepat dan aman berbasis multi-engine verification.",
+
+    images: ["/og-security.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
-const VIRUS_STATUS_MAP: Record<string, { color: string; label: string }> = {
-  BAHAYA: { color: "text-red-500", label: "⚠️ DETECTED" }, // Label dinamis nanti kita handle
-  "TIDAK ADA DATA": { color: "text-orange-500", label: "NO RECORD" },
-  DEFAULT: { color: "text-green-500", label: "✔️ NO VIRUS" },
-};
-export default function SecurityPage() {
-  const [urlInput, setUrlInput] = useState("");
-  const [result, setResult] = useState<SecurityResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const getGoogle = result
-    ? GOOGLE_STATUS_MAP[result.googleStatus] || GOOGLE_STATUS_MAP.DEFAULT
-    : GOOGLE_STATUS_MAP.DEFAULT;
-
-  const getVirus = result
-    ? VIRUS_STATUS_MAP[result.virusTotal] || VIRUS_STATUS_MAP.DEFAULT
-    : VIRUS_STATUS_MAP.DEFAULT;
-  const getTrustColor = (score: number) => {
-    if (score < 50) return "bg-red-500";
-    if (score < 90) return "bg-orange-500";
-    return "bg-green-500";
-  };
-  const messages = [
-    "Please Wait...",
-    "DECRYPTING PACKET OBFUSCATION...",
-    "SCANNING DATABASE REPUTATION...",
-    "EXTRACTING HEURISTIC PATTERNS...",
-    "CALCULATING RISK PROBABILITY...",
-    "FINALIZING SECURITY INTEGRITY...",
-  ];
-  const [statusIndex, setStatusIndex] = useState(0);
-  const statusText = loading ? messages[statusIndex] : "SCAN LINK SEKARANG";
-  useEffect(() => {
-    if (!loading) return;
-
-    const interval = setInterval(() => {
-      setStatusIndex((prev) => (prev + 1) % messages.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [loading, messages.length]);
-
-  const handleCekKeamanan = async () => {
-    if (!urlInput) return;
-
-    // --- 2. LOGIKA SCAn (Tetap Jalan) ---
-    setLoading(true);
-    setResult(null);
-
-    try {
-      const response = await fetch("/api/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: urlInput }),
-      });
-
-      const data: SecurityResult = await response.json();
-      setResult(data);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function Page() {
   return (
-    <div className="min-h-screen bg-black text-white p-4 md:p-10 font-sans selection:bg-red-600/40 relative overflow-x-hidden">
-      {/* --- SIDEBAR/DOCK MEDSOS (Responsive) --- */}
+    <>
+      <Scanner />
 
-      <aside className="fixed bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-auto md:top-1/2 md:right-4 md:left-auto z-50 flex flex-row md:flex-col gap-3 bg-zinc-900/80 md:bg-transparent p-3 md:p-0 rounded-full md:rounded-none border border-zinc-800 md:border-none backdrop-blur-md md:backdrop-blur-none shadow-2xl md:shadow-none">
-        <a
-          href="https://www.tiktok.com/@artupstd?lang=id-ID"
-          target="_blank"
-          rel="noopener noreferrer" // Tambahkan ini agar aman
-          className=" p-3 bg-red-600 rounded-full hover:scale-110 transition-all text-xs font-black"
-        >
-          My TikTok
-        </a>
-      </aside>
+      {/* SEO CONTENT */}
+      <section className="max-w-4xl mx-auto px-4 py-20 text-zinc-300">
 
-      <div className="max-w-2xl mx-auto">
-        <header className="text-center mb-8 md:mb-12">
-          <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-blue-600 mb-3 drop-shadow-[0_0_15px_rgba(37,99,235,0.3)] uppercase">
-            🛡️ ARTUP SECURITY
-          </h1>
-          <p className="flex flex-wrap items-center gap-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 md:tracking-[0.4em]">
-            <span>Multi-Engine Real-time Verification System</span>
-            <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-green-500 shadow-sm border border-green-500/20">
-              95% Accuracy
-            </span>
-          </p>
-        </header>
+        <h2 className="text-3xl font-black mb-6 text-white">
+          Website Security Scanner Online
+        </h2>
 
-        <div className="bg-zinc-900/40 p-5 md:p-8 rounded-4xl md:rounded-[2.5rem] border border-zinc-800/50 shadow-2xl mb-8 backdrop-blur-xl">
-          <input
-            type="text"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Tempel link / url untuk di check"
-            className="w-full p-4 md:p-5 bg-black/60 border border-zinc-800 rounded-2xl mb-4 focus:ring-2 focus:ring-red-600 outline-none transition-all font-medium text-zinc-300 placeholder:text-zinc-700 text-sm md:text-base"
-          />
-          <button
-            onClick={handleCekKeamanan}
-            disabled={loading}
-            className={`w-full py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl tracking-tight transition-all active:scale-95 ${
-              loading
-                ? "bg-zinc-800 text-red-500 cursor-not-allowed animate-pulse"
-                : "bg-red-700 hover:bg-red-600 shadow-[0_10px_40px_rgba(185,28,28,0.2)] text-white"
-            }`}
-          >
-            {loading ? statusText : "SCAN NOW"}
-          </button>
-        </div>
+        <p className="mb-4 leading-relaxed">
+          Tool security scanner ini membantu memeriksa keamanan website,
+          link, dan URL secara online untuk mendeteksi phishing,
+          malware, scam, serta aktivitas mencurigakan lainnya.
+        </p>
 
-        {result &&
-          !result.error &&
-          (() => {
-            // 1. Ambil status yang pasti ada
-            const status = result.finalStatus || "AMAN";
+        <p className="mb-4 leading-relaxed">
+          Sistem menggunakan multi-engine verification dan analisis
+          heuristic untuk memberikan hasil pemeriksaan yang cepat
+          dan akurat.
+        </p>
 
-            const getContainerStyles = (s: string) => {
-              switch (s) {
-                case "BAHAYA":
-                  return "bg-red-950/80 border-red-600 shadow-[0_0_60px_rgba(220,38,38,0.2)]";
-                case "HATI-HATI":
-                  return "bg-orange-950/80 border-orange-600 shadow-[0_0_40px_rgba(249,115,22,0.15)]";
-                default:
-                  return "bg-zinc-900/90 border-green-600 shadow-[0_0_40px_rgba(34,197,94,0.15)]";
-              }
-            };
+        <p className="mb-10 leading-relaxed">
+          Cocok digunakan untuk memeriksa keamanan link sebelum
+          membuka website, login akun, atau mengunduh file dari internet.
+        </p>
 
-            const getHeaderText = (s: string) => {
-              switch (s) {
-                case "BAHAYA":
-                  return "🚨 WEBSITE BERBAHAYA";
-                case "HATI-HATI":
-                  return "⚠️ PERLU KEWASPADAAN";
-                case "AMAN":
-                  return "✅ WEBSITE AMAN";
-                default:
-                  return "🛡️ AMAN TERVERIFIKASI";
-              }
-            };
+        <h3 className="text-2xl font-bold text-white mb-4">
+          Fitur Utama
+        </h3>
 
-            return (
-              <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                <div
-                  className={`p-6 md:p-10 rounded-[2.5rem] border-2 md:border-4 transition-all duration-700 shadow-2xl ${getContainerStyles(status)}`}
-                >
-                  <h2 className="text-2xl md:text-4xl font-black italic mb-6 md:mb-10 leading-tight uppercase tracking-tighter text-center">
-                    {getHeaderText(status)}
-                  </h2>
+        <ul className="list-disc pl-6 space-y-3 mb-10">
+          <li>Scan URL dan website online</li>
+          <li>Deteksi phishing dan scam</li>
+          <li>Analisis malware website</li>
+          <li>Trust score keamanan website</li>
+          <li>Multi-engine verification system</li>
+          <li>Gratis dan cepat digunakan</li>
+        </ul>
 
-                  <div className="bg-black/60 backdrop-blur-md p-5 md:p-7 rounded-3xl space-y-5 border border-white/5">
-                    {/* GLOBAL ENGINE */}
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
-                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                        GLOBAL ENGINE:
-                      </span>
-                      <span
-                        className={`font-black tracking-widest text-xs md:text-sm ${getGoogle.color}`}
-                      >
-                        {getGoogle.label}
-                      </span>
-                    </div>
+        <h3 className="text-2xl font-bold text-white mb-4">
+          FAQ
+        </h3>
 
-                    {/* VIRUS ENGINE */}
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-1 border-b border-white/5 pb-4">
-                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                        VIRUS ENGINE:
-                      </span>
-                      <span
-                        className={`font-black tracking-widest text-xs md:text-sm ${getVirus.color}`}
-                      >
-                        {result.virusTotal === "BAHAYA"
-                          ? `⚠️ DETECTED (${result.vtDetails?.malicious || 0} Engines)`
-                          : getVirus.label}
-                      </span>
-                    </div>
-                    {/* ARTUP LOGIC */}
-                    <div className="flex flex-col gap-2">
-                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                        ARTUP LOGIC:
-                      </span>
-                      {result.heuristicFlags?.length > 0 ? (
-                        result.heuristicFlags.map((flag: string) => (
-                          <span
-                            key={flag} // Menggunakan string flag itu sendiri sebagai key yang unik
-                            className="text-orange-400 text-xs font-bold"
-                          >
-                            ⚠️ {flag}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-green-500 text-xs font-bold">
-                          🛡️ Tidak ada indikator manipulasi
-                        </span>
-                      )}
-                    </div>
+        <div className="space-y-6">
 
-                    {/* TRUST SCORE */}
-                    <div className="border-b border-white/5 pb-4">
-                      <span className="text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
-                        TRUST SCORE
-                      </span>
-                      <div className="mt-2">
-                        <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
-                          <div
-                            style={{ width: `${result.trustScore}%` }}
-                            className={`h-full ${getTrustColor(result.trustScore)}`}
-                          />
-                        </div>
-                        <p className="mt-2 font-black">
-                          {result.trustScore}/100
-                        </p>
-                      </div>
-                    </div>
+          <div>
+            <h4 className="font-bold text-white mb-2">
+              Apakah scanner ini gratis?
+            </h4>
 
-                    {/* MESSAGE */}
-                    <div className="mt-8 text-center px-2">
-                      <p className="font-black text-[10px] md:text-xs uppercase tracking-widest leading-relaxed opacity-90 text-zinc-200">
-                        {result.userMessage}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-        {result?.error && (
-          <div className="p-5 bg-red-600/10 border border-red-600/50 rounded-2xl text-center text-red-500 text-xs font-bold uppercase tracking-widest animate-bounce">
-            {result.error}
+            <p>
+              Ya, website security scanner ini dapat digunakan gratis
+              untuk memeriksa keamanan link dan website.
+            </p>
           </div>
-        )}
-      </div>
 
-      <footer className="mt-20 text-center pb-10">
-        <div>
-          <p className="text-[12px] md:text-[20px] text-zinc-500 font-black uppercase tracking-[0.5em]">
-            ARTUP STUDIO Security Division &copy; 2026
-          </p>
+          <div>
+            <h4 className="font-bold text-white mb-2">
+              Ancaman apa saja yang bisa dideteksi?
+            </h4>
+
+            <p>
+              Sistem dapat membantu mendeteksi phishing, malware,
+              scam, fake login page, dan website mencurigakan lainnya.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-bold text-white mb-2">
+              Apakah data URL disimpan?
+            </h4>
+
+            <p>
+              Pemeriksaan dilakukan secara aman dan sistem tidak
+              menyimpan data sensitif pengguna secara permanen.
+            </p>
+          </div>
+
         </div>
-      </footer>
-    </div>
+      </section>
+    </>
   );
 }
