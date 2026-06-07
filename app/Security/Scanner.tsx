@@ -29,7 +29,7 @@ export default function SecurityPage() {
       return {
         text: "text-emerald-300",
         bg: "bg-emerald-500",
-        border: "border-emerald-500/20",
+        border: "border-emerald-800",
         glow: "shadow-[0_0_40px_rgba(16,185,129,0.25)]",
       };
     }
@@ -146,27 +146,26 @@ export default function SecurityPage() {
   const trustUI = getTrustColor(result?.trustScore || 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#0f172a] to-slate-900 text-white relative overflow-hidden">
+    <div className="min-h-screen bg-slate-900 text-white relative overflow-hidden isolate">
       {/* Background Glow */}
-      <div className="absolute top-[-200px] left-[-150px] w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-[-150px] right-[-100px] w-[350px] h-[350px] bg-blue-500/10 rounded-full blur-3xl" />
+      <div className="absolute top-[-200px] left-[-150px] w-[400px] h-[400px] bg-cyan-900 rounded-full opacity-20 blur-3xl" />
 
+<div className="absolute bottom-[-150px] right-[-100px] w-[350px] h-[350px] bg-blue-900 rounded-full opacity-20 blur-3xl" />
       {/* SOCIAL */}
       <aside className="fixed bottom-5 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 z-50">
         <a
           href="https://www.tiktok.com/@artupstd?lang=id-ID"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10 hover:bg-cyan-500 hover:scale-105 transition-all text-sm font-bold shadow-xl"
-        >
+         className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-500 border border-slate-700 hover:bg-cyan-500 hover:scale-105 transition-all text-sm font-bold shadow-xl" >
           MY TikTok
         </a>
       </aside>
 
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <div className="relative z-10 max-w-3xl mx-auto px-4 py-10">
         {/* HEADER */}
         <header className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[11px] uppercase tracking-[0.2em] font-bold mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-cyan-950 border border-cyan-800 text-cyan-300 text-[11px] uppercase tracking-[0.2em] font-bold mb-5">
             AI Security Scanner
           </div>
 
@@ -182,12 +181,12 @@ export default function SecurityPage() {
           </p>
 
           <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-bold">
+            <span className="px-3 py-1 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-300 text-xs font-bold">
               Real-time Scan
             </span>
 
             <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-bold">
-              Multi Engine
+              Accurary 95%
             </span>
 
             <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold">
@@ -197,7 +196,7 @@ export default function SecurityPage() {
         </header>
 
         {/* MAIN CARD */}
-        <div className="bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 md:p-8 shadow-2xl">
+        <div className="bg-slate-900 border border-slate-800 border border-white/10 rounded-[32px] p-6 md:p-8 shadow-2xl">
           <div className="space-y-5">
             {/* INPUT */}
             <div>
@@ -209,8 +208,8 @@ export default function SecurityPage() {
                 type="text"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="https://example.com"
-                className="w-full p-5 rounded-2xl bg-slate-950/70 border border-white/10 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 outline-none transition-all text-white placeholder:text-zinc-500"
+                placeholder="Masukkan URL/Link untuk diperiksa keamanannya"
+                className="w-full p-5 rounded-2xl bg-slate-950 border border-white/10 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 outline-none transition-all text-white placeholder:text-zinc-500"
               />
             </div>
 
@@ -233,7 +232,7 @@ export default function SecurityPage() {
           {result && !result.error && (
             <div className="mt-8 animate-in fade-in duration-500">
               <div
-                className={`rounded-[28px] border bg-slate-950/60 p-6 md:p-8 transition-all duration-500 ${trustUI.border} ${trustUI.glow}`}
+                className={`rounded-[28px] border bg-slate-950 p-6 md:p-8 transition-all duration-500 ${trustUI.border} ${trustUI.glow}`}
               >
                 <div className="text-center mb-8">
                   <div
@@ -242,7 +241,7 @@ export default function SecurityPage() {
                         ? "bg-red-500/10 text-red-300 border border-red-500/20"
                         : status === "HATI-HATI"
                           ? "bg-orange-500/10 text-orange-300 border border-orange-500/20"
-                          : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
+                          : "bg-emerald-950 text-emerald-300 border border-emerald-800"
                     }`}
                   ></div>
                   
@@ -252,7 +251,7 @@ export default function SecurityPage() {
                     <span className="text-xl text-zinc-500">/100</span>
                   </h2>
                   <div className="mt-4">
-                    <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
                       <div
                         style={{
                           width: `${result.trustScore}%`,
@@ -267,7 +266,7 @@ export default function SecurityPage() {
 
                 {/* GRID */}
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="rounded-2xl bg-white/[0.03] border border-white/10 p-5">
+                  <div className="rounded-2xl bg-slate-900 border border-white/10 p-5">
                     <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">
                       Global Engine
                     </p>
@@ -277,7 +276,7 @@ export default function SecurityPage() {
                     </p>
                   </div>
 
-                  <div className="rounded-2xl bg-white/[0.03] border border-white/10 p-5">
+                  <div className="rounded-2xl bg-slate-900 border border-white/10 p-5">
                     <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">
                       Virus Engine
                     </p>
@@ -291,7 +290,7 @@ export default function SecurityPage() {
                 </div>
 
                 {/* FLAGS */}
-                <div className="mt-5 rounded-2xl bg-white/[0.03] border border-white/10 p-5">
+                <div className="mt-5 rounded-2xl bg-slate-900 border border-white/10 p-5">
                   <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-3">
                     Security Analysis
                   </p>
@@ -301,14 +300,14 @@ export default function SecurityPage() {
                       {result.heuristicFlags.map((flag: string) => (
                         <div
                           key={flag}
-                          className="rounded-xl bg-orange-500/10 border border-orange-500/20 px-4 py-3 text-orange-300 text-sm font-semibold"
+                          className="rounded-xl bg-orange-950 border border-orange-800 px-4 py-3 text-orange-300 text-sm font-semibold"
                         >
                           ⚠️ {flag}
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-emerald-300 text-sm font-semibold">
+                    <div className="rounded-xl bg-emerald-950 border border-emerald-800 px-4 py-3 text-emerald-300 text-sm font-semibold">
                       ✅ Tidak ditemukan indikasi berbahaya
                     </div>
                   )}

@@ -84,23 +84,23 @@ const [isDropping, setIsDropping] = useState(false); // Tambahkan ini
   };
 
   return (
-  <main className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#020617] text-white flex items-center justify-center p-4 relative overflow-hidden">
+  <main className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4 relative overflow-hidden">
     
     {/* Background Glow */}
     <div className="absolute top-[-120px] left-[-120px] w-[350px] h-[350px] bg-cyan-500/20 rounded-full blur-3xl" />
     <div className="absolute bottom-[-120px] right-[-120px] w-[350px] h-[350px] bg-indigo-500/20 rounded-full blur-3xl" />
 
-    <div className="w-full max-w-lg relative z-10 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl p-8">
+    <div className="w-full max-w-lg relative z-10 bg-slate-900 border border-slate-800 rounded-[32px] shadow-2xl p-8">
 
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 text-[10px] uppercase tracking-[0.2em] font-bold mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-cyan-400/30 bg-cyan-950 text-cyan-300 text-[10px] uppercase tracking-[0.2em] font-bold mb-4">
           Aman • Cepat • Privasi Terjaga
         </div>
 
         <h1 className="text-4xl md:text-5xl font-black leading-tight mb-3">
           Convert & Resize
-          <span className="block bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+          <span className="block text-cyan-300">
             Foto Online
           </span>
         </h1>
@@ -112,9 +112,9 @@ const [isDropping, setIsDropping] = useState(false); // Tambahkan ini
       </div>
 
       {!file ? (
-        <label className="group flex flex-col items-center justify-center w-full h-64 rounded-[28px] border-2 border-dashed border-white/15 bg-white/[0.03] hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all duration-300 cursor-pointer">
+        <label className="group flex flex-col items-center justify-center w-full h-64 rounded-[28px] border-2 border-dashed border-white/15 bg-slate-800 hover:border-cyan-400/50 hover:bg-cyan-950 transition-all duration-300 cursor-pointer">
           
-          <div className="w-16 h-16 rounded-2xl bg-cyan-400/10 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+          <div className="w-16 h-16 rounded-2xl bg-cyan-950 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
             📸
           </div>
 
@@ -141,7 +141,7 @@ const [isDropping, setIsDropping] = useState(false); // Tambahkan ini
         <div className="space-y-5">
 
           {/* File Info */}
-          <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-slate-800 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-zinc-400 mb-1">File dipilih</p>
               <p className="text-sm font-semibold truncate max-w-[220px]">
@@ -158,7 +158,7 @@ const [isDropping, setIsDropping] = useState(false); // Tambahkan ini
           </div>
 
           {/* Estimasi */}
-          <div className="bg-gradient-to-br from-cyan-500/10 to-indigo-500/10 border border-cyan-400/20 rounded-[28px] p-6">
+          <div className="bg-slate-800 border border-cyan-400/20 rounded-[28px] p-6">
 
             <p className="text-xs uppercase tracking-[0.2em] text-cyan-300 font-bold mb-3">
               Estimasi Hasil
@@ -223,21 +223,21 @@ const [isDropping, setIsDropping] = useState(false); // Tambahkan ini
 </div>
           {/* SEO / Trust Section */}
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3">
+            <div className="bg-slate-800 border border-white/10 rounded-2xl p-3">
               <div className="text-xl mb-1">🔒</div>
               <p className="text-[11px] font-bold text-zinc-300">
                 Aman
               </p>
             </div>
 
-            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3">
+            <div className="bg-slate-800 border border-white/10 rounded-2xl p-3">
               <div className="text-xl mb-1">⚡</div>
               <p className="text-[11px] font-bold text-zinc-300">
                 Cepat
               </p>
             </div>
 
-            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3">
+            <div className="bg-slate-800 border border-white/10 rounded-2xl p-3">
               <div className="text-xl mb-1">🛡️</div>
               <p className="text-[11px] font-bold text-zinc-300">
                 Privasi
