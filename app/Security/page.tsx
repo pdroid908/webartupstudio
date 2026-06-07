@@ -84,87 +84,119 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <>
-      <Scanner />
+  <>
+    <Scanner />
 
-      {/* SEO CONTENT */}
-      <section className="max-w-4xl mx-auto px-4 py-20 text-zinc-300">
+    {/* SEO CONTENT */}
+    <section className="px-4 py-16 sm:py-20">
+      <div className="max-w-4xl mx-auto bg-zinc-950/95 border border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
 
-        <h2 className="text-3xl font-black mb-6 text-white">
+        <h2 className="text-3xl sm:text-4xl font-black mb-6 text-white leading-tight">
           Website Security Scanner Online
         </h2>
 
-        <p className="mb-4 leading-relaxed">
+        <p className="mb-4 leading-relaxed text-zinc-300 text-base sm:text-lg">
           Tool security scanner ini membantu memeriksa keamanan website,
           link, dan URL secara online untuk mendeteksi phishing,
           malware, scam, serta aktivitas mencurigakan lainnya.
         </p>
 
-        <p className="mb-4 leading-relaxed">
+        <p className="mb-4 leading-relaxed text-zinc-300 text-base sm:text-lg">
           Sistem menggunakan multi-engine verification dan analisis
           heuristic untuk memberikan hasil pemeriksaan yang cepat
           dan akurat.
         </p>
 
-        <p className="mb-10 leading-relaxed">
+        <p className="mb-10 leading-relaxed text-zinc-300 text-base sm:text-lg">
           Cocok digunakan untuk memeriksa keamanan link sebelum
           membuka website, login akun, atau mengunduh file dari internet.
         </p>
 
-        <h3 className="text-2xl font-bold text-white mb-4">
-          Fitur Utama
-        </h3>
+        {/* FEATURES */}
+        <div className="mb-10">
+          <h3 className="text-2xl font-bold text-white mb-5">
+            Fitur Utama
+          </h3>
 
-        <ul className="list-disc pl-6 space-y-3 mb-10">
-          <li>Scan URL dan website online</li>
-          <li>Deteksi phishing dan scam</li>
-          <li>Analisis malware website</li>
-          <li>Trust score keamanan website</li>
-          <li>Multi-engine verification system</li>
-          <li>Gratis dan cepat digunakan</li>
-        </ul>
+          <ul className="space-y-3 text-zinc-300">
+            <li className="flex items-start gap-3">
+              <span className="text-green-400 mt-1">✓</span>
+              <span>Scan URL dan website online</span>
+            </li>
 
-        <h3 className="text-2xl font-bold text-white mb-4">
-          FAQ
-        </h3>
+            <li className="flex items-start gap-3">
+              <span className="text-green-400 mt-1">✓</span>
+              <span>Deteksi phishing dan scam</span>
+            </li>
 
-        <div className="space-y-6">
+            <li className="flex items-start gap-3">
+              <span className="text-green-400 mt-1">✓</span>
+              <span>Analisis malware website</span>
+            </li>
 
-          <div>
-            <h4 className="font-bold text-white mb-2">
-              Apakah scanner ini gratis?
-            </h4>
+            <li className="flex items-start gap-3">
+              <span className="text-green-400 mt-1">✓</span>
+              <span>Trust score keamanan website</span>
+            </li>
 
-            <p>
-              Ya, website security scanner ini dapat digunakan gratis
-              untuk memeriksa keamanan link dan website.
-            </p>
-          </div>
+            <li className="flex items-start gap-3">
+              <span className="text-green-400 mt-1">✓</span>
+              <span>Multi-engine verification system</span>
+            </li>
 
-          <div>
-            <h4 className="font-bold text-white mb-2">
-              Ancaman apa saja yang bisa dideteksi?
-            </h4>
-
-            <p>
-              Sistem dapat membantu mendeteksi phishing, malware,
-              scam, fake login page, dan website mencurigakan lainnya.
-            </p>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white mb-2">
-              Apakah data URL disimpan?
-            </h4>
-
-            <p>
-              Pemeriksaan dilakukan secara aman dan sistem tidak
-              menyimpan data sensitif pengguna secara permanen.
-            </p>
-          </div>
-
+            <li className="flex items-start gap-3">
+              <span className="text-green-400 mt-1">✓</span>
+              <span>Gratis dan cepat digunakan</span>
+            </li>
+          </ul>
         </div>
-      </section>
-    </>
-  );
+
+        {/* FAQ */}
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-6">
+            FAQ
+          </h3>
+
+          <div className="space-y-5">
+
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+              <h4 className="font-bold text-white mb-2">
+                Apakah scanner ini gratis?
+              </h4>
+
+              <p className="text-zinc-300 leading-relaxed">
+                Ya, website security scanner ini dapat digunakan gratis
+                untuk memeriksa keamanan link dan website.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+              <h4 className="font-bold text-white mb-2">
+                Ancaman apa saja yang bisa dideteksi?
+              </h4>
+
+              <p className="text-zinc-300 leading-relaxed">
+                Sistem dapat membantu mendeteksi phishing, malware,
+                scam, fake login page, dan website mencurigakan lainnya.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+              <h4 className="font-bold text-white mb-2">
+                Apakah data URL disimpan?
+              </h4>
+
+              <p className="text-zinc-300 leading-relaxed">
+                Pemeriksaan dilakukan secara aman dan sistem tidak
+                menyimpan data sensitif pengguna secara permanen.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </>
+);
 }
