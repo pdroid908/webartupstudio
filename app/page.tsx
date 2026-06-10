@@ -1,326 +1,228 @@
 "use client";
-//c
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import Image from 'next/image';
-// --- INTERFACE UNTUK TYPE SAFETY ---
-interface BaseItem {
-  id: string;
-  title: string;
 
-  tech: string;
-  
-  
-  link?: string;
-  
-  
-  isInternal?: boolean; // TAMBAHKAN BARIS INI (Pake tanda tanya)
-  route?: string;
-}
+import { useState } from "react";
 
-const MY_GAMES: BaseItem[] = [
-  {
-    id: "pixel-universe",
-    title: "Analisis Big Data",
-   tech: "Android",
-    link: "https://drive.google.com/file/d/1297vtnwaJKCdRf2u6ftLAb-Tjy2CtoqY/view?usp=sharing",
-   
-    
-    
-  },
-  {
-    id: "block-fight",
-    title: "Automation Chats",
-    tech: "Android",
-    link: "https://drive.google.com/file/d/16gjJGQsM72Roj19gAV1Gmw5kJ-B_Vt_o/view?usp=sharing",
-    
-    
-    
-  },
-];
+const MAX_CHARS = 8000;
 
-const WEB_GAMES: BaseItem[] = [
-  {
-    id: "foto_converter",
-    title: "Foto Converter",
-    
-    tech: "Web Game, All device can play",
-    route: "/converter", // Tambahkan ini
-  },
-  // Kamu bisa tambah tool lain di sini
-  {
-    id: "scanner",
-    title: "Link Scanner",
-    
-    tech: "Web Game",
-    route: "/Security", 
-  },
-];
-
-export default function Home() {
+export default function HumanizerPage() {
+  const [text, setText] = useState("");
+  const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"web" | "games">("web");
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
 
+  async function handleHumanize() {
+    setError("");
 
-  useEffect(() => {
-  
-    const handleFocus = () => setLoading(false);
-    window.addEventListener("pageshow", handleFocus);
-    window.addEventListener("focus", handleFocus);
+    if (!text.trim()) {
+      setError("Please enter some text.");
+      return;
+    }
 
-    return () => {
-      window.removeEventListener("pageshow", handleFocus);
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, []);
+    if (text.length > MAX_CHARS) {
+      setError(`Maximum ${MAX_CHARS} characters allowed.`);
+      return;
+    }
 
-  const getItemsByTab = () => (activeTab === "games" ? MY_GAMES : WEB_GAMES);
+    try {
+      setLoading(true);
 
-  const currentItems = getItemsByTab();
+      const response = await fetch("/api/humanizer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text,
+        }),
+      });
 
-  const handleTabChange = (tab: "web" | "games") => {
-    // Reset loading setiap ganti tab agar tidak nyangkut
-    setLoading(false);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to process text"
+        );
+      }
+
+      setResult(data.result || "");
+    } catch (error) {
+      console.error(error);
+      setError("Failed to process text.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function copyResult() {
+    if (!result) return;
+
+    await navigator.clipboard.writeText(result);
+
+    setCopied(true);
+
     setTimeout(() => {
-      setActiveTab(tab);
-      
-    }, 200);
-  };
-
-
+      setCopied(false);
+    }, 2000);
+  }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
-      
-      {/* --- BACKGROUND --- */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-  <Image
-    src="/bgrun.png" // Tambahkan tanda slash di depan jika file di folder 'public'
-    alt="Background"
-    fill // Menggantikan w-full h-full
-    className="object-cover object-center opacity-100 transition-opacity duration-1000"
-    priority // Karena ini background di awal, tambahkan priority agar cepat muncul
-  />
-
-  {/* Overlay agar teks tetap terbaca */}
-  <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/20 to-slate-950"></div>
-</div>
-
-      {/* --- AUDIO TOGGLE --- */}
-      {/* --- SIDEBAR --- */}
-      <aside className="pt-10 w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col md:overflow-y-auto scrollbar-hide">
-        {/* CSS inline untuk memastikan scrollbar tidak muncul tapi tetap bisa di-scroll */}
-        <style jsx>{`
-          aside::-webkit-scrollbar {
-            display: none;
-          }
-          aside {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-        `}</style>
-
-        {/* Bungkus konten utama dengan flex-1 agar bagian bawah terdorong ke bawah secara alami */}
-        <div className="flex-1">
-          <div>
-            <h2 className="text-3xl font-black text-blue-500 italic tracking-tighter uppercase">
-              Artup STUDIO
-            </h2>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 ml-0.5 mb-6">
-              HIGH-TECH
-            </p>
-
-            {/* NAVIGASI */}
-            <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide mb-6 w-full">
-              {/* Tombol Web Games */}
-              <button
-                onClick={() => handleTabChange("web")}
-                className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
-              >
-                {activeTab !== "web" && (
-                  <div className="absolute inset-[-1000%] animate-[spin_5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#1e293b_0%,#3b82f6_50%,#1e293b_100%)]" />
-                )}
-                <div
-                  className={`flex h-full w-full items-center justify-center gap-3 rounded-2xl px-5 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-300 z-10 ${activeTab === "web" ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-2 border-blue-400" : "bg-slate-950 text-slate-500 hover:text-white hover:bg-blue-600"}`}
-                >
-                  <span className="text-sm">Free tools</span> 
-                </div>
-              </button>
-
-              {/* --- TOMBOL APP GAMES --- */}
-              <button
-                onClick={() => handleTabChange("games")}
-                className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
-              >
-                {activeTab !== "games" && (
-                  <div className="absolute inset-[-1000%] animate-[spin_5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#1e293b_0%,#3b82f6_50%,#1e293b_100%)]" />
-                )}
-                <div
-                  className={`flex h-full w-full items-center justify-center gap-3 rounded-2xl px-5 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-300 z-10 ${activeTab === "games" ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-2 border-blue-400" : "bg-slate-950 text-slate-400 hover:text-white hover:bg-blue-600 "}`}
-                >
-                  <span className="text-sm">Premium Tools</span> 
-                </div>
-              </button>
-
-
-            </nav>
-
-
-            {/* KONTAK ME */}
-            <div className="flex flex-col gap-2 mb-10">
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-1">
-                My email, tell me what you need
-              </p>
-              <a
-                href="mailto:p1998nr@gmail.com"
-                className="text-[10px] md:text-xs font-bold text-slate-300 bg-slate-900/50 p-3 rounded-xl border border-slate-800 hover:border-blue-500 transition-all flex items-center gap-2"
-              >
-                <span>✉️</span> p1998nr@gmail.com
-              </a>
-            </div>
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        {/* HERO */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center rounded-full border px-4 py-2 text-sm bg-white shadow-sm mb-4">
+            ✨ AI Humanizer
           </div>
-        </div>
 
-        {/* Support Section Desktop - Menggunakan mt-10 agar tetap punya jarak meski justify-between dihapus */}
-        <div className="hidden md:flex flex-col gap-4 mt-10 pt-6 border-t border-slate-900">
-          <div className="space-y-2 bg-slate-900/50 p-3 rounded-2xl border border-slate-800">
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-1">
-              Support Me
-            </p>
-            <a
-              href="https://paypal.me/put98"
-              target="_blank"
-              className="flex items-center gap-2 group"
-            >
-              <span className="text-sm">❤️</span>
-              <span className="text-[10px] font-bold text-blue-400 group-hover:text-blue-300">
-                PayPal
-              </span>
-            </a>
-            <div className="flex items-center gap-2">
-              <span className="text-sm">💚</span>
-              <span className="text-[10px] font-bold text-purple-400 uppercase tracking-tight">
-                OVO: 0813-2834-3908
-              </span>
-            </div>
-          </div>
-          <div className="space-y-2 mb-4">
-            <a
-              href="/privacy"
-              className="text-[10px] font-bold text-slate-500 hover:text-blue-400 block transition-colors uppercase italic"
-            >
-              🛡️ Privacy Policy
-            </a>
-            <div className="bg-blue-600/10 p-2 rounded-lg border border-blue-500/20 text-center">
-              <p className="text-[8px] text-blue-500 font-mono uppercase italic">
-                AMD R6 Optimized
-              </p>
-            </div>
-          </div>
-        </div>
-      </aside>
-      {/* --- MAIN CONTENT --- */}
-      <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-20 md:pt-56 min-h-screen">
-        <header className="mb-10">
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight uppercase italic text-zinc-100">
-            {activeTab === "web" ? "Free tools" : "masih Perbaikan"}
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            Humanize AI Text
           </h1>
-          <div
-            className={`h-1.5 w-12 mt-2 rounded-full ${activeTab === "web" ? "bg-purple-600" : "bg-blue-600"}`}
-          ></div>
-        </header>
 
-{/* GRID SELECTOR */}
-<div className="flex flex-wrap gap-6 mb-10">
-  {currentItems.map((item) => {
-    const isClickable = !!item.route;
-    
-    // Gunakan gradient border dan shadow yang lebih "menyala"
-    const Content = (
-      <div className={`relative w-full h-full p-5 rounded-2xl flex flex-col items-center justify-center 
-        ${isClickable 
-          ? "bg-slate-900/80 hover:bg-blue-900/40 border border-blue-500/50 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]" 
-          : "bg-slate-950 border border-slate-800"
-        } transition-all duration-300`}>
-        
-        {isClickable && (
-          <div className="absolute top-2 right-2 opacity-50">
-            <span className="text-[10px] text-cyan-400">↗</span>
-          </div>
-        )}
-        
-        <h3 className={`font-black text-sm uppercase tracking-widest transition-colors
-          ${isClickable ? "text-cyan-100 group-hover:text-white" : "text-slate-600"}`}>
-          {item.title}
-        </h3>
-      </div>
-    );
-
-    const containerClass = `w-[150px] h-[100px] relative group transition-all duration-300 
-      ${isClickable ? "cursor-pointer hover:-translate-y-1" : "cursor-default"}`;
-
-    if (isClickable) {
-      return (
-        <Link key={item.id} href={item.route!} className={containerClass} onClick={() => setLoading(true)}>
-          {Content}
-        </Link>
-      );
-    }
-    return <div key={item.id} className={containerClass}>{Content}</div>;
-  })}
-</div>
-
-
-        {/* FOOTER MOBILE */}
-        <footer className="md:hidden mt-10 p-8 bg-slate-900/90 backdrop-blur-md rounded-[2.5rem] border border-slate-800 text-center">
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-5">
-            Support My Work
+          <p className="mt-4 text-slate-600 max-w-2xl mx-auto">
+            Transform AI-generated content into more natural,
+            readable and human-like writing.
           </p>
-          <div className="flex justify-center gap-4 mb-8">
-            <a
-              href="https://paypal.me/put98"
-              className="text-xs font-bold text-blue-400 bg-blue-500/10 px-5 py-2.5 rounded-xl border border-blue-500/20"
-            >
-              PayPal
-            </a>
-            <div className="text-xs font-bold text-purple-400 bg-purple-500/10 px-5 py-2.5 rounded-xl border border-purple-500/20">
-              OVO: 0813-2834-3908
+        </div>
+
+        {/* TOOL */}
+        <div className="bg-white rounded-3xl border shadow-lg p-5 md:p-8">
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* INPUT */}
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="font-semibold">
+                  Input Text
+                </h2>
+
+                <span
+                  className={`text-sm ${
+                    text.length > MAX_CHARS
+                      ? "text-red-500"
+                      : "text-slate-500"
+                  }`}
+                >
+                  {text.length} / {MAX_CHARS}
+                </span>
+              </div>
+
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Paste your text here..."
+                className="w-full h-[350px] p-4 rounded-2xl border border-slate-300 resize-none focus:outline-none focus:ring-2 focus:ring-black"
+              />
+
+              {/* Progress Bar */}
+              <div className="mt-3 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all ${
+                    text.length > MAX_CHARS
+                      ? "bg-red-500"
+                      : "bg-black"
+                  }`}
+                  style={{
+                    width: `${Math.min(
+                      (text.length / MAX_CHARS) * 100,
+                      100
+                    )}%`,
+                  }}
+                />
+              </div>
+
+              {error && (
+                <div className="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                  ⚠️ {error}
+                </div>
+              )}
+
+              <button
+                onClick={handleHumanize}
+                disabled={
+                  loading ||
+                  !text.trim() ||
+                  text.length > MAX_CHARS
+                }
+                className="mt-5 w-full bg-black text-white rounded-2xl py-3 font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {loading
+                  ? "Processing..."
+                  : "✨ Humanize Text"}
+              </button>
+            </div>
+
+            {/* OUTPUT */}
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="font-semibold">
+                  Humanized Result
+                </h2>
+
+                {result && (
+                  <button
+                    onClick={copyResult}
+                    className="border rounded-xl px-4 py-2 text-sm hover:bg-slate-50"
+                  >
+                    {copied
+                      ? "✅ Copied"
+                      : "📋 Copy"}
+                  </button>
+                )}
+              </div>
+
+              <div className="h-[350px] overflow-auto rounded-2xl border border-slate-300 bg-slate-50 p-4">
+                {result ? (
+                  <div className="whitespace-pre-wrap text-slate-700">
+                    {result}
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center text-slate-400">
+                    <div className="text-5xl mb-3">
+                      📝
+                    </div>
+
+                    <p>
+                      Humanized text will appear here
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="mb-8 flex flex-col gap-2">
-            <a
-              href="mailto:p1998nr@gmail.com"
-              className="text-[10px] font-bold text-blue-500 underline uppercase italic"
-            >
-              Email Support: p1998nr@gmail.com
-            </a>
-            <a
-              href="/privacy"
-              className="text-[10px] font-bold text-slate-600 uppercase italic"
-            >
-              🛡️ Privacy Policy
-            </a>
+        {/* FEATURES */}
+        <div className="grid md:grid-cols-3 gap-4 mt-8">
+          <div className="bg-white rounded-2xl border p-5">
+            <div className="text-2xl mb-2">⚡</div>
+            <h3 className="font-semibold">
+              Fast Processing
+            </h3>
+            <p className="text-sm text-slate-600 mt-2">
+              Humanize content in seconds.
+            </p>
           </div>
 
-          <div className="text-[9px] text-slate-600 font-mono uppercase">
-            Artup Studio &copy; 2026
-            <br />
-            Honest and pure heart
+          <div className="bg-white rounded-2xl border p-5">
+            <div className="text-2xl mb-2">🔒</div>
+            <h3 className="font-semibold">
+              Secure
+            </h3>
+            <p className="text-sm text-slate-600 mt-2">
+              Safe rendering and validation.
+            </p>
           </div>
-        </footer>
-      </section>
 
-      {/* Overlay Loading */}
-      <div
-        className={`fixed inset-0 z-40 transition-opacity duration-500 
-  ${loading ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-      >
-        {loading && (
-          <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center">
-            {/* Isi spinner kamu */}
+          <div className="bg-white rounded-2xl border p-5">
+            <div className="text-2xl mb-2">✨</div>
+            <h3 className="font-semibold">
+              Natural Writing
+            </h3>
+            <p className="text-sm text-slate-600 mt-2">
+              Improve readability and flow.
+            </p>
           </div>
-        )}
+        </div>
       </div>
     </main>
   );
