@@ -190,7 +190,7 @@ export default function Page() {
             name: "AI Text Humanizer",
             applicationCategory: "TextEditor",
             operatingSystem: "All",
-            url: "https://artup.pages.dev//humanizer",
+            url: "https://artup.pages.dev//humanize",
             description:
               "Humanizer teks AI online gratis untuk membuat teks lebih natural dan manusiawi.",
             offers: {

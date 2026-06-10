@@ -79,27 +79,34 @@ const DICTIONARY = [
   { type: "word", find: "di mana", replace: "yang" },
   { type: "word", find: "hal tersebut", replace: "itu" },
   { type: "word", find: "hal ini", replace: "ini" },
-];
+]as const;
 
 /* =========================
-   RATE LIMIT (ANTI SPAM BASIC)
+   RATE LIMIT (EDGE SAFE)
 ========================= */
-const ipMap = new Map<string, { count: number; startTime: number }>();
+type RateData = {
+  count: number;
+  startTime: number;
+};
+
+const ipMap = new Map<string, RateData>();
 
 const LIMIT = 5;
 const WINDOW = 60 * 1000;
 
-setInterval(() => {
+function cleanRateLimit(): void {
   const now = Date.now();
 
-  for (const [ip, data] of ipMap) {
+  for (const [ip, data] of ipMap.entries()) {
     if (now - data.startTime > WINDOW) {
       ipMap.delete(ip);
     }
   }
-}, 60_000);
+}
 
-function rateLimit(ip: string) {
+function rateLimit(ip: string): boolean {
+  cleanRateLimit();
+
   const now = Date.now();
   const data = ipMap.get(ip);
 
@@ -115,20 +122,22 @@ function rateLimit(ip: string) {
 
   if (data.count >= LIMIT) return false;
 
-  data.count++;
+  ipMap.set(ip, {
+    count: data.count + 1,
+    startTime: data.startTime
+  });
+
   return true;
 }
 
 /* =========================
-   SECURITY HELPERS
+   SECURITY
 ========================= */
-
-function escapeRegex(str: string) {
+function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// anti script injection basic
-function sanitizeInput(text: string) {
+function sanitizeInput(text: string): string {
   return text
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
     .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "")
@@ -140,8 +149,7 @@ function sanitizeInput(text: string) {
 /* =========================
    HUMANIZER
 ========================= */
-
-function humanizeText(text: string) {
+function humanizeText(text: string): string {
   let result = text;
 
   for (const rule of DICTIONARY) {
@@ -161,83 +169,92 @@ function humanizeText(text: string) {
 /* =========================
    MAIN API
 ========================= */
-export async function POST(req: NextRequest) {
+type RequestBody = {
+  text?: string;
+};
+
+type ApiSuccess = {
+  success: true;
+  originalLength: number;
+  resultLength: number;
+  result: string;
+};
+
+type ApiError = {
+  error: string;
+  detail?: string;
+};
+
+export async function POST(req: NextRequest): Promise<Response> {
   try {
-    // IP detect
-    const ip =
+    const ip: string =
       req.headers.get("x-forwarded-for")?.split(",")[0] ||
       req.headers.get("x-real-ip") ||
       "unknown";
 
-    // RATE LIMIT
     if (!rateLimit(ip)) {
-      return NextResponse.json(
-        { error: "Too many requests. wait 1 minute." },
-        { status: 429 }
-      );
+      const res: ApiError = {
+        error: "Too many requests. wait 1 minute."
+      };
+
+      return NextResponse.json(res, { status: 429 });
     }
 
-    // BODY SAFE PARSE (anti DoS payload)
-    const raw = await req.text();
+    let body: RequestBody;
 
-    if (raw.length > 10000) {
-      return NextResponse.json(
-        { error: "Payload too large" },
-        { status: 413 }
-      );
-    }
-
-    let body;
     try {
-      body = JSON.parse(raw);
+      body = (await req.json()) as RequestBody;
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON" },
-        { status: 400 }
-      );
+      const res: ApiError = {
+        error: "Invalid JSON"
+      };
+
+      return NextResponse.json(res, { status: 400 });
     }
 
-    // VALIDATION
-    if (!body?.text || typeof body.text !== "string") {
-      return NextResponse.json(
-        { error: "Invalid input" },
-        { status: 400 }
-      );
+    if (!body.text || typeof body.text !== "string") {
+      const res: ApiError = {
+        error: "Invalid input"
+      };
+
+      return NextResponse.json(res, { status: 400 });
     }
 
-    let text = body.text.trim();
+    let text: string = body.text.trim();
 
     if (!text) {
-      return NextResponse.json(
-        { error: "Text required" },
-        { status: 400 }
-      );
+      const res: ApiError = {
+        error: "Text required"
+      };
+
+      return NextResponse.json(res, { status: 400 });
     }
 
     if (text.length > MAX_TEXT_LENGTH) {
-      return NextResponse.json(
-        { error: "Text too large" },
-        { status: 413 }
-      );
+      const res: ApiError = {
+        error: "Text too large"
+      };
+
+      return NextResponse.json(res, { status: 413 });
     }
 
-    // SANITIZE
     text = sanitizeInput(text);
 
-    // PROCESS
-    const humanized = humanizeText(text);
+    const result: string = humanizeText(text);
 
-    return NextResponse.json({
+    const response: ApiSuccess = {
       success: true,
       originalLength: text.length,
-      resultLength: humanized.length,
-      result: humanized,
-    });
+      resultLength: result.length,
+      result
+    };
 
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json(response);
+  } catch {
+    const res: ApiError = {
+      error: "Server error"
+    };
+
+    return NextResponse.json(res, { status: 500 });
   }
 }
