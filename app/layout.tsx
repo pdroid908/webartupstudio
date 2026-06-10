@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import DonateBox from "./components/DonateBox";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,7 @@ export default function RootLayout({ children }: { readonly children: React.Reac
         {/* Meta Tag AdSense dihapus demi keamanan */}
       </head>
       <body className="min-h-full flex flex-col overflow-x-hidden selection:bg-blue-500/30">
-        
+        <DonateBox />
         {/* Security Layer yang lebih bersih */}
         <Script id="security-layer" strategy="afterInteractive">
           {`
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { readonly children: React.Reac
         </Script>
 
         <main className="flex-1">{children}</main>
+        <DonateBox />
       </body>
     </html>
   );
