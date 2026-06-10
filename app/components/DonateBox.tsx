@@ -4,17 +4,26 @@ import { useState } from "react";
 
 export default function DonateBox() {
   const [open, setOpen] = useState(true);
+  // State untuk melacak status copy
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText("0813-2834-3908");
+    setCopied(true);
+    
+    // Kembalikan ke teks semula setelah 2 detik
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
 
   if (!open) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50">
-      {/* Overlay click area kecil (optional, tidak ganggu full screen) */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center ">
       <div className="relative">
-
-        {/* Card */}
         <div className="w-72 rounded-2xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl text-white p-5 animate-in fade-in slide-in-from-bottom-3">
-
+          
           {/* Close Button */}
           <button
             onClick={() => setOpen(false)}
@@ -26,9 +35,7 @@ export default function DonateBox() {
           {/* Header */}
           <div className="text-center mb-4">
             <p className="text-lg font-semibold">☕ Traktir developer kopi</p>
-            <p className="text-xs text-white/60">
-              Terima kasih sudah mampir ❤️
-            </p>
+            <p className="text-xs text-white/60">Terima kasih sudah mampir ❤️</p>
           </div>
 
           {/* OVO */}
@@ -48,14 +55,16 @@ export default function DonateBox() {
             Donate via PayPal
           </a>
 
-          {/* Copy Button */}
+          {/* Copy Button dengan efek dinamis */}
           <button
-            onClick={() => {
-              navigator.clipboard.writeText("0813-2834-3908");
-            }}
-            className="w-full bg-white text-black text-sm py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition"
+            onClick={handleCopy}
+            className={`w-full text-sm py-2.5 rounded-xl font-semibold transition-all duration-300 ${
+              copied 
+                ? "bg-green-500 text-white" 
+                : "bg-white text-black hover:bg-gray-200"
+            }`}
           >
-            Copy nomor OVO
+            {copied ? "Berhasil disalin! ✅" : "Copy nomor OVO"}
           </button>
         </div>
       </div>

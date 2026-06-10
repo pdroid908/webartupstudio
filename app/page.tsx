@@ -86,23 +86,20 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
       {/* --- BACKGROUND --- */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-  <div className="relative w-full h-full">
-    <Image
-      src="/bgrun.png"
-      alt="Background"
-      fill
-      priority
-      sizes="100vw"
-      className="object-cover object-center opacity-90"
-    />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+  
+  {/* Background */}
+  <div
+    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+    style={{
+      backgroundImage: "url('/bgrun.png')",
+    }}
+  />
 
-    {/* Overlay */}
-    <div className="absolute inset-0 bg-gradient-to-b from-slate-950/50 via-slate-950/20 to-slate-950/70" />
-  </div>
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-gradient-to-b from-slate-500/50 via-slate-950/20 to-slate-950/70" />
 </div>
 
-      {/* --- AUDIO TOGGLE --- */}
       {/* --- SIDEBAR --- */}
       <aside className="pt-10 w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col md:overflow-y-auto scrollbar-hide">
         {/* CSS inline untuk memastikan scrollbar tidak muncul tapi tetap bisa di-scroll */}
@@ -131,13 +128,21 @@ export default function Home() {
               {/* Tombol Web Games */}
               <button
                 onClick={() => handleTabChange("web")}
-                className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
+                // Tambahkan transition-all dan duration agar pergerakannya tidak patah
+                className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all duration-300 ease-out active:scale-90"
               >
+                {/* Border animasi (tetap ada saat tidak aktif) */}
                 {activeTab !== "web" && (
                   <div className="absolute inset-[-1000%] animate-[spin_5s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#1e293b_0%,#3b82f6_50%,#1e293b_100%)]" />
                 )}
+
+                {/* Div Utama */}
                 <div
-                  className={`flex h-full w-full items-center justify-center gap-3 rounded-2xl px-5 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-300 z-10 ${activeTab === "web" ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border-2 border-blue-400" : "bg-slate-950 text-slate-500 hover:text-white hover:bg-blue-600"}`}
+                  className={`flex h-full w-full items-center justify-center gap-3 rounded-2xl px-5 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-500 ease-out z-10 ${
+                    activeTab === "web"
+                      ? "bg-blue-600 text-white scale-105 shadow-[0_0_25px_rgba(37,99,235,0.5)] border-2 border-blue-400"
+                      : "bg-slate-950 text-slate-500 hover:bg-blue-900/50"
+                  }`}
                 >
                   <span className="text-sm">Free tools</span>
                 </div>
@@ -215,11 +220,11 @@ export default function Home() {
       {/* --- MAIN CONTENT --- */}
       <section className="relative z-10 p-5 md:p-10 md:ml-64 pt-20 md:pt-56 min-h-screen">
         <header className="mb-10">
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight uppercase italic text-zinc-100">
+          <h1 className="text-3xl md:text-3xl font-black tracking-tight uppercase italic text-zinc-100">
             {activeTab === "web" ? "Free tools" : "masih Perbaikan"}
           </h1>
           <div
-            className={`h-1.5 w-12 mt-2 rounded-full ${activeTab === "web" ? "bg-purple-600" : "bg-blue-600"}`}
+            className={`h-1.5 w-24 mt-2 rounded-full ${activeTab === "web" ? "bg-purple-600" : "bg-blue-600"}`}
           ></div>
         </header>
 
@@ -231,7 +236,7 @@ export default function Home() {
             // Gunakan gradient border dan shadow yang lebih "menyala"
             const Content = (
               <div
-                className={`relative w-full h-full p-5 rounded-2xl flex flex-col items-center justify-center 
+                className={`relative w-full h-full p-5 rounded-3xl flex flex-col items-center justify-center 
         ${
           isClickable
             ? "bg-slate-900/80 hover:bg-blue-900/40 border border-blue-500/50 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]"

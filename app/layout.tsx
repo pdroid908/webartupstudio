@@ -41,7 +41,8 @@ export default function RootLayout({ children }: { readonly children: React.Reac
         </Script>
 
         <main className="flex-1">{children}</main>
-        <DonateBox />
+        
+        
       </body>
     </html>
   );
