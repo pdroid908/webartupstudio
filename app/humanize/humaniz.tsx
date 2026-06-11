@@ -72,7 +72,7 @@ export default function HumanizerPage() {
 }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-950">
+    <main className="relative min-h-screen overflow-hidden md:bg-slate-950 bg-slate-800">
       {/* Background Effects */}
       <div className="absolute left-[-150px] top-[-100px] h-[350px] w-[350px] rounded-full bg-blue-600/20 blur-3xl" />
       <div className="absolute right-[-150px] top-[100px] h-[350px] w-[350px] rounded-full bg-purple-600/20 blur-3xl" />

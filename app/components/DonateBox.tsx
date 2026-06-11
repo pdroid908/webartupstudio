@@ -52,7 +52,7 @@ export default function DonateBox() {
             target="_blank"
             className="block text-center text-sm font-semibold text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 px-4 py-2.5 rounded-xl border border-blue-500/20 transition mb-3"
           >
-            Donate via PayPal
+            kirim via PayPal
           </a>
 
           {/* Copy Button dengan efek dinamis */}

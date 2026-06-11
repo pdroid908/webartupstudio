@@ -84,7 +84,7 @@ const [isDropping, setIsDropping] = useState(false); // Tambahkan ini
   };
 
   return (
-  <main className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4 relative overflow-hidden">
+  <main className="min-h-screen bg-slate-800 md:bg-slate-900 text-white flex items-center justify-center p-4 relative overflow-hidden">
     
     {/* Background Glow */}
     <div className="absolute top-[-120px] left-[-120px] w-[350px] h-[350px] bg-cyan-500/20 rounded-full blur-3xl" />

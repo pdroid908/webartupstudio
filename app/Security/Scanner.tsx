@@ -146,18 +146,19 @@ export default function SecurityPage() {
   const trustUI = getTrustColor(result?.trustScore || 0);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white relative overflow-hidden isolate">
+    <div className="min-h-screen md:bg-slate-900 bg-slate-800 text-white relative overflow-hidden isolate">
       {/* Background Glow */}
       <div className="absolute top-[-200px] left-[-150px] w-[400px] h-[400px] bg-cyan-900 rounded-full opacity-20 blur-3xl" />
 
-<div className="absolute bottom-[-150px] right-[-100px] w-[350px] h-[350px] bg-blue-900 rounded-full opacity-20 blur-3xl" />
+      <div className="absolute bottom-[-150px] right-[-100px] w-[350px] h-[350px] bg-blue-900 rounded-full opacity-20 blur-3xl" />
       {/* SOCIAL */}
       <aside className="fixed bottom-5 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:top-1/2 md:-translate-y-1/2 md:translate-x-0 z-50">
         <a
           href="https://www.tiktok.com/@artupstd?lang=id-ID"
           target="_blank"
           rel="noopener noreferrer"
-         className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-500 border border-slate-700 hover:bg-cyan-500 hover:scale-105 transition-all text-sm font-bold shadow-xl" >
+          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-500 border border-slate-700 hover:bg-cyan-500 hover:scale-105 transition-all text-sm font-bold shadow-xl"
+        >
           MY TikTok
         </a>
       </aside>
@@ -225,7 +226,6 @@ export default function SecurityPage() {
             >
               {loading ? statusText : "Scan Website"}
             </button>
-            
           </div>
 
           {/* RESULT */}
@@ -244,7 +244,6 @@ export default function SecurityPage() {
                           : "bg-emerald-950 text-emerald-300 border border-emerald-800"
                     }`}
                   ></div>
-                  
 
                   <h2 className={`text-5xl font-black mb-2 ${trustUI.text}`}>
                     {result.trustScore}

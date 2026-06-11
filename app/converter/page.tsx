@@ -90,7 +90,7 @@ export default function Page() {
 
       {/* SEO Content */}
       <section className="px-4 py-16 sm:py-20">
-        <div className="max-w-4xl mx-auto bg-zinc-950/95 border border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
+        <div className="max-w-4xl mx-auto bg-slate-800 border border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
           <h2 className="text-3xl sm:text-4xl font-black mb-6 text-white leading-tight">
             Convert Foto Online Aman & Cepat
           </h2>
