@@ -66,7 +66,7 @@ export default function ChatBot() {
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-cyan-500/20 blur-[180px]" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/10 blur-[150px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-400/10 blur-[150px]" />
 
         <div
           className="
