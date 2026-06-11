@@ -80,8 +80,9 @@ export default function ChatBot() {
 
       <div className="relative z-10 flex flex-col h-screen">
         {/* Header */}
-        <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/30 border-b border-white/10 mb-10">
-          <div className="max-w-5xl mx-auto h-16 px-6 flex items-center justify-between">
+        <header className="sticky mb-10 top-0 z-50 backdrop-blur-xl bg-black/30 border-b border-white/10 pt-[env(safe-area-inset-top)]">
+          <div className="max-w-5xl mx-auto h-16 md:h-20 px-6 flex items-center justify-between">
+            {" "}
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl overflow-hidden border border-cyan-500/30">
                 <Image
@@ -120,17 +121,20 @@ export default function ChatBot() {
             {chat.length === 0 && !loading && (
               <div className="h-[70vh] flex flex-col justify-center items-center text-center md:mt-2 mt-10">
                 <h2 className="text-2xl md:text-5xl font-bold">
-                  Selamat Datang
+                  Halo, saya Mio!
                 </h2>
 
                 <p className="mt-4 text-slate-400 max-w-xl text-sm md:text-lg">
-                  Kami menjual jasa pembuatan website, alat otomatisasi, dan
-                  project digital lainnya dengan teknologi terbaru. anda bisa
-                  mengembangkan ide alat digital dan kami yang memprosesnya.
+                  Saya hadir di sini untuk membantumu menjawab pertanyaan seputar proyek dan layanan di ARTUP STUDIO. Yuk, kita mulai obrolanmu.
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-3 mt-10 w-full max-w-2xl">
-                  {["Jasa", "tentang artup?","siapa kamu?", "penting kontak developer!"].map((item) => (
+                  {[
+                    "Jasa",
+                    "tentang artup?",
+                    "siapa kamu?",
+                    "penting kontak developer!",
+                  ].map((item) => (
                     <button
                       key={item}
                       onClick={() => setInput(item)}
@@ -264,7 +268,7 @@ rounded-2xl
                 rows={1}
                 value={input}
                 disabled={loading}
-                placeholder="Tanyakan apa saja..."
+                placeholder="ketik pesan..."
                 onChange={(e) => setInput(e.target.value)}
                 onInput={(e) => {
                   e.currentTarget.style.height = "auto";
@@ -277,7 +281,7 @@ rounded-2xl
                     sendMessage();
                   }
                 }}
-               className="
+                className="
 flex-1
 resize-none
 bg-transparent
