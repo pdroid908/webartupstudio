@@ -66,7 +66,7 @@ export default function ChatBot() {
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-cyan-500/20 blur-[180px]" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-400/10 blur-[150px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/10 blur-[150px]" />
 
         <div
           className="
@@ -80,9 +80,8 @@ export default function ChatBot() {
 
       <div className="relative z-10 flex flex-col h-screen">
         {/* Header */}
-        <header className="sticky mb-10 top-0 z-50 backdrop-blur-xl bg-black/30 border-b border-white/10 pt-[env(safe-area-inset-top)]">
-          <div className="max-w-5xl mx-auto h-16 md:h-20 px-6 flex items-center justify-between">
-            {" "}
+        <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-black/30 border-b border-white/10">
+          <div className="max-w-5xl mx-auto h-16 px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl overflow-hidden border border-cyan-500/30">
                 <Image
@@ -110,22 +109,23 @@ export default function ChatBot() {
         {/* Chat Area */}
         <main
           className="
-        flex-1
-        overflow-y-auto
-        scrollbar-thin
-        scrollbar-thumb-white/10
-      "
+    flex-1
+    overflow-y-auto
+    scrollbar-thin
+    scrollbar-thumb-white/10
+    pt-28
+  "
         >
           <div className="max-w-4xl mx-auto px-4 py-8">
             {/* Welcome */}
             {chat.length === 0 && !loading && (
-              <div className="h-[70vh] flex flex-col justify-center items-center text-center md:mt-2 mt-10">
+              <div className="flex flex-col justify-center items-center text-center md:mt-40 mt-30">
                 <h2 className="text-2xl md:text-5xl font-bold">
-                  Halo, saya Mio!
+                  Selamat Datang
                 </h2>
 
                 <p className="mt-4 text-slate-400 max-w-xl text-sm md:text-lg">
-                  Saya hadir di sini untuk membantumu menjawab pertanyaan seputar proyek dan layanan di ARTUP STUDIO. Yuk, kita mulai obrolanmu.
+                  Aku Mio, asisten virtual di Artup Studio. Yuk ngobrol denganku, silakan tanya apa saja.
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-3 mt-10 w-full max-w-2xl">
@@ -268,7 +268,7 @@ rounded-2xl
                 rows={1}
                 value={input}
                 disabled={loading}
-                placeholder="ketik pesan..."
+                placeholder="Tanyakan apa saja..."
                 onChange={(e) => setInput(e.target.value)}
                 onInput={(e) => {
                   e.currentTarget.style.height = "auto";
