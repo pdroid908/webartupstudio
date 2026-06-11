@@ -21,7 +21,7 @@ const nextConfig = {
               "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://challenges.cloudflare.com; " +
               "child-src 'self'; " +
               "font-src 'self' data: https://fonts.gstatic.com; " +
-              "connect-src 'self' https://backendconverter-production.up.railway.app https://safebrowsing.googleapis.com https://www.virustotal.com https://challenges.cloudflare.com https://cloudflareinsights.com; " +
+              "connect-src 'self' https://pasdaoiji-chatbot.hf.space/chat https://backendconverter-production.up.railway.app https://safebrowsing.googleapis.com https://www.virustotal.com https://challenges.cloudflare.com https://cloudflareinsights.com; " +
               "upgrade-insecure-requests;",
           },
           {
