@@ -21,7 +21,7 @@ const MY_GAMES: BaseItem[] = [
     id: "pixel-universe",
     title: "Analisis Big Data",
     tech: "Android",
-    link: "https://drive.google.com/file/d/1297vtnwaJKCdRf2u6ftLAb-Tjy2CtoqY/view?usp=sharing",
+    route: "/data",
   },
   {
     id: "block-fight",
