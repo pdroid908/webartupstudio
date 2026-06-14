@@ -86,12 +86,13 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
       {/* --- BACKGROUND --- */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Background */}
+      <div className="fixed inset-0 -z-0 overflow-hidden">
+        {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('/bgrun.png')",
+            transform: "translateZ(0)", // bantu stabil di mobile
           }}
         />
 
