@@ -87,17 +87,17 @@ export default function Home() {
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
       {/* --- BACKGROUND --- */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-  {/* Background */}
-  <div
-    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-    style={{
-      backgroundImage: "url('/bgrun.png')",
-    }}
-  />
+        {/* Background */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/bgrun.png')",
+          }}
+        />
 
-  {/* Overlay */}
-  <div className="absolute inset-0 bg-gradient-to-b from-slate-500/50 via-slate-950/20 to-slate-950/70" />
-</div>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-500/50 via-slate-950/20 to-slate-950/70" />
+      </div>
 
       {/* --- SIDEBAR --- */}
       <aside className="pt-10 w-full md:w-64 md:h-screen md:fixed md:top-0 md:left-0 border-b md:border-r border-slate-900 p-4 md:p-6 bg-slate-950/90 backdrop-blur-xl z-30 flex flex-col md:overflow-y-auto scrollbar-hide">
@@ -126,8 +126,12 @@ export default function Home() {
             <nav className="flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-hide mb-6 w-full">
               {/* Tombol Web Games */}
               <button
-                onClick={() => handleTabChange("web")}
-                // Tambahkan transition-all dan duration agar pergerakannya tidak patah
+                onClick={() => {
+                  // 1. Berikan jeda agar animasi active:scale-90 terlihat
+                  setTimeout(() => {
+                    handleTabChange("web");
+                  }, 300); // 150ms sudah cukup terasa sebagai "umpan balik" tanpa terasa lambat
+                }} // Tambahkan transition-all dan duration agar pergerakannya tidak patah
                 className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all duration-300 ease-out active:scale-90"
               >
                 {/* Border animasi (tetap ada saat tidak aktif) */}
@@ -149,7 +153,12 @@ export default function Home() {
 
               {/* --- TOMBOL APP GAMES --- */}
               <button
-                onClick={() => handleTabChange("games")}
+                onClick={() => {
+                  // Berikan delay agar animasi scale-95 sempat terlihat
+                  setTimeout(() => {
+                    handleTabChange("games");
+                  }, 300);
+                }}
                 className="flex-shrink-0 group relative h-12 w-[140px] md:w-full flex items-center justify-center p-[2px] rounded-2xl overflow-hidden transition-all active:scale-95"
               >
                 {activeTab !== "games" && (

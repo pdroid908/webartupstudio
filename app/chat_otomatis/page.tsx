@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-interface ChatMessage {
+type ChatMessage = {
   user: string;
-  ai: string;
-}
+  ai?: string;
+  loading?: boolean;
+};
 
 export default function ChatBot() {
   const [input, setInput] = useState("");
@@ -21,45 +22,63 @@ export default function ChatBot() {
   }, [chat, loading]);
 
   const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+  if (!input.trim() || loading) return;
 
-    const userMessage = input;
+  const userMessage = input;
+  setInput("");
+  setLoading(true);
 
-    setInput("");
-    setLoading(true);
+  // 1. langsung tampilkan user + placeholder AI
+  setChat((prev) => [
+    ...prev,
+    {
+      user: userMessage,
+      ai: "",
+      loading: true,
+    },
+  ]);
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: userMessage,
-        }),
-      });
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: userMessage,
+      }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      setChat((prev) => [
-        ...prev,
-        {
-          user: userMessage,
-          ai: data.reply || "Tidak ada respons.",
-        },
-      ]);
-    } catch (err) {
-      setChat((prev) => [
-        ...prev,
-        {
-          user: userMessage,
-          ai: "Terjadi kesalahan saat menghubungi AI.",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // 2. update AI message terakhir
+    setChat((prev) =>
+      prev.map((msg, i) =>
+        i === prev.length - 1
+          ? {
+              ...msg,
+              ai: data.reply || "Tidak ada respons.",
+              loading: false,
+            }
+          : msg
+      )
+    );
+  } catch (err) {
+    setChat((prev) =>
+      prev.map((msg, i) =>
+        i === prev.length - 1
+          ? {
+              ...msg,
+              ai: "Terjadi kesalahan saat menghubungi Asisten Virtual.",
+              loading: false,
+            }
+          : msg
+      )
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020617] text-white">
@@ -212,35 +231,23 @@ rounded-2xl
   shadow-black/20
 "
                     >
-                      {msg.ai}
+                      {
+  msg.loading ? (
+    <div className="flex items-center gap-1">
+      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" />
+      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-150" />
+      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-300" />
+    </div>
+  ) : (
+    msg.ai
+  )
+}
                     </div>
                   </div>
                 </div>
               ))}
 
-              {/* Loading */}
-              {loading && (
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600" />
 
-                  <div
-                    className="
-                  px-5
-                  py-4
-                  rounded-3xl
-                  bg-white/5
-                  border
-                  border-white/10
-                "
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-150" />
-                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-300" />
-                    </div>
-                  </div>
-                </div>
-              )}
 
               <div ref={chatEndRef} />
             </div>
