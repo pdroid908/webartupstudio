@@ -63,30 +63,28 @@ interface SentimentResult {
    MAIN PAGE
 ========================= */
 export default function BigDataPage() {
-  const [mode, setMode] = useState<"news" | "youtube">("news");
+  const [mode, setMode] = useState<"news" | "Media Sosial">("news");
   const [input, setInput] = useState("");
   const [result, setResult] = useState<SentimentResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dominant =
-  result?.dominant_sentiment ||
-  (result
-    ? (() => {
-        const dist = result.sentiment_distribution;
-        if (!dist) return "Unknown";
+    result?.dominant_sentiment ||
+    (result
+      ? (() => {
+          const dist = result.sentiment_distribution;
+          if (!dist) return "Unknown";
 
-        const entries = Object.entries(dist) as [
-          "Positive" | "Negative" | "Neutral",
-          number
-        ][];
+          const entries = Object.entries(dist) as [
+            "Positive" | "Negative" | "Neutral",
+            number,
+          ][];
 
-        const max = entries.reduce((a, b) =>
-          b[1] > a[1] ? b : a
-        );
+          const max = entries.reduce((a, b) => (b[1] > a[1] ? b : a));
 
-        return max[0];
-      })()
-    : "Unknown");
+          return max[0];
+        })()
+      : "Unknown");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,12 +178,12 @@ export default function BigDataPage() {
           </button>
 
           <button
-            onClick={() => setMode("youtube")}
+            onClick={() => setMode("Media Sosial")}
             style={{
               padding: "10px 18px",
               borderRadius: 10,
               border: "none",
-              background: mode === "youtube" ? "#ef4444" : "#1f2937",
+              background: mode === "Media Sosial" ? "#ef4444" : "#1f2937",
               color: "white",
               cursor: "pointer",
             }}
@@ -210,158 +208,179 @@ export default function BigDataPage() {
               marginBottom: 10,
             }}
           />
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: 14,
-              borderRadius: 12,
-              background: "#10b981",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            {loading ? "Loading..." : "Analisis Data"}
-          </button>
+<button
+  type="submit"
+  disabled={loading}
+  style={{
+    width: "100%",
+    padding: 14,
+    borderRadius: 12,
+    // Jika loading, warna jadi lebih gelap (grayish), kalau tidak tetap hijau
+    background: loading ? "#374151" : "#10b981",
+    border: "none",
+    cursor: loading ? "not-allowed" : "pointer",
+    // Tambahkan flex agar spinner dan teks sejajar
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    color: "white",
+    fontWeight: "bold",
+    transition: "background 0.3s ease",
+  }}
+>
+  {loading ? (
+    <>
+      <div className="spinner"></div>
+      <span>Menganalisis ratusan data harap tunggu...</span>
+    </>
+  ) : (
+    "Analisis Data"
+  )}
+</button>
         </form>
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {/* RESULT */}
         {result && (
-  <>
-    {/* QUERY */}
-    <div style={cardStyle}>
-      <h2>🔍 {result.query}</h2>
-      <p style={{ color: "#9ca3af" }}>
-        Source: {result.source ?? mode}
-      </p>
+          <>
+            {/* QUERY */}
+            <div style={cardStyle}>
+              <h2>🔍 {result.query}</h2>
+              <p style={{ color: "#9ca3af" }}>
+                Source: {result.source ?? mode}
+              </p>
+            </div>
+
+            {/* PIE + PERCENT BAR */}
+            <div
+  style={{
+    display: "grid",
+    // Menggunakan auto-fit agar otomatis pindah baris jika layar sempit
+    // minmax(300px, 1fr) artinya: tiap kartu minimal 300px, jika layar lebih kecil, 
+    // dia akan otomatis mengambil sisa ruang (1fr) dan menumpuk ke bawah.
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: 20,
+    marginTop: 20,
+  }}
+>
+  {/* PIE CHART */}
+  <div style={cardStyle}>
+    <h3>Sentiment Chart</h3>
+    <div style={{ width: "100%", height: 300, display: "flex", justifyContent: "center" }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            outerRadius={80}
+            label // Label akan membantu menjaga chart tetap informatif
+          >
+            {pieData.map((_, i) => (
+              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
     </div>
+  </div>
 
-    {/* PIE + PERCENT BAR */}
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 20,
-        marginTop: 20,
-      }}
-    >
-      {/* PIE CHART */}
-      <div style={cardStyle}>
-        <h3>🥧 Sentiment Chart</h3>
-
-        <div style={{ width: "100%", height: 250 }}>
-          <ResponsiveContainer>
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                outerRadius={90}
-                label
-              >
-                {pieData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* BAR */}
-      <div style={cardStyle}>
-        <h3>📈 Percentage</h3>
-
-        <SentimentBar
-          label="Positive"
-          value={result.sentiment_percentage.Positive}
-          color="#22c55e"
-        />
-        <SentimentBar
-          label="Neutral"
-          value={result.sentiment_percentage.Neutral}
-          color="#3b82f6"
-        />
-        <SentimentBar
-          label="Negative"
-          value={result.sentiment_percentage.Negative}
-          color="#ef4444"
-        />
-      </div>
+  {/* BAR */}
+  <div style={cardStyle}>
+    <h3>📈 Percentage</h3>
+    <div style={{ marginTop: 10 }}>
+      <SentimentBar
+        label="Positive"
+        value={result.sentiment_percentage.Positive}
+        color="#22c55e"
+      />
+      <SentimentBar
+        label="Neutral"
+        value={result.sentiment_percentage.Neutral}
+        color="#3b82f6"
+      />
+      <SentimentBar
+        label="Negative"
+        value={result.sentiment_percentage.Negative}
+        color="#ef4444"
+      />
     </div>
+  </div>
+</div>
 
-    {/* 🔥 TOP WORDS (TAMBAHAN BARU) */}
-    {result.top_words && result.top_words.length > 0 && (
-      <div style={cardStyle}>
-        <h3>🔥 Top Words</h3>
+            {/* 🔥 TOP WORDS (TAMBAHAN BARU) */}
+            {result.top_words && result.top_words.length > 0 && (
+              <div style={cardStyle}>
+                <h3>🔥 Top Words</h3>
 
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 10,
-            marginTop: 10,
-          }}
-        >
-          {result.top_words.map((w, i) => (
-            <span
-              key={i}
-              style={{
-                background: "#1f2937",
-                padding: "8px 12px",
-                borderRadius: 999,
-                border: "1px solid #374151",
-                fontSize: 13,
-              }}
-            >
-              {w.word} ({w.count ?? w.score ?? 0})
-            </span>
-          ))}
-        </div>
-      </div>
-    )}
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  {result.top_words.map((w, i) => (
+                    <span
+                      key={i}
+                      style={{
+                        background: "#1f2937",
+                        padding: "8px 12px",
+                        borderRadius: 999,
+                        border: "1px solid #374151",
+                        fontSize: 13,
+                      }}
+                    >
+                      {w.word} ({w.count ?? w.score ?? 0})
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
-    {/* METADATA (TETAP) */}
-    <div style={gridStyle}>
-      {metadata?.videos !== undefined && (
-        <StatCard title="Videos" value={metadata.videos} />
-      )}
-      {metadata?.articles !== undefined && (
-        <StatCard title="Articles" value={metadata.articles} />
-      )}
-      {metadata?.analyzed !== undefined && (
-        <StatCard title="Analyzed" value={metadata.analyzed} />
-      )}
-    </div>
+            {/* METADATA (TETAP) */}
+            <div style={gridStyle}>
+              {metadata?.comments_analyzed !== undefined && (
+                <StatCard
+                  title="Comments Processed"
+                  value={`${metadata.comments_analyzed} / ${metadata.comments_raw}`}
+                />
+              )}
+              {metadata?.articles !== undefined && (
+                <StatCard title="Articles" value={metadata.articles} />
+              )}
+              {metadata?.analyzed !== undefined && (
+                <StatCard title="Analyzed" value={metadata.analyzed} />
+              )}
+            </div>
 
-    {/* INSIGHT */}
-    <div style={cardStyle}>
-      <h3>🧠 Insight</h3>
-      <p>
-        Dominant: <b>{dominant}</b>
-      </p>
-      <p>Avg Score: {avgScore.toFixed(4)}</p>
-    </div>
+            {/* INSIGHT */}
+            <div style={cardStyle}>
+              <h3>🧠 Insight</h3>
+              <p>
+                Dominant: <b>{dominant}</b>
+              </p>
+              <p>Avg Score: {avgScore.toFixed(4)}</p>
+            </div>
 
-    {/* SAMPLE */}
-    <div style={cardStyle}>
-      <h3>📰 Sample Data</h3>
+            {/* SAMPLE */}
+            <div style={cardStyle}>
+              <h3>📰 Sample Data</h3>
 
-      {samples.slice(0, 10).map((item, i) => (
-        <div key={i} style={sampleBox}>
-          <p>{item.text}</p>
-          <b>
-            {item.label} ({(item.score * 100).toFixed(1)}%)
-          </b>
-        </div>
-      ))}
-    </div>
-  </>
-)}
+              {samples.slice(0, 10).map((item, i) => (
+                <div key={i} style={sampleBox}>
+                  <p>{item.text}</p>
+                  <b>
+                    {item.label} ({(item.score * 100).toFixed(1)}%)
+                  </b>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -86,15 +86,16 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-white font-sans overflow-x-hidden relative">
       {/* --- BACKGROUND --- */}
-      <div className="fixed inset-0 -z-0 overflow-hidden">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/bgrun.png')",
-            transform: "translateZ(0)", // bantu stabil di mobile
-          }}
-        />
+      <div className="fixed inset-0 -z-0 h-svh w-full overflow-hidden">
+  {/* Background Image */}
+  <div
+    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+    style={{
+      backgroundImage: "url('/bgrun.png')",
+      // Gunakan will-change untuk performa rendering yang lebih stabil
+      willChange: "transform",
+    }}
+  />
 
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-500/50 via-slate-950/20 to-slate-950/70" />
