@@ -21,17 +21,36 @@ body {
 
 div[id^="at-"] { z-index: 9999 !important; }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
 }
 
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: #10b981; /* Warna hijau senada dengan tombol Anda */
+.loader-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.loader-dots span {
+  width: 6px;
+  height: 6px;
+  background: #8b5cf6;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
-  display: inline-block;
+  animation: pulse 0.6s infinite ease-in-out;
+}
+
+/* biar animasi beda timing (lebih hidup) */
+.loader-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loader-dots span:nth-child(3) {
+  animation-delay: 0.4s;
 }

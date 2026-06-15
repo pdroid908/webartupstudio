@@ -218,13 +218,24 @@ export default function BigDataPage() {
       }}
     >
       <div style={{ maxWidth: 1200, margin: "auto" }}>
-        {/* TITLE */}
-        <h1 style={{ fontSize: "2rem", marginBottom: 20 }}>
-          📊 Analisis Data Real Time
-        </h1>
+  {/* TITLE */}
+  <h1 style={{ fontSize: "2rem", marginBottom: 10 }}>
+    📊 Analisis Data Real Time
+  </h1>
 
-        {/* MODE */}
-        <div className="flex flex-wrap gap-3 mb-5">
+  {/* WARNING / NOTE */}
+  <p style={{ 
+    fontSize: "0.95rem",
+    color: "#666",
+    marginBottom: 20,
+    lineHeight: 1.5
+  }}>
+    ⚠️ Data ditampilkan secara real-time dari sumber otomatis. 
+    Pastikan untuk selalu mengecek kembali jika ada ketidaksesuaian atau error pada data sebelum digunakan sebagai keputusan.
+  </p>
+
+  {/* MODE */}
+  <div className="flex flex-wrap gap-3 mb-5">
   <button
     onClick={() => {
       setMode("trending");
@@ -297,8 +308,14 @@ export default function BigDataPage() {
                 color: "white",
                 fontWeight: "bold",
               }}
-            >
-              {loading ? "Menganalisis..." : "Analisis Data"}
+            >{loading && (
+    <div className="loader-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  )}
+              {loading ? "Menganalisis ratusan data tunngu..." : "Analisis Data"}
             </button>
           </form>
         )}
