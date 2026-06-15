@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 /* =========================
@@ -58,16 +58,74 @@ interface SentimentResult {
   sentiment_details_sample?: SentimentItem[];
   ["20 sample"]?: SentimentItem[];
 }
+interface TrendingItem {
+  title: string;
+  link: string;
+  traffic_val: number;
+  traffic: string;
+}
 
 /* =========================
    MAIN PAGE
 ========================= */
 export default function BigDataPage() {
-  const [mode, setMode] = useState<"news" | "Media Sosial">("news");
+  const [mode, setMode] = useState<"news" | "social" | "trending">("trending");
   const [input, setInput] = useState("");
   const [result, setResult] = useState<SentimentResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [trendingData, setTrendingData] = useState<TrendingItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // 2. FUNGSI FETCH (Gunakan useCallback agar tidak re-render/re-create setiap saat)
+  const fetchTrending = useCallback(async () => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    const res = await fetch("/api/trend_data"); // 🔥 pakai 1 endpoint saja
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Gagal");
+
+    setTrendingData(data.trends || []);
+  } catch (err) {
+    setError("Gagal memuat trending");
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
+  useEffect(() => {
+  if (mode !== "trending") return;
+
+  let ignore = false;
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/trend_data");
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Gagal");
+
+      if (!ignore) {
+        setTrendingData(data.trends || []);
+      }
+    } catch (err) {
+      if (!ignore) setError("Gagal memuat trending");
+    } finally {
+      if (!ignore) setLoading(false);
+    }
+  };
+
+  load();
+
+  return () => {
+    ignore = true;
+  };
+}, [mode]);
   const dominant =
     result?.dominant_sentiment ||
     (result
@@ -93,8 +151,12 @@ export default function BigDataPage() {
     setError(null);
     setResult(null);
 
-    const endpoint = mode === "news" ? "/api/news_data" : "/api/yt_data";
-
+    const endpoint =
+      mode === "trending"
+        ? "/api/trend_data"
+        : mode === "news"
+          ? "/api/news_data"
+          : "/api/yt_data";
     try {
       const res = await fetch(endpoint, {
         method: "POST",
@@ -162,83 +224,131 @@ export default function BigDataPage() {
         </h1>
 
         {/* MODE */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-          <button
-            onClick={() => setMode("news")}
-            style={{
-              padding: "10px 18px",
-              borderRadius: 10,
-              border: "none",
-              background: mode === "news" ? "#3b82f6" : "#1f2937",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Artikel Berita
-          </button>
+        <div className="flex flex-wrap gap-3 mb-5">
+  <button
+    onClick={() => {
+      setMode("trending");
+      fetchTrending();
+    }}
+    className={`px-4 py-2 rounded-xl transition-all duration-200 font-medium
+      ${mode === "trending"
+        ? "bg-violet-500 text-white shadow-md scale-105"
+        : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+      }`}
+  >
+    🔥 Trending 3 jam update
+  </button>
 
-          <button
-            onClick={() => setMode("Media Sosial")}
-            style={{
-              padding: "10px 18px",
-              borderRadius: 10,
-              border: "none",
-              background: mode === "Media Sosial" ? "#ef4444" : "#1f2937",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Tanggapan Publik
-          </button>
-        </div>
+  <button
+    onClick={() => setMode("news")}
+    className={`px-4 py-2 rounded-xl transition-all duration-200 font-medium
+      ${mode === "news"
+        ? "bg-blue-500 text-white shadow-md scale-105"
+        : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+      }`}
+  >
+    📰 Artikel Berita
+  </button>
+
+  <button
+    onClick={() => setMode("social")}
+    className={`px-4 py-2 rounded-xl transition-all duration-200 font-medium
+      ${mode === "social"
+        ? "bg-red-500 text-white shadow-md scale-105"
+        : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+      }`}
+  >
+    💬 Tanggapan Publik
+  </button>
+</div>
 
         {/* INPUT */}
-        <form onSubmit={handleSubmit}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Masukkan keyword..."
-            style={{
-              width: "100%",
-              padding: 14,
-              borderRadius: 12,
-              background: "#111827",
-              border: "1px solid #374151",
-              color: "white",
-              marginBottom: 10,
-            }}
-          />
-<button
-  type="submit"
-  disabled={loading}
-  style={{
-    width: "100%",
-    padding: 14,
-    borderRadius: 12,
-    // Jika loading, warna jadi lebih gelap (grayish), kalau tidak tetap hijau
-    background: loading ? "#374151" : "#10b981",
-    border: "none",
-    cursor: loading ? "not-allowed" : "pointer",
-    // Tambahkan flex agar spinner dan teks sejajar
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    color: "white",
-    fontWeight: "bold",
-    transition: "background 0.3s ease",
-  }}
->
-  {loading ? (
-    <>
-      <div className="spinner"></div>
-      <span>Menganalisis ratusan data harap tunggu...</span>
-    </>
-  ) : (
-    "Analisis Data"
-  )}
-</button>
-        </form>
+        {mode !== "trending" && (
+          <form onSubmit={handleSubmit}>
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Masukkan keyword..."
+              style={{
+                width: "100%",
+                padding: 14,
+                borderRadius: 12,
+                background: "#111827",
+                border: "1px solid #374151",
+                color: "white",
+                marginBottom: 10,
+              }}
+            />
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: "100%",
+                padding: 14,
+                borderRadius: 12,
+                background: loading ? "#374151" : "#10b981",
+                border: "none",
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                color: "white",
+                fontWeight: "bold",
+              }}
+            >
+              {loading ? "Menganalisis..." : "Analisis Data"}
+            </button>
+          </form>
+        )}
+
+        {mode === "trending" && (
+          <div style={cardStyle}>
+            <h3>🌍 Top Pencarian Google (Indonesia)</h3>
+            {loading ? (
+              <p>Memuat data...</p>
+            ) : trendingData.length > 0 ? (
+              <div style={{ overflowX: "auto" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: 15,
+                  }}
+                >
+                  <thead>
+                    <tr style={{ color: "#9ca3af", textAlign: "left" }}>
+                      <th style={{ padding: 10 }}>Rank</th>
+                      <th style={{ padding: 10 }}>Topic</th>
+                      <th style={{ padding: 10 }}>Volume</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trendingData.map((item, i) => (
+                      <tr key={i} style={{ borderBottom: "1px solid #1f2937" }}>
+                        <td style={{ padding: 10 }}>{i + 1}</td>
+                        <td style={{ padding: 10 }}>
+                          <a
+                            href={item.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: "#60a5fa" }}
+                          >
+                            {item.title}
+                          </a>
+                        </td>
+                        <td style={{ padding: 10 }}>{item.traffic}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p>Tidak ada data.</p>
+            )}
+          </div>
+        )}
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -255,60 +365,67 @@ export default function BigDataPage() {
 
             {/* PIE + PERCENT BAR */}
             <div
-  style={{
-    display: "grid",
-    // Menggunakan auto-fit agar otomatis pindah baris jika layar sempit
-    // minmax(300px, 1fr) artinya: tiap kartu minimal 300px, jika layar lebih kecil, 
-    // dia akan otomatis mengambil sisa ruang (1fr) dan menumpuk ke bawah.
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: 20,
-    marginTop: 20,
-  }}
->
-  {/* PIE CHART */}
-  <div style={cardStyle}>
-    <h3>Sentiment Chart</h3>
-    <div style={{ width: "100%", height: 300, display: "flex", justifyContent: "center" }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={pieData}
-            dataKey="value"
-            outerRadius={80}
-            label // Label akan membantu menjaga chart tetap informatif
-          >
-            {pieData.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
-  </div>
+              style={{
+                display: "grid",
+                // Menggunakan auto-fit agar otomatis pindah baris jika layar sempit
+                // minmax(300px, 1fr) artinya: tiap kartu minimal 300px, jika layar lebih kecil,
+                // dia akan otomatis mengambil sisa ruang (1fr) dan menumpuk ke bawah.
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                gap: 20,
+                marginTop: 20,
+              }}
+            >
+              {/* PIE CHART */}
+              <div style={cardStyle}>
+                <h3>Sentiment Chart</h3>
+                <div
+                  style={{
+                    width: "100%",
+                    height: 300,
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        outerRadius={80}
+                        label // Label akan membantu menjaga chart tetap informatif
+                      >
+                        {pieData.map((_, i) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
 
-  {/* BAR */}
-  <div style={cardStyle}>
-    <h3>📈 Percentage</h3>
-    <div style={{ marginTop: 10 }}>
-      <SentimentBar
-        label="Positive"
-        value={result.sentiment_percentage.Positive}
-        color="#22c55e"
-      />
-      <SentimentBar
-        label="Neutral"
-        value={result.sentiment_percentage.Neutral}
-        color="#3b82f6"
-      />
-      <SentimentBar
-        label="Negative"
-        value={result.sentiment_percentage.Negative}
-        color="#ef4444"
-      />
-    </div>
-  </div>
-</div>
+              {/* BAR */}
+              <div style={cardStyle}>
+                <h3>📈 Percentage</h3>
+                <div style={{ marginTop: 10 }}>
+                  <SentimentBar
+                    label="Positive"
+                    value={result.sentiment_percentage.Positive}
+                    color="#22c55e"
+                  />
+                  <SentimentBar
+                    label="Neutral"
+                    value={result.sentiment_percentage.Neutral}
+                    color="#3b82f6"
+                  />
+                  <SentimentBar
+                    label="Negative"
+                    value={result.sentiment_percentage.Negative}
+                    color="#ef4444"
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* 🔥 TOP WORDS (TAMBAHAN BARU) */}
             {result.top_words && result.top_words.length > 0 && (
@@ -370,7 +487,7 @@ export default function BigDataPage() {
             <div style={cardStyle}>
               <h3>📰 Sample Data</h3>
 
-              {samples.slice(0, 10).map((item, i) => (
+              {samples.slice(0, 20).map((item, i) => (
                 <div key={i} style={sampleBox}>
                   <p>{item.text}</p>
                   <b>
