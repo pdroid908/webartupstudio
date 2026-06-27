@@ -22,12 +22,6 @@ const DONATE_METHODS: DonateMethod[] = [
     type: "link",
     value: "https://paypal.me/put98",
   },
-  {
-    id: "BANK",
-    label: "Donasi palestina melalui abu zyad",
-    type: "copy",
-    value: "BANK muamalat: 3510-0618-57",
-  },
 ];
 
 export default function DonateBox() {
